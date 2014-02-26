@@ -112,20 +112,32 @@ execute <- function(request) {
   
   err = tryCatch({
     expr = parse(text=code)
+    output_conn = textConnection("output", "w")
+    sink(output_conn)
     result = eval(expr, envir=userenv)
+    list(ename=NULL)  # Result of expression: error status
   }, error = function(e) {
     return(list(ename="ERROR", evalue=toString(e), traceback=list(toString(e))))
+  }, finally = {
+    sink()
+    close(output_conn)
   })
 
   if (!silent) {
+      print(err)
       if (!is.null(err$ename)) {
         send_response("pyerr", request, iopub_socket,
                       c(err, list(execution_count=execution_count)))
       } else if (result$visible) {
         data = list()
-        data['text/plain'] = toString(result$value)
+        data['text/plain'] = capture.output(print(result$value))
         send_response("pyout", request, iopub_socket,
                   list(data=data, metadata=list(), execution_count=execution_count))
+      }
+
+      if (length(output) > 0) {
+        send_response("stream", request, iopub_socket,
+                      list(name="stdout", data=output))
       }
   }
   
