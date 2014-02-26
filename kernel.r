@@ -124,7 +124,6 @@ execute <- function(request) {
   })
 
   if (!silent) {
-      print(err)
       if (!is.null(err$ename)) {
         send_response("pyerr", request, iopub_socket,
                       c(err, list(execution_count=execution_count)))
