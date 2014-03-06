@@ -1,8 +1,18 @@
-Package: IR_kernel
-Title: 
-Description: 
+Package: ipyr
+Title: Native R kernel for the IPython notebook
+Description: This package provides a native interface to the R kernel from the
+    IPython notebook
 Version: 0.1
-Authors@R: 'Karthik Ram <karthik.ram@gmail.com> [aut, cre]'
-Depends: R (>= 3.0.2)
-License: CC0
+Authors@R: c(person("Thomas", "Kluver", role = c("aut", "cre"),
+    email = "takowl@gmail.com"),
+    person("Karthik", "Ram", role = "aut",
+    email = "karthik.ram@gmail.com"))
+Depends:
+    R (>= 3.0.2)
+License: MIT + License
 LazyData: true
+Imports:
+    rzmq,
+    rjson,
+    uuid,
+    digest

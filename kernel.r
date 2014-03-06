@@ -1,9 +1,10 @@
+# To start this, use a command like:
+# ipython qtconsole --KernelManager.kernel_cmd="['Rscript', '/home/takluyver/Code/ir_kernel/kernel.r', '{connection_file}']"
+
 library(rzmq)
 library(rjson)
 library(uuid)
 library(digest)  # for HMAC
-
-
 
 hb_reply <- function() {
   data = receive.socket(hb_socket, unserialize=FALSE)
@@ -81,13 +82,14 @@ send_response <- function(msg_type, parent_msg, socket, content) {
 }
 
 handle_shell <- function() {
-  print("Shell msg")
   parts = recv_multipart(shell_socket)
   msg = wire_to_msg(parts)
   if (msg$header$msg_type == "execute_request") {
     execute(msg)
   } else if (msg$header$msg_type == "kernel_info_request") {
     kernel_info(msg)
+  } else if (msg$header$msg_type == "history_request") {
+    history(msg)
   } else {
     print(c("Got unhandled msg_type:", msg$header$msg_type))
   }
@@ -101,27 +103,56 @@ execute <- function(request) {
   send_response("pyin", request, iopub_socket,
                 list(code=request$code, execution_count=execution_count))
 
-  code = sprintf("withVisible({%s})", request$content$code)
-  print(code)
-  expr = parse(text=code)
-  result = eval(expr, envir=userenv)
-  print(userenv)
-  print(result)
+  silent = request$content$silent
+  if (silent) {
+    code = request$contents$code
+  } else {
+    code = sprintf("withVisible({%s})", request$content$code)
+  }
   
-  if (result$visible) {
-    data = list()
-    data['text/plain'] = toString(result$value)
-    send_response("pyout", request, iopub_socket,
-              list(data=data, metadata=list(), execution_count=execution_count))
+  err = tryCatch({
+    expr = parse(text=code)
+    output_conn = textConnection("output", "w")
+    sink(output_conn)
+    result = eval(expr, envir=userenv)
+    list(ename=NULL)  # Result of expression: error status
+  }, error = function(e) {
+    return(list(ename="ERROR", evalue=toString(e), traceback=list(toString(e))))
+  }, finally = {
+    sink()
+    close(output_conn)
+  })
+
+  if (!silent) {
+      if (!is.null(err$ename)) {
+        send_response("pyerr", request, iopub_socket,
+                      c(err, list(execution_count=execution_count)))
+      } else if (result$visible) {
+        data = list()
+        data['text/plain'] = capture.output(print(result$value))
+        send_response("pyout", request, iopub_socket,
+                  list(data=data, metadata=list(), execution_count=execution_count))
+      }
+
+      if (length(output) > 0) {
+        send_response("stream", request, iopub_socket,
+                      list(name="stdout", data=output))
+      }
   }
   
   send_response("status", request, iopub_socket, list(execution_state="idle"))
   
-  reply_content = list(status='ok', execution_count=execution_count,
-                payload=list(), user_variables=list(), user_expressions=list())
+  if (!is.null(err$ename)) {
+    reply_content = c(err, list(status='error', execution_count=execution_count))
+  } else {
+    reply_content = list(status='ok', execution_count=execution_count,
+                  payload=list(), user_variables=list(), user_expressions=list())
+  }
   send_response("execute_reply", request, shell_socket, reply_content)
   
-  assign("execution_count", execution_count+1, envir=.GlobalEnv)
+  if (!silent) {
+    assign("execution_count", execution_count+1, envir=.GlobalEnv)
+  }
 }
 
 kernel_info <- function(request) {
@@ -129,10 +160,30 @@ kernel_info <- function(request) {
                 list(protocol_version=c(4, 0), language="R"))
 }
 
+history <- function(request) {
+  send_response("history_reply", request, shell_socket, list(history=list()))
+}
+
+handle_control <- function() {
+  parts = recv_multipart(control_socket)
+  msg = wire_to_msg(parts)
+  if (msg$header$msg_type == "shutdown_request") {
+    shutdown(msg)
+  } else {
+    print(c("Unhandled control message, msg_type:", msg$header$msg_type))
+  }
+}
+
+shutdown <- function(request) {
+  send_response('shutdown_reply', request, control_socket,
+                list(restart=request$content$restart))
+  stop("Shut down by frontend.")
+}
+
 argv = commandArgs(trailingOnly=TRUE)
 connection_info = fromJSON(file=argv[1])
 
-print(connection_info)
+#print(connection_info)
 
 url = paste(connection_info$transport, "://", connection_info$ip, sep="")
 
@@ -170,5 +221,9 @@ while(1) {
   
   if (events[[2]]$read) {  # Shell socket
     handle_shell()
+  }
+
+  if (events[[3]]$read) {  # Control socket
+    handle_control()
   }
 }

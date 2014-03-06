@@ -1,9 +1,20 @@
+DO NOT USE. SUPER ALPHA, MUCH UNSAFE, VERY DISASTER. WOW.
+
 # Native R kernel for IPython
+code using the IPython interface.
 
 __Installing__
 
+First you'll need the latest version of zmq. Install with homebrew:
 
-__Installing dependencies__
+```coffee
+brew install zmq
+# or upgrade
+brew update
+brew upgrade zmq
+```
+
+__Installing dependencies__ (This will all change soon too)
 
 ```coffee
 install.packages(c("rjson", "uuid", "digest"))
@@ -12,16 +23,9 @@ install.packages(c("rjson", "uuid", "digest"))
 
 ```
 
-__Dependencies for `rzmq`__
+# Running the notebook
 
 ```coffee
-git clone git://github.com/zeromq/libzmq.git
-cd libzmq
-./autogen.sh
-./configure     # add other options here
-make
-make check
-sudo make install
+# This is in flux, will change soon
+ipython qtconsole --KernelManager.kernel_cmd="['Rscript', 'kernel.r', '{connection_file}']"
 ```
-libzmq also requires `pkg-config`. See more info on getting libzmq set up [here](http://zeromq.org/docs:source-git).
-
