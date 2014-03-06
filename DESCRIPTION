@@ -1,0 +1,8 @@
+Package: IR_kernel
+Title: 
+Description: 
+Version: 0.1
+Authors@R: 'Karthik Ram <karthik.ram@gmail.com> [aut, cre]'
+Depends: R (>= 3.0.2)
+License: CC0
+LazyData: true
