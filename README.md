@@ -20,7 +20,7 @@ __Installing dependencies__ (This will all change soon too)
 install.packages(c("rjson", "uuid", "digest"))
 # You'll also need to install the rzmq library
 # https://github.com/armstrtw/rzmq
-
+devtools::install_github(armstrtw/rzmq)
 ```
 
 # Running the notebook
