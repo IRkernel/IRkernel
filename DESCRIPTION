@@ -4,9 +4,11 @@ Description: This package provides a native interface to the R kernel from the
     IPython notebook
 Version: 0.1
 Authors@R: c(person("Thomas", "Kluver", role = c("aut", "cre"),
-    email = "takowl@gmail.com"),
+    email = "thomas@kluyver.me.uk"),
     person("Karthik", "Ram", role = "aut",
     email = "karthik.ram@gmail.com"))
+Author: Thomas Kluyver <thomas@kluyver.me.uk>
+Maintainer: Thomas Kluyver <thomas@kluyver.me.uk>
 Depends:
     R (>= 3.0.2)
 License: MIT + License

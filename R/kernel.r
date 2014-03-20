@@ -118,72 +118,144 @@ send_response <- function(msg_type, parent_msg, socket, content) {
 #' @param  <what param does>
 #' @export
 handle_shell <- function() {
-    print("Shell msg")
     parts <- recv_multipart(shell_socket)
     msg <- wire_to_msg(parts)
     if (msg$header$msg_type == "execute_request") {
         execute(msg)
     } else if (msg$header$msg_type == "kernel_info_request") {
         kernel_info(msg)
+    } else if (msg$header$msg_type == "history_request") {
+        history(msg)
     } else {
         print(c("Got unhandled msg_type:", msg$header$msg_type))
     }
 }
-execution_count <- 1
-userenv <- new.env()
+
+history <- function(request) {
+  send_response("history_reply", request, shell_socket, list(history=list()))
+}
+
+execution_count = 1
+userenv = new.env()
+
 execute <- function(request) {
-    send_response("status", request, iopub_socket, list(execution_state = "busy"))
-    send_response("pyin", request, iopub_socket, list(code = request$code, execution_count = execution_count))
-    code <- sprintf("withVisible({%s})", request$content$code)
-    print(code)
-    expr <- parse(text = code)
-    result <- eval(expr, envir = userenv)
-    print(userenv)
-    print(result)
-    if (result$visible) {
-        data <- list()
-        data["text/plain"] <- toString(result$value)
-        send_response("pyout", request, iopub_socket, list(data = data, metadata = list(), 
-            execution_count = execution_count))
-    }
-    send_response("status", request, iopub_socket, list(execution_state = "idle"))
-    reply_content <- list(status = "ok", execution_count = execution_count, payload = list(), 
-        user_variables = list(), user_expressions = list())
-    send_response("execute_reply", request, shell_socket, reply_content)
-    assign("execution_count", execution_count + 1, envir = .GlobalEnv)
+  send_response("status", request, iopub_socket, list(execution_state="busy"))
+  send_response("pyin", request, iopub_socket,
+                list(code=request$code, execution_count=execution_count))
+
+  silent = request$content$silent
+  if (silent) {
+    code = request$contents$code
+  } else {
+    code = sprintf("withVisible({%s})", request$content$code)
+  }
+  
+  err = tryCatch({
+    expr = parse(text=code)
+    output_conn = textConnection("output", "w")
+    sink(output_conn)
+    result = eval(expr, envir=userenv)
+    list(ename=NULL)  # Result of expression: error status
+  }, error = function(e) {
+    return(list(ename="ERROR", evalue=toString(e), traceback=list(toString(e))))
+  }, finally = {
+    sink()
+    close(output_conn)
+  })
+
+  if (!silent) {
+      if (!is.null(err$ename)) {
+        send_response("pyerr", request, iopub_socket,
+                      c(err, list(execution_count=execution_count)))
+      } else if (result$visible) {
+        data = list()
+        data['text/plain'] = capture.output(print(result$value))
+        send_response("pyout", request, iopub_socket,
+                  list(data=data, metadata=list(), execution_count=execution_count))
+      }
+
+      if (length(output) > 0) {
+        send_response("stream", request, iopub_socket,
+                      list(name="stdout", data=output))
+      }
+  }
+  
+  send_response("status", request, iopub_socket, list(execution_state="idle"))
+  
+  if (!is.null(err$ename)) {
+    reply_content = c(err, list(status='error', execution_count=execution_count))
+  } else {
+    reply_content = list(status='ok', execution_count=execution_count,
+                  payload=list(), user_variables=list(), user_expressions=list())
+  }
+  send_response("execute_reply", request, shell_socket, reply_content)
+  
+  if (!silent) {
+    assign("execution_count", execution_count+1, envir=.GlobalEnv)
+  }
 }
+
 kernel_info <- function(request) {
-    send_response("kernel_info_reply", request, shell_socket, list(protocol_version = c(4, 
-        0), language = "R"))
+  send_response("kernel_info_reply", request, shell_socket, 
+                list(protocol_version=c(4, 0), language="R"))
 }
-argv <- commandArgs(trailingOnly = TRUE)
-connection_info <- fromJSON(file = argv[1])
-print(connection_info)
-url <- paste(connection_info$transport, "://", connection_info$ip, sep = "")
-url_with_port <- function(port_name) {
-    return(paste(url, ":", connection_info[port_name], sep = ""))
+
+handle_control <- function() {
+  parts = recv_multipart(control_socket)
+  msg = wire_to_msg(parts)
+  if (msg$header$msg_type == "shutdown_request") {
+    shutdown(msg)
+  } else {
+    print(c("Unhandled control message, msg_type:", msg$header$msg_type))
+  }
 }
-# ZMQ Socket setup
-zmqctx <- init.context()
-hb_socket <- init.socket(zmqctx, "ZMQ_REP")
-bind.socket(hb_socket, url_with_port("hb_port"))
-iopub_socket <- init.socket(zmqctx, "ZMQ_DEALER")
-bind.socket(iopub_socket, url_with_port("iopub_port"))
-control_socket <- init.socket(zmqctx, "ZMQ_DEALER")
-bind.socket(control_socket, url_with_port("control_port"))
-stdin_socket <- init.socket(zmqctx, "ZMQ_DEALER")
-bind.socket(stdin_socket, url_with_port("stdin_port"))
-shell_socket <- init.socket(zmqctx, "ZMQ_DEALER")
-bind.socket(shell_socket, url_with_port("shell_port"))
-while (1) {
-    events <- poll.socket(list(hb_socket, shell_socket, control_socket), list("read", 
-        "read", "read"), timeout = -1L)
-    if (events[[1]]$read) {
-        # heartbeat
-        hb_reply()
+
+shutdown <- function(request) {
+  send_response('shutdown_reply', request, control_socket,
+                list(restart=request$content$restart))
+  stop("Shut down by frontend.")
+}
+
+main <- function(argv=NULL) {
+    if (is.null(argv)) {
+      argv <- commandArgs(trailingOnly = TRUE)
     }
-    if (events[[2]]$read) {
-        # Shell socket
-        handle_shell()
+    connection_info <<- fromJSON(file = argv[1])
+    print(connection_info)
+    url <- paste(connection_info$transport, "://", connection_info$ip, sep = "")
+    url_with_port <- function(port_name) {
+        return(paste(url, ":", connection_info[port_name], sep = ""))
     }
-} 
+
+    # ZMQ Socket setup
+    
+    zmqctx <- init.context()
+    hb_socket <<- init.socket(zmqctx, "ZMQ_REP")
+    iopub_socket <<- init.socket(zmqctx, "ZMQ_DEALER")
+    control_socket <<- init.socket(zmqctx, "ZMQ_DEALER")
+    stdin_socket <<- init.socket(zmqctx, "ZMQ_DEALER")
+    shell_socket <<- init.socket(zmqctx, "ZMQ_DEALER")
+    bind.socket(hb_socket, url_with_port("hb_port"))
+    bind.socket(iopub_socket, url_with_port("iopub_port"))
+    bind.socket(control_socket, url_with_port("control_port"))
+    bind.socket(stdin_socket, url_with_port("stdin_port"))
+    bind.socket(shell_socket, url_with_port("shell_port"))
+
+	# Loop
+    while (1) {
+        events <- poll.socket(list(hb_socket, shell_socket, control_socket),
+                              list("read", "read", "read"), timeout = -1L)
+        if (events[[1]]$read) {
+            # heartbeat
+            hb_reply()
+        }
+        if (events[[2]]$read) {
+            # Shell socket
+            handle_shell()
+        }
+
+        if (events[[3]]$read) {  # Control socket
+            handle_control()
+        }
+    }
+}
