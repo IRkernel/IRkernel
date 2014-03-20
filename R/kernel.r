@@ -1,28 +1,6 @@
 #'<brief desc>
 #'
 #'<full description>
-#' @export
-#' @import rzmq
-#' @import uuid
-#' @import digest
-#' @importFrom rjson fromJSON toJSON
-hb_reply <- function() {
-    data <- receive.socket(hb_socket, unserialize = FALSE)
-    send.socket(hb_socket, data, serialize = FALSE)
-}
-
-#'<brief desc>
-#'
-#'<full description>
-#' @param msg_lst <what param does>
-#' @export
-sign_msg <- function(msg_lst) {
-    concat <- paste(msg_lst, collapse = "")
-    return(hmac(connection_info$key, concat, "sha256"))
-}
-#'<brief desc>
-#'
-#'<full description>
 #' @param socket <what param does>
 #' @export
 recv_multipart <- function(socket) {
@@ -43,6 +21,30 @@ send_multipart <- function(socket, parts) {
         send.raw.string(socket, part, send.more = TRUE)
     }
     send.raw.string(socket, parts[length(parts)], send.more = FALSE)
+}
+
+
+#'<brief desc>
+#'
+#'<full description>
+#' @export
+#' @import rzmq
+#' @import uuid
+#' @import digest
+#' @importFrom rjson fromJSON toJSON
+hb_reply <- function() {
+    data <- receive.socket(sockets$hb, unserialize = FALSE)
+    send.socket(sockets$hb, data, serialize = FALSE)
+}
+
+#'<brief desc>
+#'
+#'<full description>
+#' @param msg_lst <what param does>
+#' @export
+sign_msg <- function(msg_lst) {
+    concat <- paste(msg_lst, collapse = "")
+    return(hmac(connection_info$key, concat, "sha256"))
 }
 #'<brief desc>
 #'
@@ -107,9 +109,10 @@ new_reply <- function(msg_type, parent_msg) {
 #' @param  socket <what param does>
 #' @param  content <what param does>
 #' @export
-send_response <- function(msg_type, parent_msg, socket, content) {
+send_response <- function(msg_type, parent_msg, socket_name, content) {
     msg <- new_reply(msg_type, parent_msg)
     msg$content <- content
+    socket <- sockets[socket_name][[1]]
     send_multipart(socket, msg_to_wire(msg))
 }
 #'<brief desc>
@@ -118,7 +121,7 @@ send_response <- function(msg_type, parent_msg, socket, content) {
 #' @param  <what param does>
 #' @export
 handle_shell <- function() {
-    parts <- recv_multipart(shell_socket)
+    parts <- recv_multipart(sockets$shell)
     msg <- wire_to_msg(parts)
     if (msg$header$msg_type == "execute_request") {
         execute(msg)
@@ -132,16 +135,16 @@ handle_shell <- function() {
 }
 
 history <- function(request) {
-  send_response("history_reply", request, shell_socket, list(history=list()))
+  send_response("history_reply", request, 'shell', list(history=list()))
 }
 
 kernel_info <- function(request) {
-  send_response("kernel_info_reply", request, shell_socket, 
+  send_response("kernel_info_reply", request, 'shell',
                 list(protocol_version=c(4, 0), language="R"))
 }
 
 handle_control <- function() {
-  parts = recv_multipart(control_socket)
+  parts = recv_multipart(sockets$control)
   msg = wire_to_msg(parts)
   if (msg$header$msg_type == "shutdown_request") {
     shutdown(msg)
@@ -151,7 +154,7 @@ handle_control <- function() {
 }
 
 shutdown <- function(request) {
-  send_response('shutdown_reply', request, control_socket,
+  send_response('shutdown_reply', request, 'control',
                 list(restart=request$content$restart))
   stop("Shut down by frontend.")
 }
@@ -170,20 +173,22 @@ main <- function(argv=NULL) {
     # ZMQ Socket setup
     
     zmqctx <- init.context()
-    hb_socket <<- init.socket(zmqctx, "ZMQ_REP")
-    iopub_socket <<- init.socket(zmqctx, "ZMQ_DEALER")
-    control_socket <<- init.socket(zmqctx, "ZMQ_DEALER")
-    stdin_socket <<- init.socket(zmqctx, "ZMQ_DEALER")
-    shell_socket <<- init.socket(zmqctx, "ZMQ_DEALER")
-    bind.socket(hb_socket, url_with_port("hb_port"))
-    bind.socket(iopub_socket, url_with_port("iopub_port"))
-    bind.socket(control_socket, url_with_port("control_port"))
-    bind.socket(stdin_socket, url_with_port("stdin_port"))
-    bind.socket(shell_socket, url_with_port("shell_port"))
+    sockets <<- list(
+        hb = init.socket(zmqctx, "ZMQ_REP"),
+        iopub = init.socket(zmqctx, "ZMQ_DEALER"),
+        control = init.socket(zmqctx, "ZMQ_DEALER"),
+        stdin = init.socket(zmqctx, "ZMQ_DEALER"),
+        shell = init.socket(zmqctx, "ZMQ_DEALER")
+    )
+    bind.socket(sockets$hb, url_with_port("hb_port"))
+    bind.socket(sockets$iopub, url_with_port("iopub_port"))
+    bind.socket(sockets$control, url_with_port("control_port"))
+    bind.socket(sockets$stdin, url_with_port("stdin_port"))
+    bind.socket(sockets$shell, url_with_port("shell_port"))
 
-	# Loop
+    # Loop
     while (1) {
-        events <- poll.socket(list(hb_socket, shell_socket, control_socket),
+        events <- poll.socket(list(sockets$hb, sockets$shell, sockets$control),
                               list("read", "read", "read"), timeout = -1L)
         if (events[[1]]$read) {
             # heartbeat
