@@ -135,10 +135,12 @@ history <- function(request) {
   send_response("history_reply", request, shell_socket, list(history=list()))
 }
 
-execution_count = 1
+exec.special = new.env()
+assign("counter", 1, envir=exec.special)
 userenv = new.env()
 
 execute <- function(request) {
+  execution_count = get("counter", envir=exec.special)
   send_response("status", request, iopub_socket, list(execution_state="busy"))
   send_response("pyin", request, iopub_socket,
                 list(code=request$code, execution_count=execution_count))
@@ -191,7 +193,7 @@ execute <- function(request) {
   send_response("execute_reply", request, shell_socket, reply_content)
   
   if (!silent) {
-    assign("execution_count", execution_count+1, envir=.GlobalEnv)
+    assign("counter", execution_count+1, envir=exec.special)
   }
 }
 
