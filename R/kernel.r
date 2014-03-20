@@ -159,11 +159,8 @@ shutdown <- function(request) {
   stop("Shut down by frontend.")
 }
 
-main <- function(argv=NULL) {
-    if (is.null(argv)) {
-      argv <- commandArgs(trailingOnly = TRUE)
-    }
-    connection_info <<- fromJSON(file = argv[1])
+initialize <- function(connection_file) {
+    connection_info <<- fromJSON(file = connection_file)
     print(connection_info)
     url <- paste(connection_info$transport, "://", connection_info$ip, sep = "")
     url_with_port <- function(port_name) {
@@ -171,8 +168,7 @@ main <- function(argv=NULL) {
     }
 
     # ZMQ Socket setup
-    
-    zmqctx <- init.context()
+    zmqctx <<- init.context()
     sockets <<- list(
         hb = init.socket(zmqctx, "ZMQ_REP"),
         iopub = init.socket(zmqctx, "ZMQ_DEALER"),
@@ -185,8 +181,9 @@ main <- function(argv=NULL) {
     bind.socket(sockets$control, url_with_port("control_port"))
     bind.socket(sockets$stdin, url_with_port("stdin_port"))
     bind.socket(sockets$shell, url_with_port("shell_port"))
+}
 
-    # Loop
+run <- function() {
     while (1) {
         events <- poll.socket(list(sockets$hb, sockets$shell, sockets$control),
                               list("read", "read", "read"), timeout = -1L)
@@ -203,4 +200,9 @@ main <- function(argv=NULL) {
             handle_control()
         }
     }
+}
+
+main <- function(connection_file) {
+    initialize(connection_file)
+    run()
 }
