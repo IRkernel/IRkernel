@@ -2,7 +2,7 @@ exec.special = new.env()
 assign("counter", 1, envir=exec.special)
 userenv = new.env()
 
-execute <- function(request) {
+execute <- function(request, send_response) {
   execution_count = get("counter", envir=exec.special)
   send_response("status", request, 'iopub', list(execution_state="busy"))
   send_response("pyin", request, 'iopub',
