@@ -1,9 +1,10 @@
-DO NOT USE. SUPER ALPHA, MUCH UNSAFE, VERY DISASTER. WOW.
-
 # Native R kernel for IPython
-code using the IPython interface.
 
-__Installing__
+This is still highly experimental and unreliable. Your code should be safe,
+since IPython handles saving and loading notebooks in another process, but
+ou'll lose all your variables if it crashes.
+
+##Installing
 
 First you'll need the latest version of zmq. Install with homebrew:
 
@@ -14,17 +15,26 @@ brew update
 brew upgrade zmq
 ```
 
-__Installing dependencies__ (This will all change soon too)
+Install the dependencies:
 
 ```R
 install.packages(c("rjson", "uuid", "digest"))
-# You'll also need to install the rzmq library
+# You'll also need to install the rzmq library from Github for now
 # https://github.com/armstrtw/rzmq
-devtools::install_github(armstrtw/rzmq)
+devtools::install_github("armstrtw/rzmq")
+```
+
+And the package itself:
+
+```Shell
+# Run this with the directory or tarball:
+R CMD INSTALL IR_kernel
 ```
 
 # Running the notebook
 
 ```Shell
-ipython qtconsole --KernelManager.kernel_cmd="['R', '-e', 'library(ipyr); main(\'{connection_file}\')']"
+ipython notebook --KernelManager.kernel_cmd="['R', '-e', 'library(ipyr); main(\'{connection_file}\')']"
 ```
+
+You can also substitute 'qtconsole' or 'console' for 'notebook' in this command.
