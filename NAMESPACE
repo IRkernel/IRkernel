@@ -1,2 +1,7 @@
 export(main)
-import(rzmq, rjson, uuid, digest)
+import(digest)
+import(methods)
+import(rzmq)
+import(uuid)
+importFrom(rjson,fromJSON)
+importFrom(rjson,toJSON)

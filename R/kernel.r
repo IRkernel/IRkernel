@@ -1,8 +1,9 @@
-#'<brief desc>
+#'Receive multipart ZMQ message
 #'
-#'<full description>
-#' @param socket <what param does>
-#' @export
+#'Returns a string vector, one element per message part.
+#'This will hopefully become part of rzmq.
+#'
+#' @param socket The ZMQ socket from which to receive data
 recv_multipart <- function(socket) {
     parts <- rawToChar(receive.socket(socket, unserialize = FALSE))
     while (get.rcvmore(socket)) {
@@ -10,12 +11,11 @@ recv_multipart <- function(socket) {
     }
     return(parts)
 }
-#'<brief desc>
+#'Send multipart ZMQ message.
 #'
-#'<full description>
-#' @param socket <what param does>
-#' @param  parts <what param does>
-#' @export
+#'This will hopefully become part of rzmq.
+#' @param socket The ZMQ socket on which to send data
+#' @param parts A string vector; each element will be sent as one part of the message
 send_multipart <- function(socket, parts) {
     for (part in parts[1:(length(parts) - 1)]) {
         send.raw.string(socket, part, send.more = TRUE)
@@ -27,14 +27,7 @@ send_multipart <- function(socket, parts) {
 Kernel <- setRefClass("Kernel",
                 fields = c("connection_info", "zmqctx", "sockets", "executor"),
                 methods= list(
-#'<brief desc>
-#'
-#'<full description>
-#' @export
-#' @import rzmq
-#' @import uuid
-#' @import digest
-#' @importFrom rjson fromJSON toJSON
+
 hb_reply = function() {
     data <- receive.socket(sockets$hb, unserialize = FALSE)
     send.socket(sockets$hb, data, serialize = FALSE)
@@ -208,6 +201,10 @@ run = function() {
 })
 )
 
+#'Initialise and run the kernel
+#'
+#'@param connection_file The path to the IPython connection file, written by the frontend
+#'@export 
 main <- function(connection_file) {
     kernel <- Kernel$new(connection_file=connection_file)
     kernel$run()
