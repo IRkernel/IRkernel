@@ -34,7 +34,7 @@ R CMD INSTALL IR_kernel
 # Running the notebook
 
 ```Shell
-ipython notebook --KernelManager.kernel_cmd="['R', '-e', 'library(ipyr); main(\'{connection_file}\')']"
+ipython notebook --KernelManager.kernel_cmd="['R', '-e', 'ipyr::main(\'{connection_file}\')']"
 ```
 
 You can also substitute 'qtconsole' or 'console' for 'notebook' in this command.
