@@ -41,7 +41,7 @@ execute = function(request) {
 
       if (length(output) > 0) {
         send_response("stream", request, 'iopub',
-                      list(name="stdout", data=output))
+                      list(name="stdout", data=paste(output, collapse="\n")))
       }
   }
   
