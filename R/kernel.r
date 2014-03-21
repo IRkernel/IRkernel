@@ -25,7 +25,7 @@ send_multipart <- function(socket, parts) {
 
 
 Kernel <- setRefClass("Kernel",
-                fields = c("connection_info", "zmqctx", "sockets"),
+                fields = c("connection_info", "zmqctx", "sockets", "executor"),
                 methods= list(
 #'<brief desc>
 #'
@@ -127,7 +127,7 @@ handle_shell = function() {
     parts <- recv_multipart(sockets$shell)
     msg <- wire_to_msg(parts)
     if (msg$header$msg_type == "execute_request") {
-        execute(msg, send_response)
+        executor$execute(msg)
     } else if (msg$header$msg_type == "kernel_info_request") {
         kernel_info(msg)
     } else if (msg$header$msg_type == "history_request") {
@@ -184,6 +184,8 @@ initialize = function(connection_file) {
     bind.socket(sockets$control, url_with_port("control_port"))
     bind.socket(sockets$stdin, url_with_port("stdin_port"))
     bind.socket(sockets$shell, url_with_port("shell_port"))
+
+    executor <<- Executor$new(kernel=.self)
 },
 
 run = function() {

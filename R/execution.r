@@ -1,9 +1,9 @@
-exec.special = new.env()
-assign("counter", 1, envir=exec.special)
-userenv = new.env()
+Executor = setRefClass("Executor",
+            fields=c("execution_count", "userenv", "kernel"),
+            methods = list(
 
-execute <- function(request, send_response) {
-  execution_count = get("counter", envir=exec.special)
+execute = function(request) {
+  send_response = kernel$send_response
   send_response("status", request, 'iopub', list(execution_state="busy"))
   send_response("pyin", request, 'iopub',
                 list(code=request$code, execution_count=execution_count))
@@ -56,6 +56,13 @@ execute <- function(request, send_response) {
   send_response("execute_reply", request, 'shell', reply_content)
   
   if (!silent) {
-    assign("counter", execution_count+1, envir=exec.special)
+    execution_count <<- execution_count + 1
   }
-}
+},
+
+initialize = function(...) {
+    execution_count <<- 1
+    userenv <<- new.env()
+    callSuper(...)
+})
+)
