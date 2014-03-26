@@ -51,10 +51,6 @@ wire_to_msg = function(parts) {
 msg_to_wire = function(msg) {
     bodyparts <- c(toJSON(msg$header), toJSON(msg$parent_header), toJSON(msg$metadata), 
         toJSON(msg$content))
-    # Hack: an empty R list becomes [], not {}, which is what we want
-    if (length(msg$metadata) == 0) {
-        bodyparts[3] <- "{}"
-    }
     signature <- sign_msg(bodyparts)
     # print(msg$identities)
     return(c(msg$identities, "<IDS|MSG>", signature, bodyparts))
@@ -69,7 +65,8 @@ new_reply = function(msg_type, parent_msg) {
     header <- list(msg_id = UUIDgenerate(), username = parent_msg$header$username, 
         session = parent_msg$header$session, msg_type = msg_type)
     return(list(header = header, parent_header = parent_msg$header, identities = parent_msg$identities, 
-        metadata = list()))
+        metadata = setNames(list(), character(0))  # Ensure this is {} in JSON, not []
+        ))
 },
 #'<brief desc>
 #'

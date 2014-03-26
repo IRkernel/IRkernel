@@ -36,7 +36,8 @@ execute = function(request) {
         data = list()
         data['text/plain'] = capture.output(print(result$value))
         send_response("pyout", request, 'iopub',
-                  list(data=data, metadata=list(), execution_count=execution_count))
+                  list(data=data, metadata=setNames(list(), character(0)),
+                  execution_count=execution_count))
       }
 
       if (length(output) > 0) {
