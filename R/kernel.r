@@ -1,29 +1,3 @@
-#'Receive multipart ZMQ message
-#'
-#'Returns a string vector, one element per message part.
-#'This will hopefully become part of rzmq.
-#'
-#' @param socket The ZMQ socket from which to receive data
-recv_multipart <- function(socket) {
-    parts <- rawToChar(receive.socket(socket, unserialize = FALSE))
-    while (get.rcvmore(socket)) {
-        parts <- append(parts, rawToChar(receive.socket(socket, unserialize = FALSE)))
-    }
-    return(parts)
-}
-#'Send multipart ZMQ message.
-#'
-#'This will hopefully become part of rzmq.
-#' @param socket The ZMQ socket on which to send data
-#' @param parts A string vector; each element will be sent as one part of the message
-send_multipart <- function(socket, parts) {
-    for (part in parts[1:(length(parts) - 1)]) {
-        send.raw.string(socket, part, send.more = TRUE)
-    }
-    send.raw.string(socket, parts[length(parts)], send.more = FALSE)
-}
-
-
 Kernel <- setRefClass("Kernel",
                 fields = c("connection_info", "zmqctx", "sockets", "executor"),
                 methods= list(
@@ -109,7 +83,7 @@ send_response = function(msg_type, parent_msg, socket_name, content) {
     msg <- new_reply(msg_type, parent_msg)
     msg$content <- content
     socket <- sockets[socket_name][[1]]
-    send_multipart(socket, msg_to_wire(msg))
+    send.multipart(socket, msg_to_wire(msg))
 },
 #'<brief desc>
 #'
@@ -117,7 +91,7 @@ send_response = function(msg_type, parent_msg, socket_name, content) {
 #' @param  <what param does>
 #' @export
 handle_shell = function() {
-    parts <- recv_multipart(sockets$shell)
+    parts <- receive.multipart(sockets$shell)
     msg <- wire_to_msg(parts)
     if (msg$header$msg_type == "execute_request") {
         executor$execute(msg)
@@ -140,7 +114,7 @@ kernel_info = function(request) {
 },
 
 handle_control = function() {
-  parts = recv_multipart(sockets$control)
+  parts = receive.multipart(sockets$control)
   msg = wire_to_msg(parts)
   if (msg$header$msg_type == "shutdown_request") {
     shutdown(msg)
