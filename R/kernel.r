@@ -141,7 +141,7 @@ initialize = function(connection_file) {
     zmqctx <<- init.context()
     sockets <<- list(
         hb = init.socket(zmqctx, "ZMQ_REP"),
-        iopub = init.socket(zmqctx, "ZMQ_DEALER"),
+        iopub = init.socket(zmqctx, "ZMQ_PUB"),
         control = init.socket(zmqctx, "ZMQ_DEALER"),
         stdin = init.socket(zmqctx, "ZMQ_DEALER"),
         shell = init.socket(zmqctx, "ZMQ_DEALER")
