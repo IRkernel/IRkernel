@@ -34,7 +34,7 @@ execute = function(request) {
                       c(err, list(execution_count=execution_count)))
       } else if (result$visible) {
         data = list()
-        data['text/plain'] = capture.output(print(result$value))
+        data['text/plain'] = paste(capture.output(print(result$value)), collapse="\n")
         send_response("pyout", request, 'iopub',
                   list(data=data, metadata=setNames(list(), character(0)),
                   execution_count=execution_count))
