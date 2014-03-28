@@ -2,7 +2,7 @@
 
 This is still highly experimental and unreliable. Your code should be safe,
 since IPython handles saving and loading notebooks in another process, but
-you'll lose all your variables if it crashes.
+ou'll lose all your variables if it crashes.
 
 ##Installing
 
@@ -15,26 +15,22 @@ brew update
 brew upgrade zmq
 ```
 
-Install the dependencies:
+Install the dependencies and the package:
 
-```R
+```coffee
 install.packages(c("rjson", "uuid", "digest"))
 # You'll also need to install the rzmq library from Github for now
 # https://github.com/armstrtw/rzmq
-devtools::install_github("armstrtw/rzmq")
+library(devtools)
+install_github("armstrtw/rzmq")
+install_github("takluyver/IR_kernel")
 ```
 
-And the package itself:
-
-```Shell
-# Run this with the directory or tarball:
-R CMD INSTALL IR_kernel
-```
 
 # Running the notebook
 
 ```Shell
-ipython notebook --KernelManager.kernel_cmd="['R', '-e', 'ipyr::main(\'{connection_file}\')']"
+ipython notebook --KernelManager.kernel_cmd="['R', '-e', 'library(ipyr); main(\'{connection_file}\')']"
 ```
 
 You can also substitute 'qtconsole' or 'console' for 'notebook' in this command.
