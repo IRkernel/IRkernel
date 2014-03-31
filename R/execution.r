@@ -9,17 +9,12 @@ execute = function(request) {
                 list(code=request$code, execution_count=execution_count))
 
   silent = request$content$silent
-  if (silent) {
-    code = request$contents$code
-  } else {
-    code = sprintf("withVisible({%s\n})", request$content$code)
-  }
   
   err = tryCatch({
     output_conn = textConnection("output", "w")
     sink(output_conn)
-    expr = parse(text=code)
-    result = eval(expr, envir=userenv)
+    expr = parse(text=request$content$code)
+    result = withVisible(eval(expr, envir=userenv))
     list(ename=NULL)  # Result of expression: error status
   }, error = function(e) {
     return(list(ename="ERROR", evalue=toString(e), traceback=list(toString(e))))
