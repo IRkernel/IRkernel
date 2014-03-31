@@ -2,7 +2,7 @@
 
 This is still highly experimental and unreliable. Your code should be safe,
 since IPython handles saving and loading notebooks in another process, but
-ou'll lose all your variables if it crashes.
+you'll lose all your variables if it crashes.
 
 ##Installing
 
