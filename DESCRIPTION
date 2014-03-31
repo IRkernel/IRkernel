@@ -10,7 +10,7 @@ Authors@R: c(person("Thomas", "Kluver", role = c("aut", "cre"),
 Author: Thomas Kluyver <thomas@kluyver.me.uk>
 Maintainer: Thomas Kluyver <thomas@kluyver.me.uk>
 Depends:
-    R (>= 3.0.2)
+    R (>= 3.0.1)
 License: MIT + file LICENSE
 LazyData: true
 Imports:
