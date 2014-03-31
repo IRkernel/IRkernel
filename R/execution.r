@@ -12,7 +12,7 @@ execute = function(request) {
   if (silent) {
     code = request$contents$code
   } else {
-    code = sprintf("withVisible({%s})", request$content$code)
+    code = sprintf("withVisible({%s\n})", request$content$code)
   }
   
   err = tryCatch({
