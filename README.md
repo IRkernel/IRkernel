@@ -6,7 +6,13 @@ you'll lose all your variables if it crashes.
 
 ##Installing
 
-First you'll need the latest version of zmq. Install with homebrew:
+You'll need zmq development headers to compile rzmq. Install this, e.g. with apt:
+
+```Shell
+apt-get install libzmq3-dev
+```
+
+or with homebrew:
 
 ```Shell
 brew install zmq
@@ -29,6 +35,10 @@ install_github("takluyver/IRdisplay")
 install_github("takluyver/IR_kernel")
 ```
 
+You'll also need [IPython](http://ipython.org/). If you already have a Python
+environment set up, install IPython using your preferred tools. If not, installing
+[Anaconda](http://continuum.io/downloads) is the quickest way to get everything
+you need.
 
 # Running the notebook
 
