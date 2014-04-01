@@ -24,7 +24,7 @@ brew upgrade zmq
 Install the dependencies and the package:
 
 ```coffee
-install.packages(c("rjson", "uuid", "digest", "evaluate"))
+install.packages(c("rjson", "uuid", "digest"))
 # You'll also need to install rzmq and evaluate from Github for now
 # https://github.com/armstrtw/rzmq
 # https://github.com/hadley/evaluate
