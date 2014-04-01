@@ -12,12 +12,10 @@ execute = function(request) {
 
   silent = request$content$silent
   
-  display  = function(mimetype, content, metadata) {
-    if (missing(metadata)) {
+  display  = function(data, metadata=NULL) {
+    if (is.null(metadata)) {
         metadata = setNames(list(), character(0))
     }
-    data = list()
-    data[mimetype] = content
     send_response("display_data", request, 'iopub',
             list(source='R display func', data=data, metadata=metadata)
         )
