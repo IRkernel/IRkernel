@@ -71,12 +71,18 @@ execute = function(request) {
                           value=handle_value
                           )
 
-  evaluate(request$content$code, envir=userenv, output_handler=oh,
-            stop_on_error=0)
+  interrupted = FALSE
+  tryCatch(
+    evaluate(request$content$code, envir=userenv, output_handler=oh,
+                stop_on_error=0),
+        interrupt = function(cond) {interrupted <<- TRUE}
+    )
   
   send_response("status", request, 'iopub', list(execution_state="idle"))
   
-  if (!is.null(err$ename)) {
+  if (interrupted) {
+    reply_content = list(status='abort')
+  } else if (!is.null(err$ename)) {
     reply_content = c(err, list(status='error', execution_count=execution_count))
   } else {
     reply_content = list(status='ok', execution_count=execution_count,
