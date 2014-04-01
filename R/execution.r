@@ -1,7 +1,7 @@
 displayenv = environment(display)
 
 Executor = setRefClass("Executor",
-            fields=c("execution_count", "userenv", "err", "kernel"),
+            fields=c("execution_count", "userenv", "err", "interrupted", "kernel"),
             methods = list(
 
 execute = function(request) {
@@ -71,7 +71,7 @@ execute = function(request) {
                           value=handle_value
                           )
 
-  interrupted = FALSE
+  interrupted <<- FALSE
   tryCatch(
     evaluate(request$content$code, envir=userenv, output_handler=oh,
                 stop_on_error=0),
