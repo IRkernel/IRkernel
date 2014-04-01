@@ -25,6 +25,7 @@ install.packages(c("rjson", "uuid", "digest", "evaluate"))
 library(devtools)
 install_github("armstrtw/rzmq")
 install_github("hadley/evaluate")
+install_github("takluyver/IRdisplay")
 install_github("takluyver/IR_kernel")
 ```
 

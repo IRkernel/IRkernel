@@ -1,3 +1,5 @@
+displayenv = environment(display)
+
 Executor = setRefClass("Executor",
             fields=c("execution_count", "userenv", "err", "kernel"),
             methods = list(
@@ -21,7 +23,8 @@ execute = function(request) {
         )
     invisible(T)
   }
-  assign('display', display, pos=userenv)
+  unlockBinding("base_display", displayenv)
+  assign('base_display', display, pos=displayenv)
   
   err <<- list()
   

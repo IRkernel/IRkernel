@@ -16,6 +16,7 @@ LazyData: true
 Imports:
     methods,
     evaluate,
+    IRdisplay,
     rzmq,
     rjson,
     uuid,
