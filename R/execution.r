@@ -43,23 +43,30 @@ execute = function(request) {
   if (silent) {
     stream = function(s, n) {}
     handle_value = identity
+    handle_graphics = identity
   } else {
     handle_value = function (obj) {
-        write("value", stderr())
         data = list()
         data['text/plain'] = paste(capture.output(print(obj)), collapse="\n")
         send_response("pyout", request, 'iopub',
                   list(data=data, metadata=setNames(list(), character(0)),
                   execution_count=execution_count))
-      }
+    }
     stream = function(output, streamname) {
-        write("stream", stderr())
         send_response("stream", request, 'iopub',
                       list(name=streamname, data=paste(output, collapse="\n")))
-      }
+    }
+    handle_graphics = function(plotobj) {
+        tf = tempfile(fileext='.png')
+        png(tf)
+        replayPlot(plotobj)
+        dev.off()
+        display_png(filename=tf)
+    }
   }
   
   oh = new_output_handler(text=function(o) {stream(o, 'stdout')},
+                          graphics=handle_graphics,
                           message=function(o) {stream(o, 'stderr')},
                           warning=function(o) {stream(o, stderr)},
                           error=handle_error,
@@ -67,7 +74,7 @@ execute = function(request) {
                           )
 
   evaluate(request$content$code, envir=userenv, output_handler=oh,
-            stop_on_error=0, new_device=FALSE)
+            stop_on_error=0)
   
   send_response("status", request, 'iopub', list(execution_state="idle"))
   
