@@ -23,6 +23,10 @@ execute = function(request) {
         )
     invisible(T)
   }
+  
+  # Push the display function into the IRdisplay namespace
+  # This looks awkward, but we do need to get a reference to the execution
+  # state into a global environment.
   unlockBinding("base_display", displayenv)
   assign('base_display', display, pos=displayenv)
   
