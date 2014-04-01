@@ -15,6 +15,7 @@ License: MIT + file LICENSE
 LazyData: true
 Imports:
     methods,
+    evaluate,
     rzmq,
     rjson,
     uuid,

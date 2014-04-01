@@ -1,5 +1,5 @@
 Executor = setRefClass("Executor",
-            fields=c("execution_count", "userenv", "kernel"),
+            fields=c("execution_count", "userenv", "err", "kernel"),
             methods = list(
 
 execute = function(request) {
@@ -10,36 +10,57 @@ execute = function(request) {
 
   silent = request$content$silent
   
-  err = tryCatch({
-    output_conn = textConnection("output", "w")
-    sink(output_conn)
-    expr = parse(text=request$content$code)
-    result = withVisible(eval(expr, envir=userenv))
-    list(ename=NULL)  # Result of expression: error status
-  }, error = function(e) {
-    return(list(ename="ERROR", evalue=toString(e), traceback=list(toString(e))))
-  }, finally = {
-    sink()
-    close(output_conn)
-  })
-
-  if (!silent) {
-      if (!is.null(err$ename)) {
-        send_response("pyerr", request, 'iopub',
-                      c(err, list(execution_count=execution_count)))
-      } else if (result$visible) {
+  display  = function(mimetype, content, metadata) {
+    if (missing(metadata)) {
+        metadata = setNames(list(), character(0))
+    }
+    data = list()
+    data[mimetype] = content
+    send_response("display_data", request, 'iopub',
+            list(source='R display func', data=data, metadata=metadata)
+        )
+    invisible(T)
+  }
+  assign('display', display, pos=userenv)
+  
+  err <<- list()
+  
+  
+  handle_error = function(e) {
+    err <<- list(ename="ERROR", evalue=toString(e), traceback=list(toString(e)))
+    if (!silent) {
+      send_response("pyerr", request, 'iopub',
+                    c(err, list(execution_count=execution_count)))
+    }
+  }
+  if (silent) {
+    stream = function(s, n) {}
+    handle_value = identity
+  } else {
+    handle_value = function (obj) {
+        write("value", stderr())
         data = list()
-        data['text/plain'] = paste(capture.output(print(result$value)), collapse="\n")
+        data['text/plain'] = paste(capture.output(print(obj)), collapse="\n")
         send_response("pyout", request, 'iopub',
                   list(data=data, metadata=setNames(list(), character(0)),
                   execution_count=execution_count))
       }
-
-      if (length(output) > 0) {
+    stream = function(output, streamname) {
+        write("stream", stderr())
         send_response("stream", request, 'iopub',
-                      list(name="stdout", data=paste(output, collapse="\n")))
+                      list(name=streamname, data=paste(output, collapse="\n")))
       }
   }
+  
+  oh = new_output_handler(text=function(o) {stream(o, 'stdout')},
+                          message=function(o) {stream(o, 'stderr')},
+                          warning=function(o) {stream(o, stderr)},
+                          error=handle_error,
+                          value=handle_value
+                          )
+
+  evaluate(request$content$code, envir=userenv, output_handler=oh,
+            stop_on_error=0, new_device=FALSE)
   
   send_response("status", request, 'iopub', list(execution_state="idle"))
   
@@ -59,6 +80,7 @@ execute = function(request) {
 initialize = function(...) {
     execution_count <<- 1
     userenv <<- new.env()
+    err <<- list()
     callSuper(...)
 })
 )

@@ -1,5 +1,6 @@
 export(main)
 import(digest)
+import(evaluate)
 import(methods)
 import(rzmq)
 import(uuid)
