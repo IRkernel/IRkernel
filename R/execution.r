@@ -75,7 +75,8 @@ execute = function(request) {
   tryCatch(
     evaluate(request$content$code, envir=userenv, output_handler=oh,
                 stop_on_error=0),
-        interrupt = function(cond) {interrupted <<- TRUE}
+        interrupt = function(cond) {interrupted <<- TRUE},
+        error = handle_error  # evaluate does not catch errors in parsing
     )
   
   send_response("status", request, 'iopub', list(execution_state="idle"))
