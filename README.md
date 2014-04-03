@@ -32,7 +32,7 @@ library(devtools)
 install_github("armstrtw/rzmq")
 install_github("hadley/evaluate")
 install_github("takluyver/IRdisplay")
-install_github("takluyver/IR_kernel")
+install_github("takluyver/IRkernel")
 ```
 
 You'll also need [IPython](http://ipython.org/). If you already have a Python
@@ -43,7 +43,7 @@ you need.
 # Running the notebook
 
 ```Shell
-ipython notebook --KernelManager.kernel_cmd="['R', '-e', 'ipyr::main(\'{connection_file}\')']"
+ipython notebook --KernelManager.kernel_cmd="['R', '-e', 'IRkernel::main(\'{connection_file}\')']"
 ```
 
 You can also substitute 'qtconsole' or 'console' for 'notebook' in this command.

@@ -1,7 +1,7 @@
 \docType{package}
-\name{ipyr}
-\alias{ipyr}
-\alias{ipyr-package}
+\name{IRkernel}
+\alias{IRkernel}
+\alias{IRkernel-package}
 \title{An R kernel for IPython.}
 \description{
 IPython's modern interfaces, including the IPython

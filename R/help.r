@@ -11,6 +11,6 @@
 #' @import digest
 #' @importFrom rjson fromJSON toJSON
 #' @docType package
-#' @name ipyr
-#' @aliases ipyr ipyr-package
+#' @name IRkernel
+#' @aliases IRkernel IRkernel-package
 NULL
