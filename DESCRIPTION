@@ -18,6 +18,5 @@ Imports:
     evaluate (>= 0.5.4),
     IRdisplay,
     rzmq (>= 0.7.0),
-    rjson,
     uuid,
     digest
