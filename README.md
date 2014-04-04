@@ -21,7 +21,7 @@ brew update
 brew upgrade zmq
 ```
 
-Install the dependencies and the package:
+We need devel versions of the following packages from Github for now due to recent fixes:
 
 ```coffee
 library(devtools)
