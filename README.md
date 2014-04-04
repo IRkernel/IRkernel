@@ -1,6 +1,6 @@
 # Native R kernel for IPython
 
-This is still highly experimental and unreliable. Your code should be safe,
+This is still experimental and unreliable. Your code should be safe,
 since IPython handles saving and loading notebooks in another process, but
 you'll lose all your variables if it crashes.
 
@@ -9,7 +9,7 @@ you'll lose all your variables if it crashes.
 You'll need zmq development headers to compile rzmq. Install this, e.g. with apt:
 
 ```Shell
-apt-get install libzmq3-dev
+sudo apt-get install libzmq3-dev
 ```
 
 or with homebrew:
@@ -21,11 +21,12 @@ brew update
 brew upgrade zmq
 ```
 
-We need devel versions of the following packages from Github for now due to recent fixes:
+We need development versions of several packages from Github for now, due to
+recent fixes:
 
 ```coffee
+# If you don't already have devtools, install.packages("devtools")
 library(devtools)
-# Otherwise install with install.packages("devtools")
 install_github("armstrtw/rzmq")
 install_github("hadley/evaluate")
 install_github("jeroenooms/jsonlite")
