@@ -31,6 +31,7 @@ install.packages(c("rjson", "uuid", "digest"))
 library(devtools)
 install_github("armstrtw/rzmq")
 install_github("hadley/evaluate")
+install_github("jeroenooms/jsonlite")
 install_github("takluyver/IRdisplay")
 install_github("takluyver/IRkernel")
 ```

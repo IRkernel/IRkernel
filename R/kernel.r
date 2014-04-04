@@ -49,8 +49,8 @@ wire_to_msg = function(parts) {
 #' @param msg <what param does>
 #' @export
 msg_to_wire = function(msg) {
-    bodyparts <- c(toJSON(msg$header), toJSON(msg$parent_header), toJSON(msg$metadata), 
-        toJSON(msg$content))
+    bodyparts <- c(toJSON(msg$header, auto_unbox=TRUE), toJSON(msg$parent_header, auto_unbox=TRUE), 
+        toJSON(msg$metadata, auto_unbox=TRUE), toJSON(msg$content, auto_unbox=TRUE))
     signature <- sign_msg(bodyparts)
     # print(msg$identities)
     return(c(msg$identities, "<IDS|MSG>", signature, bodyparts))
@@ -127,7 +127,7 @@ shutdown = function(request) {
 },
 
 initialize = function(connection_file) {
-    connection_info <<- fromJSON(file = connection_file)
+    connection_info <<- fromJSON(connection_file)
     print(connection_info)
     url <- paste(connection_info$transport, "://", connection_info$ip, sep = "")
     url_with_port <- function(port_name) {
