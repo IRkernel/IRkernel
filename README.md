@@ -25,6 +25,7 @@ We need devel versions of the following packages from Github for now due to rece
 
 ```coffee
 library(devtools)
+# Otherwise install with install.packages("devtools")
 install_github("armstrtw/rzmq")
 install_github("hadley/evaluate")
 install_github("jeroenooms/jsonlite")
