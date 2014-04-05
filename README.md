@@ -6,14 +6,12 @@ you'll lose all your variables if it crashes.
 
 ##Installing
 
-You'll need zmq development headers to compile rzmq, as well as a few other dev
-and R libraries. On a recent Ubuntu/Debian installation, you can get these
+You'll need zmq development headers to compile rzmq, as well curl headers for
+R devtools. On a recent Ubuntu/Debian installation, you can get these
 with:
 
 ```Shell
-sudo apt-get install libzmq3-dev
-sudo apt-get install libcurl4-openssl-dev 
-sudo apt-get install r-cran-reshape2 r-cran-rcpp
+sudo apt-get install libzmq3-dev libcurl4-openssl-dev
 ```
 
 or with homebrew:
@@ -26,11 +24,11 @@ brew upgrade zmq
 ```
 
 We need development versions of several packages from Github for now, due to
-recent fixes. First, you need to make sure you have both the `devtools` and
-`knitr` R packages available. If you don't, at the R console type:
+recent fixes. First, you need to make sure you have the `devtools` R package
+available. If you don't, at the R console type:
 
 ```coffee
-install.packages(c("devtools", "knitr"))
+install.packages("devtools")
 ```
 
 Then, you can install the necessary development dependencies with:
@@ -39,7 +37,7 @@ Then, you can install the necessary development dependencies with:
 library(devtools)
 install_github("armstrtw/rzmq")
 install_github("hadley/evaluate")
-install_github("jeroenooms/jsonlite")
+install_github("jeroenooms/jsonlite", build_vignettes=FALSE)
 install_github("takluyver/IRdisplay")
 install_github("takluyver/IRkernel")
 ```
