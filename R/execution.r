@@ -66,7 +66,7 @@ execute = function(request) {
   oh = new_output_handler(text=function(o) {stream(o, 'stdout')},
                           graphics=handle_graphics,
                           message=function(o) {stream(o, 'stderr')},
-                          warning=function(o) {stream(o, stderr)},
+                          warning=function(o) {stream(o, 'stderr')},
                           error=handle_error,
                           value=handle_value
                           )
