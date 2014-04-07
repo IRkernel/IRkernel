@@ -18,6 +18,6 @@ Imports:
     evaluate (>= 0.5.4),
     IRdisplay,
     rzmq (>= 0.7.0),
-    jsonlite (>= 0.9.5.99),
+    jsonlite (>= 0.9.6),
     uuid,
     digest
