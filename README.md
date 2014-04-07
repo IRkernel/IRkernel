@@ -37,7 +37,6 @@ Then, you can install the necessary development dependencies with:
 library(devtools)
 install_github("armstrtw/rzmq")
 install_github("hadley/evaluate")
-install_github("jeroenooms/jsonlite", build_vignettes=FALSE)
 install_github("takluyver/IRdisplay")
 install_github("takluyver/IRkernel")
 ```
