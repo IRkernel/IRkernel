@@ -1,7 +1,13 @@
 displayenv = environment(display)
 
+lappend <- function(lst, obj) {
+    # I hope this isn't the best way to do this.
+    lst[[length(lst)+1]] = obj
+    return(lst)
+}
+
 Executor = setRefClass("Executor",
-            fields=c("execution_count", "userenv", "err", "interrupted", "kernel"),
+            fields=c("execution_count", "userenv", "payload", "err", "interrupted", "kernel"),
             methods = list(
 
 execute = function(request) {
@@ -28,6 +34,17 @@ execute = function(request) {
   unlockBinding("base_display", displayenv)
   assign('base_display', display, pos=displayenv)
   
+  payload <<- list()
+
+  options(pager=function(files, header, title, delete.file) {
+    text=title
+    for (path in files) {
+        text = c(text, header, readLines(path))
+    }
+    if (delete.file) file.remove(files)
+    payload <<- lappend(payload, list(source='page', text=paste(text, collapse="\n")))
+  })
+
   err <<- list()
   
   
@@ -87,7 +104,7 @@ execute = function(request) {
     reply_content = c(err, list(status='error', execution_count=execution_count))
   } else {
     reply_content = list(status='ok', execution_count=execution_count,
-                  payload=list(), user_variables=list(), user_expressions=list())
+                  payload=payload, user_variables=list(), user_expressions=list())
   }
   send_response("execute_reply", request, 'shell', reply_content)
   
