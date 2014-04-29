@@ -5,6 +5,10 @@ lappend <- function(lst, obj) {
     lst[[length(lst)+1]] = obj
     return(lst)
 }
+namedlist <- function() {
+    # create an empty named list
+    return(setNames(list(), character(0)))
+}
 
 Executor = setRefClass("Executor",
             fields=c("execution_count", "userenv", "payload", "err", "interrupted", "kernel"),
@@ -20,7 +24,7 @@ execute = function(request) {
   
   display  = function(data, metadata=NULL) {
     if (is.null(metadata)) {
-        metadata = setNames(list(), character(0))
+        metadata = namedlist()
     }
     send_response("display_data", request, 'iopub',
             list(source='R display func', data=data, metadata=metadata)
@@ -64,7 +68,7 @@ execute = function(request) {
         data = list()
         data['text/plain'] = paste(capture.output(print(obj)), collapse="\n")
         send_response("pyout", request, 'iopub',
-                  list(data=data, metadata=setNames(list(), character(0)),
+                  list(data=data, metadata=namedlist(),
                   execution_count=execution_count))
     }
     stream = function(output, streamname) {
@@ -104,7 +108,7 @@ execute = function(request) {
     reply_content = c(err, list(status='error', execution_count=execution_count))
   } else {
     reply_content = list(status='ok', execution_count=execution_count,
-                  payload=payload, user_variables=list(), user_expressions=list())
+          payload=payload, user_variables=namedlist(), user_expressions=namedlist())
   }
   send_response("execute_reply", request, 'shell', reply_content)
   

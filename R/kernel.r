@@ -65,7 +65,7 @@ new_reply = function(msg_type, parent_msg) {
     header <- list(msg_id = UUIDgenerate(), username = parent_msg$header$username, 
         session = parent_msg$header$session, msg_type = msg_type)
     return(list(header = header, parent_header = parent_msg$header, identities = parent_msg$identities, 
-        metadata = setNames(list(), character(0))  # Ensure this is {} in JSON, not []
+        metadata = namedlist()  # Ensure this is {} in JSON, not []
         ))
 },
 #'<brief desc>
