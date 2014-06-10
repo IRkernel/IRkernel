@@ -23,6 +23,15 @@ brew update
 brew upgrade zmq
 ```
 
+If using MacPorts on OS X, make sure an [X server is intalled](http://xquartz.macosforge.org/), open a terminal and do the following:
+
+ * `sudo port install zmq`
+ * Direct the compiler to use MacPorts libraries using
+
+        export CPATH=/opt/local/include
+        export LIBRARY_PATH=/opt/local/lib
+ * Start `R` in the same terminal, and proceed as below:
+
 We need development versions of several packages from Github for now, due to
 recent fixes. First, you need to make sure you have the `devtools` R package
 available. If you don't, at the R console type:
