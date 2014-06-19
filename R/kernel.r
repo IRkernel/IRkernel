@@ -13,7 +13,7 @@ hb_reply = function() {
 #' @param msg_lst <what param does>
 #' @export
 sign_msg = function(msg_lst) {
-    concat <- paste(msg_lst, collapse = "")
+    concat <- unlist(msg_lst)
     return(hmac(connection_info$key, concat, "sha256"))
 },
 #'<brief desc>
@@ -24,17 +24,17 @@ sign_msg = function(msg_lst) {
 #' @export
 wire_to_msg = function(parts) {
     i <- 1
-    # print(parts)
-    while (parts[i] != "<IDS|MSG>") {
+    #print(parts)
+    while (any(parts[[i]] != charToRaw("<IDS|MSG>"))) {
         i <- i + 1
     }
-    signature <- parts[i + 1]
+    signature <- rawToChar(parts[[i + 1]])
     expected_signature <- sign_msg(parts[(i + 2):(i + 5)])
     stopifnot(identical(signature, expected_signature))
-    header <- fromJSON(parts[i + 2])
-    parent_header <- fromJSON(parts[i + 3])
-    metadata <- fromJSON(parts[i + 4])
-    content <- fromJSON(parts[i + 5])
+    header <- fromJSON(rawToChar(parts[[i + 2]]))
+    parent_header <- fromJSON(rawToChar(parts[[i + 3]]))
+    metadata <- fromJSON(rawToChar(parts[[i + 4]]))
+    content <- fromJSON(rawToChar(parts[[i + 5]]))
     if (i > 1) {
         identities <- parts[1:(i - 1)]
     } else {
@@ -49,11 +49,14 @@ wire_to_msg = function(parts) {
 #' @param msg <what param does>
 #' @export
 msg_to_wire = function(msg) {
-    bodyparts <- c(toJSON(msg$header, auto_unbox=TRUE), toJSON(msg$parent_header, auto_unbox=TRUE), 
-        toJSON(msg$metadata, auto_unbox=TRUE), toJSON(msg$content, auto_unbox=TRUE))
+    #print(msg)
+    bodyparts <- list(charToRaw(toJSON(msg$header, auto_unbox=TRUE)),
+                      charToRaw(toJSON(msg$parent_header, auto_unbox=TRUE)),
+                      charToRaw(toJSON(msg$metadata, auto_unbox=TRUE)),
+                      charToRaw(toJSON(msg$content, auto_unbox=TRUE))
+                     )
     signature <- sign_msg(bodyparts)
-    # print(msg$identities)
-    return(c(msg$identities, "<IDS|MSG>", signature, bodyparts))
+    return(c(msg$identities, list(charToRaw("<IDS|MSG>")), list(charToRaw(signature)), bodyparts))
 },
 #'<brief desc>
 #'
