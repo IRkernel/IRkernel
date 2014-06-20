@@ -44,7 +44,7 @@ Then, you can install the necessary development dependencies with:
 
 ```coffee
 library(devtools)
-install_github("armstrtw/rzmq")
+install_github('armstrtw/rzmq', pull=8, ref=NULL)
 install_github("takluyver/IRdisplay")
 install_github("takluyver/IRkernel")
 ```
