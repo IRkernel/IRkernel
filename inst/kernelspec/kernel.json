@@ -1,4 +1,5 @@
 {"argv":["R","-e","IRkernel::main('{connection_file}')"],
 "display_name":"R",
-"language":"R"
+"language":"R",
+"codemirror_mode": "r"
 }
