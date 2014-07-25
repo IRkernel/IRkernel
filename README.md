@@ -57,7 +57,7 @@ everything you need.
 # Running the notebook
 
 ```Shell
-ipython notebook --KernelManager.kernel_cmd="['R', '-e', 'IRkernel::main(\'{connection_file}\')']"
+ipython notebook --KernelManager.kernel_cmd="['R', '-e', 'IRkernel::main()', '--args', '{connection_file}']"
 ```
 
 You can also substitute 'qtconsole' or 'console' for 'notebook' in this command.
