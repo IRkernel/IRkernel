@@ -9,7 +9,9 @@
 #' @import rzmq
 #' @import uuid
 #' @import digest
-#' @importFrom rjson fromJSON toJSON
+#' @import evaluate
+#' @importFrom jsonlite fromJSON toJSON
+#' @importFrom IRdisplay display display_png
 #' @docType package
 #' @name IRkernel
 #' @aliases IRkernel IRkernel-package

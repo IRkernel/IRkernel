@@ -47,6 +47,9 @@ library(devtools)
 install_github('armstrtw/rzmq', pull=8, ref=NULL)
 install_github("takluyver/IRdisplay")
 install_github("takluyver/IRkernel")
+
+# Only if you have IPython 3 or above installed:
+IRkernel::installspec()
 ```
 
 You'll also need [IPython](http://ipython.org/). If you already have a Python
@@ -55,6 +58,10 @@ installing [Anaconda](http://continuum.io/downloads) is the quickest way to get
 everything you need.
 
 # Running the notebook
+
+If you have IPython 3 installed, you can create a notebook and switch to
+IRkernel from the dropdown menu. In IPython 2.x, you will need to start the
+notebook with this command:
 
 ```Shell
 ipython notebook --KernelManager.kernel_cmd="['R', '-e', 'IRkernel::main()', '--args', '{connection_file}']"

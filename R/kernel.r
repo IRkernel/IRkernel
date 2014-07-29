@@ -189,3 +189,12 @@ main <- function(connection_file="") {
     kernel <- Kernel$new(connection_file=connection_file)
     kernel$run()
 }
+
+#'Install the kernelspec to tell IPython (>= 3) about IRkernel
+#'
+#'@export
+installspec <- function() {
+    srcdir = system.file("kernelspec", package="IRkernel")
+    cmd = paste("ipython kernelspec install --replace --name ir", srcdir, sep=" ")
+    system(cmd, wait=TRUE)
+}
