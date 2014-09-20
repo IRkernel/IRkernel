@@ -43,6 +43,8 @@ install.packages("devtools")
 Then, you can install the necessary development dependencies with:
 
 ```coffee
+# Need RCurl for install_github
+install.packages('RCurl')
 library(devtools)
 install_github('armstrtw/rzmq', pull=8, ref=NULL)
 install_github("takluyver/IRdisplay")
