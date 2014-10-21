@@ -1,5 +1,9 @@
 displayenv = environment(display)
 
+
+
+
+
 lappend <- function(lst, obj) {
     # I hope this isn't the best way to do this.
     lst[[length(lst)+1]] = obj
@@ -51,7 +55,6 @@ execute = function(request) {
 
   err <<- list()
   
-  
   handle_error = function(e) {
     err <<- list(ename="ERROR", evalue=toString(e), traceback=list(toString(e)))
     if (!silent) {
@@ -63,17 +66,20 @@ execute = function(request) {
     stream = function(s, n) {}
     handle_value = identity
     handle_graphics = identity
+    handle_message = identity
+    handle_warning = identity
+
   } else {
+    stream = function(output, streamname) {
+        send_response("stream", request, 'iopub',
+                      list(name=streamname, data=paste(output, collapse="\n")))
+    }
     handle_value = function (obj) {
         data = list()
         data['text/plain'] = paste(capture.output(print(obj)), collapse="\n")
         send_response("pyout", request, 'iopub',
                   list(data=data, metadata=namedlist(),
                   execution_count=execution_count))
-    }
-    stream = function(output, streamname) {
-        send_response("stream", request, 'iopub',
-                      list(name=streamname, data=paste(output, collapse="\n")))
     }
     handle_graphics = function(plotobj) {
         tf = tempfile(fileext='.png')
@@ -82,12 +88,30 @@ execute = function(request) {
         dev.off()
         display_png(filename=tf)
     }
+    handle_message = function(o){    	
+    	out <- sub("^simpleMessage in message","", o)
+    	open <- gregexpr("\\(", out)[[1]]
+    	first <- open[1]
+    	close <- gregexpr("\\)", out)[[1]]
+    	new <- rep(0, nchar(out))
+    	new[open] <- 1
+    	new[close] <- -1
+    	new_sum <- cumsum(new)
+    	last <- which(new_sum==0 & new_sum < c(NA, head(new_sum, -1)))[1]
+    	out <- paste0(substring(out, 1, first-1), substring(out, last+1, nchar(out)))
+    	out <- sub("^: ","", out)
+    	stream(out, 'stderr')
+    }
+    handle_warning = function(o){     
+      stream(sub("^simple","", o), 'stderr')
+    }
   }
   
+
   oh = new_output_handler(text=function(o) {stream(o, 'stdout')},
                           graphics=handle_graphics,
-                          message=function(o) {stream(o, 'stderr')},
-                          warning=function(o) {stream(o, 'stderr')},
+                          message=handle_message,
+                          warning= handle_warning,
                           error=handle_error,
                           value=handle_value
                           )
