@@ -91,14 +91,24 @@ execute = function(request) {
         dev.off()
         display_png(filename=tf)
     }
+    handle_message = function(o){     
+      stream(paste(o$message, collapse = ''), 'stderr')
+    }
+    handle_warning = function(o){    
+      call = if (is.null(o$call)) '' else {
+       call = deparse(o$call)[1]
+       paste('In', call)
+      }
+    stream(sprintf('Warning message:\n%s: %s', call, o$message), 'stderr')
+    }
   }
   
   oh = new_output_handler(text=function(o) {stream(o, 'stdout')},
-                          graphics=handle_graphics,
-                          message=function(o) {stream(o, 'stderr')},
-                          warning=function(o) {stream(o, 'stderr')},
-                          error=handle_error,
-                          value=handle_value
+                          graphics = handle_graphics,
+                          message = handle_message,
+                          warning = handle_warning,
+                          error = handle_error,
+                          value = handle_value
                           )
 
   interrupted <<- FALSE
