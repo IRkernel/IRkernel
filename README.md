@@ -46,7 +46,7 @@ Then, you can install the necessary development dependencies with:
 # Need RCurl for install_github
 install.packages('RCurl')
 library(devtools)
-install_github('armstrtw/rzmq#8')
+install_github('armstrtw/rzmq')
 install_github("takluyver/IRdisplay")
 install_github("takluyver/IRkernel")
 
