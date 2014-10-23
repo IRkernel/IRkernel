@@ -88,9 +88,9 @@ execute = function(request) {
     handle_warning = function(o){    
       call = if (is.null(o$call)) '' else {
        call = deparse(o$call)[1]
-       if (call == 'eval(expr, envir, enclos)') '' else paste(' in', call)
+       paste('In', call)
       }
-    stream(sprintf('Warning%s: %s', call, o$message), 'stderr')
+    stream(sprintf('Warning message:\n%s: %s', call, o$message), 'stderr')
     }
   }
   
