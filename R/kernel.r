@@ -110,7 +110,11 @@ history = function(request) {
 
 kernel_info = function(request) {
   send_response("kernel_info_reply", request, 'shell',
-                list(protocol_version=c(4, 0), language="R"))
+                list(protocol_version=c(4, 0), language="R",
+                     language_info=list(name="R", codemirror_mode="r",
+                                pygments_lexer="r", mimetype="text/x-r-source")
+                    )
+                )
 },
 
 handle_control = function() {
