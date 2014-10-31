@@ -1,5 +1,3 @@
-{"argv":["R","-e","IRkernel::main()","--args","{connection_file}"],
-"display_name":"R",
-"language":"R",
-"codemirror_mode": "r"
+{"argv": ["R","-e","IRkernel::main()","--args","{connection_file}"],
+ "display_name":"R",
 }
