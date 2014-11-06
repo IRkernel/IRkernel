@@ -72,6 +72,8 @@ execute = function(request) {
     stream = function(s, n) {}
     handle_value = identity
     handle_graphics = identity
+    handle_message = identity
+    handle_warning = identity
   } else {
     handle_value = function (obj) {
         data = list()
