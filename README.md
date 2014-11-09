@@ -4,60 +4,68 @@ This is still experimental and unreliable. Your code should be safe,
 since IPython handles saving and loading notebooks in another process, but
 you'll lose all your variables if it crashes.
 
-##Installing
+## Installing
 
-You'll need zmq development headers to compile rzmq, as well curl headers for
-R devtools. On a recent Ubuntu/Debian installation, you can get these
-with:
+  1. You'll need zmq development headers to compile rzmq, as well curl headers
+    for R devtools.
+      * **Ubuntu/Debian**
 
-```Shell
-sudo apt-get install libzmq3-dev libcurl4-openssl-dev
-```
+        ```Shell
+        sudo apt-get install libzmq3-dev libcurl4-openssl-dev
+        ```
 
-or with homebrew:
+      * **Homebrew**
 
-```Shell
-brew install zmq
-# or upgrade
-brew update
-brew upgrade zmq
-```
+        ```Shell
+        brew install zmq
+        # or upgrade
+        brew update
+        brew upgrade zmq
+        ```
 
-If using MacPorts on OS X, make sure an [X server is intalled](http://xquartz.macosforge.org/), open a terminal and do the following:
+      * **MacPorts**
+        * make sure an [X server is intalled](http://xquartz.macosforge.org/),
+          open a terminal and do the following:
 
- * `sudo port install zmq`
- * Direct the compiler to use MacPorts libraries using
+          ```
+          sudo port install zmq
+          ```
 
-        export CPATH=/opt/local/include
-        export LIBRARY_PATH=/opt/local/lib
- * Start `R` in the same terminal, and proceed as below:
+        * Direct the compiler to use MacPorts libraries using:
 
-We need development versions of several packages from Github for now, due to
-recent fixes. First, you need to make sure you have the `devtools` R package
-available. If you don't, at the R console type:
+          ```
+          export CPATH=/opt/local/include
+          export LIBRARY_PATH=/opt/local/lib
+          ```
 
-```coffee
-install.packages("devtools")
-```
+  2. Start `R` in the same terminal, and proceed as below:
 
-Then, you can install the necessary development dependencies with:
+    * We need development versions of several packages from Github for now,
+      due to recent fixes. First, you need to make sure you have the `devtools`
+      R package available. If you don't, at the R console type:
 
-```coffee
-# Need RCurl for install_github
-install.packages('RCurl')
-library(devtools)
-install_github('armstrtw/rzmq')
-install_github("takluyver/IRdisplay")
-install_github("takluyver/IRkernel")
+      ```coffee
+      install.packages("devtools")
+      ```
 
-# Only if you have IPython 3 or above installed:
-IRkernel::installspec()
-```
+    * Then, you can install the necessary development dependencies with:
 
-You'll also need [IPython](http://ipython.org/). If you already have a Python
-environment set up, install IPython using your preferred tools. If not,
-installing [Anaconda](http://continuum.io/downloads) is the quickest way to get
-everything you need.
+      ```coffee
+      # Need RCurl for install_github
+      install.packages('RCurl')
+      library(devtools)
+      install_github('armstrtw/rzmq')
+      install_github("takluyver/IRdisplay")
+      install_github("takluyver/IRkernel")
+
+      # Only if you have IPython 3 or above installed:
+      IRkernel::installspec()
+      ```
+
+  3. You'll also need [IPython](http://ipython.org/). If you already have a
+    Python environment set up, install IPython using your preferred tools. If
+    not, installing [Anaconda](http://continuum.io/downloads) is the quickest
+    way to get everything you need.
 
 # Running the notebook
 
