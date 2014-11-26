@@ -22,6 +22,12 @@ you'll lose all your variables if it crashes.
         brew update
         brew upgrade zmq
         ```
+        
+        Note: the `zmq.hpp` header may not exist as part of your zmq installation. In which case, you can grab it directly and place in `/usr/local/include/`:
+        ```
+        curl https://raw.githubusercontent.com/zeromq/cppzmq/master/zmq.hpp -o /usr/local/include/zmq.hpp
+        ```
+        
 
       * **MacPorts**
         * make sure an [X server is intalled](http://xquartz.macosforge.org/),
