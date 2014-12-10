@@ -113,7 +113,7 @@ kernel_info = function(request) {
                 list(protocol_version=c(4, 0), language="R",
                      language_info=list(name="R", codemirror_mode="r",
                                 pygments_lexer="r", mimetype="text/x-r-source",
-                                file_extension="r"
+                                file_extension=".r"
                                 )
                     )
                 )
