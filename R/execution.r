@@ -1,5 +1,29 @@
 displayenv = environment(display)
 
+plot_options=new.env() # environment for storing plot-options
+
+#'Set options for plotting
+#'
+#'IRkernel displays plots in the notebook with calls to png().
+#'This function allows to set the variables that will be passed on to
+#'png(), for example width or height, see help(png).
+#' @param ... options that will be passed to  png()
+#' @export
+set_plot_options <- function(...){
+    options <- list(...)
+    for(opt in names(options)){
+        assign( opt, options[[opt]], plot_options )
+    }
+}
+
+#'Get options for plotting
+#'
+#'Use set_plot_options() for modifying.
+#' @export
+get_plot_options <- function(){
+    return(as.list(plot_options))
+}
+
 lappend <- function(lst, obj) {
     # I hope this isn't the best way to do this.
     lst[[length(lst)+1]] = obj
@@ -88,7 +112,7 @@ execute = function(request) {
     }
     handle_graphics = function(plotobj) {
         tf = tempfile(fileext='.png')
-        png(tf)
+        do.call(png, c(list(filename=tf), get_plot_options()))
         replayPlot(plotobj)
         dev.off()
         display_png(filename=tf)
