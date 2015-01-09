@@ -198,9 +198,11 @@ main <- function(connection_file="") {
 
 #'Install the kernelspec to tell IPython (>= 3) about IRkernel
 #'
+#'@param user Install into user directory ~/.ipython or globally?
 #'@export
-installspec <- function() {
+installspec <- function(user=T) {
     srcdir = system.file("kernelspec", package="IRkernel")
-    cmd = paste("ipython kernelspec install --replace --name ir", srcdir, sep=" ")
+    user_flag=ifelse(user, "--user", "")
+    cmd = paste("ipython kernelspec install --replace --name ir", user_flag, srcdir, sep=" ")
     system(cmd, wait=TRUE)
 }
