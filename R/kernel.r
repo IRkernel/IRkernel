@@ -200,7 +200,7 @@ main <- function(connection_file="") {
 #'
 #'@param user Install into user directory ~/.ipython or globally?
 #'@export
-installspec <- function(user=F) {
+installspec <- function(user=T) {
     srcdir = system.file("kernelspec", package="IRkernel")
     user_flag=ifelse(user, "--user", "")
     cmd = paste("ipython kernelspec install --replace --name ir", user_flag, srcdir, sep=" ")
