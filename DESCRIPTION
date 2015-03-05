@@ -2,7 +2,7 @@ Package: IRkernel
 Title: Native R kernel for the IPython notebook
 Description: This package provides a native interface to the R kernel from the
     IPython notebook
-Version: 0.1
+Version: 0.2
 Authors@R: c(person("Thomas", "Kluver", role = c("aut", "cre"),
     email = "thomas@kluyver.me.uk"),
     person("Karthik", "Ram", role = "aut",
