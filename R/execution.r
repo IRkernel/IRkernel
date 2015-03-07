@@ -37,9 +37,19 @@ namedlist <- function() {
 # This function copied from testthat, by Hadley Wickham. MIT licensed.
 # https://github.com/cran/testthat/blob/9e78f643d5b1c5d5882849508772ecbe980d3ac9/R/test-package.r
 with_top_env <- function(env, code) {
-    old <- options(topLevelEnvironment = env)
-    on.exit(options(old), add = TRUE)
-
+    old.env <- .BaseNamespaceEnv$.GlobalEnv
+    unlockBinding('.GlobalEnv', .BaseNamespaceEnv)
+    .BaseNamespaceEnv$.GlobalEnv <- env
+    
+    old.opt <- options(topLevelEnvironment = env)
+    
+    on.exit({
+        .BaseNamespaceEnv$.GlobalEnv <- old.env
+        lockBinding('.GlobalEnv', .BaseNamespaceEnv)
+        
+        options(old.opt)
+    }, add = TRUE)
+    
     code
 }
 
