@@ -99,9 +99,41 @@ handle_shell = function() {
         kernel_info(msg)
     } else if (msg$header$msg_type == "history_request") {
         history(msg)
+    } else if (msg$header$msg_type == "complete_request") {
+        complete(msg)
     } else {
         print(c("Got unhandled msg_type:", msg$header$msg_type))
     }
+},
+
+complete = function(request) {
+    # 5.0 protocol:
+    #code <- request$content$code
+    # once this is supported, we’ll need to change the
+    # .assignEnd call because it expects in-line pos
+    
+    # 4.0 protocol:
+    code <- request$content$line
+    
+    c.info <- with_top_env(executor$userenv, {
+        utils:::.assignLinebuffer(code)
+        utils:::.assignEnd(request$content$cursor_pos)
+        utils:::.guessTokenFromLine()
+        utils:::.completeToken()
+        
+        c(list(comps = utils:::.retrieveCompletions()),
+          utils:::.guessTokenFromLine(update = FALSE))
+    })
+    
+    send_response('complete_reply', request, 'shell', list(
+        matches = c.info$comps,
+        metadata = namedlist(),
+        status = 'ok',
+        # 5.0 protocol
+        #cursor_start = c.info$start,
+        #cursor_end = c.info$start + nchar(c.info$token),
+        # 4.0 protocol
+        matched_text = c.info$token))
 },
 
 history = function(request) {
