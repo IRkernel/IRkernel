@@ -121,6 +121,8 @@ complete = function(request) {
         utils:::.guessTokenFromLine()
         utils:::.completeToken()
         
+        # .guessTokenFromLine, like most other functions here usually sets variables in .CompletionEnv.
+        # When specifying update = FALSE, it instead returns a list(token = ..., start = ...)
         c(list(comps = utils:::.retrieveCompletions()),
           utils:::.guessTokenFromLine(update = FALSE))
     })
