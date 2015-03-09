@@ -34,7 +34,7 @@ namedlist <- function() {
     return(setNames(list(), character(0)))
 }
 
-# This function copied from testthat, by Hadley Wickham. MIT licensed.
+# This function originally copied from testthat, by Hadley Wickham. MIT licensed.
 # https://github.com/cran/testthat/blob/9e78f643d5b1c5d5882849508772ecbe980d3ac9/R/test-package.r
 with_top_env <- function(env, code) {
     old.env <- .BaseNamespaceEnv$.GlobalEnv
