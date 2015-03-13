@@ -1,6 +1,6 @@
 # Native R kernel for IPython
 
-This is still experimental and unreliable. Your code should be safe,
+This is still experimental. Your code should be safe,
 since IPython handles saving and loading notebooks in another process, but
 you'll lose all your variables if it crashes.
 
