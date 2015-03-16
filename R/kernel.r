@@ -128,7 +128,7 @@ complete = function(request) {
     })
     
     send_response('complete_reply', request, 'shell', list(
-        matches = c.info$comps,
+        matches = as.list(c.info$comps),
         metadata = namedlist(),
         status = 'ok',
         # 5.0 protocol
