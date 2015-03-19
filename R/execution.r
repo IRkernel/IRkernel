@@ -34,27 +34,8 @@ namedlist <- function() {
     return(setNames(list(), character(0)))
 }
 
-# This function originally copied from testthat, by Hadley Wickham. MIT licensed.
-# https://github.com/cran/testthat/blob/9e78f643d5b1c5d5882849508772ecbe980d3ac9/R/test-package.r
-with_top_env <- function(env, code) {
-    old.env <- .BaseNamespaceEnv$.GlobalEnv
-    unlockBinding('.GlobalEnv', .BaseNamespaceEnv)
-    .BaseNamespaceEnv$.GlobalEnv <- env
-    
-    old.opt <- options(topLevelEnvironment = env)
-    
-    on.exit({
-        .BaseNamespaceEnv$.GlobalEnv <- old.env
-        lockBinding('.GlobalEnv', .BaseNamespaceEnv)
-        
-        options(old.opt)
-    }, add = TRUE)
-    
-    code
-}
-
 Executor = setRefClass("Executor",
-            fields=c("execution_count", "userenv", "payload", "err", "interrupted", "kernel"),
+            fields=c("execution_count", "payload", "err", "interrupted", "kernel"),
             methods = list(
 
 execute = function(request) {
@@ -148,14 +129,14 @@ execute = function(request) {
                           )
 
   interrupted <<- FALSE
-  with_top_env(userenv, {
-      tryCatch(
-        evaluate(request$content$code, envir=userenv, output_handler=oh,
-                    stop_on_error=0),
-            interrupt = function(cond) {interrupted <<- TRUE},
-            error = handle_error  # evaluate does not catch errors in parsing
-        )
-  })
+  
+  tryCatch(
+    evaluate(request$content$code, envir=.GlobalEnv, output_handler=oh,
+                stop_on_error=0),
+        interrupt = function(cond) {interrupted <<- TRUE},
+        error = handle_error  # evaluate does not catch errors in parsing
+    )
+
   
   send_response("status", request, 'iopub', list(execution_state="idle"))
   
@@ -176,7 +157,6 @@ execute = function(request) {
 
 initialize = function(...) {
     execution_count <<- 1
-    userenv <<- new.env()
     err <<- list()
     callSuper(...)
 })
