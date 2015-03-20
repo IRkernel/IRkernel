@@ -115,17 +115,15 @@ complete = function(request) {
     # 4.0 protocol:
     code <- request$content$line
     
-    c.info <- with_top_env(executor$userenv, {
-        utils:::.assignLinebuffer(code)
-        utils:::.assignEnd(request$content$cursor_pos)
-        utils:::.guessTokenFromLine()
-        utils:::.completeToken()
+    utils:::.assignLinebuffer(code)
+    utils:::.assignEnd(request$content$cursor_pos)
+    utils:::.guessTokenFromLine()
+    utils:::.completeToken()
         
         # .guessTokenFromLine, like most other functions here usually sets variables in .CompletionEnv.
         # When specifying update = FALSE, it instead returns a list(token = ..., start = ...)
-        c(list(comps = utils:::.retrieveCompletions()),
-          utils:::.guessTokenFromLine(update = FALSE))
-    })
+    c.info <- c(list(comps = utils:::.retrieveCompletions()),
+                utils:::.guessTokenFromLine(update = FALSE))
     
     send_response('complete_reply', request, 'shell', list(
         matches = as.list(c.info$comps),
