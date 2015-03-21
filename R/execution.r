@@ -41,7 +41,7 @@ Executor = setRefClass("Executor",
 execute = function(request) {
   send_response = kernel$send_response
   send_response("status", request, 'iopub', list(execution_state="busy"))
-  send_response("pyin", request, 'iopub',
+  send_response("execute_input", request, 'iopub',
                 list(code=request$code, execution_count=execution_count))
 
   silent = request$content$silent
@@ -79,7 +79,7 @@ execute = function(request) {
   handle_error = function(e) {
     err <<- list(ename="ERROR", evalue=toString(e), traceback=list(toString(e)))
     if (!silent) {
-      send_response("pyerr", request, 'iopub',
+      send_response("error", request, 'iopub',
                     c(err, list(execution_count=execution_count)))
     }
   }
@@ -93,13 +93,13 @@ execute = function(request) {
     handle_value = function (obj) {
         data = list()
         data['text/plain'] = paste(capture.output(print(obj)), collapse="\n")
-        send_response("pyout", request, 'iopub',
+        send_response("execute_result", request, 'iopub',
                   list(data=data, metadata=namedlist(),
                   execution_count=execution_count))
     }
     stream = function(output, streamname) {
         send_response("stream", request, 'iopub',
-                      list(name=streamname, data=paste(output, collapse="\n")))
+                      list(name=streamname, text=paste(output, collapse="\n")))
     }
     handle_graphics = function(plotobj) {
         tf = tempfile(fileext='.png')
@@ -146,7 +146,7 @@ execute = function(request) {
     reply_content = c(err, list(status='error', execution_count=execution_count))
   } else {
     reply_content = list(status='ok', execution_count=execution_count,
-          payload=payload, user_variables=namedlist(), user_expressions=namedlist())
+          payload=payload, user_expressions=namedlist())
   }
   send_response("execute_reply", request, 'shell', reply_content)
   
