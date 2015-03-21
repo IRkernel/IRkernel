@@ -66,7 +66,7 @@ msg_to_wire = function(msg) {
 #' @export
 new_reply = function(msg_type, parent_msg) {
     header <- list(msg_id = UUIDgenerate(), username = parent_msg$header$username, 
-        session = parent_msg$header$session, msg_type = msg_type)
+        session = parent_msg$header$session, msg_type = msg_type, version='5.0')
     return(list(header = header, parent_header = parent_msg$header, identities = parent_msg$identities, 
         metadata = namedlist()  # Ensure this is {} in JSON, not []
         ))
@@ -108,32 +108,39 @@ handle_shell = function() {
 
 complete = function(request) {
     # 5.0 protocol:
-    #code <- request$content$code
-    # once this is supported, we’ll need to change the
-    # .assignEnd call because it expects in-line pos
+    code <- request$content$code
+    cursor_pos <- request$content$cursor_pos
     
-    # 4.0 protocol:
-    code <- request$content$line
+    # Find which line we're on and position within that line
+    lines <- strsplit(code, '\n', fixed=T)[[1]]
+    chars_before_line = 0
+    for (line in lines) {
+        new_cursor_pos <- cursor_pos - (nchar(line) + 1) # +1 for the newline
+        if (new_cursor_pos < 0) {
+            break
+        }
+        cursor_pos <- new_cursor_pos
+        chars_before_line <- chars_before_line + (nchar(line) + 1)
+    }
     
-    utils:::.assignLinebuffer(code)
-    utils:::.assignEnd(request$content$cursor_pos)
+    utils:::.assignLinebuffer(line)
+    utils:::.assignEnd(cursor_pos)
     utils:::.guessTokenFromLine()
     utils:::.completeToken()
         
-        # .guessTokenFromLine, like most other functions here usually sets variables in .CompletionEnv.
-        # When specifying update = FALSE, it instead returns a list(token = ..., start = ...)
+    # .guessTokenFromLine, like most other functions here usually sets variables in .CompletionEnv.
+    # When specifying update = FALSE, it instead returns a list(token = ..., start = ...)
     c.info <- c(list(comps = utils:::.retrieveCompletions()),
                 utils:::.guessTokenFromLine(update = FALSE))
     
+    start_position = chars_before_line + c.info$start
     send_response('complete_reply', request, 'shell', list(
         matches = as.list(c.info$comps),
         metadata = namedlist(),
         status = 'ok',
-        # 5.0 protocol
-        #cursor_start = c.info$start,
-        #cursor_end = c.info$start + nchar(c.info$token),
-        # 4.0 protocol
-        matched_text = c.info$token))
+        cursor_start = start_position,
+        cursor_end = start_position + nchar(c.info$token)
+    ))
 },
 
 history = function(request) {
@@ -141,12 +148,15 @@ history = function(request) {
 },
 
 kernel_info = function(request) {
+  rversion = paste(version$major, '.', version$minor, sep="")
   send_response("kernel_info_reply", request, 'shell',
-                list(protocol_version=c(4, 0), language="R",
+                list(protocol_version='5.0', implementation='IRkernel',
+                     implementation_version='0.2',
                      language_info=list(name="R", codemirror_mode="r",
-                                pygments_lexer="r", mimetype="text/x-r-source",
-                                file_extension=".r"
-                                )
+                        pygments_lexer="r", mimetype="text/x-r-source",
+                        file_extension=".r", version=rversion
+                     ),
+                     banner=version$version.string
                     )
                 )
 },
