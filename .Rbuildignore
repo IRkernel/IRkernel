@@ -1,3 +1,5 @@
 .gitignore
 .ipynb_checkpoints
 .*.ipynb
+^.*\.Rproj$
+^\.Rproj\.user$
