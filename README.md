@@ -24,7 +24,7 @@ you'll lose all your variables if it crashes.
         ```
 
       * **MacPorts**
-        * make sure an [X server is intalled](http://xquartz.macosforge.org/),
+        * make sure an [X server is installed](http://xquartz.macosforge.org/),
           open a terminal and do the following:
 
           ```
