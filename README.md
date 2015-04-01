@@ -52,11 +52,11 @@ you'll lose all your variables if it crashes.
 
       ```coffee
       # Need RCurl for install_github
-      install.packages('RCurl')
+      install.packages(c('RCurl', 'base64enc'))
       library(devtools)
       install_github('armstrtw/rzmq')
-      install_github("IRkernel/IRdisplay")
-      install_github("IRkernel/IRkernel")
+      install_github('IRkernel/IRdisplay')
+      install_github('IRkernel/IRkernel')
 
       # Only if you have IPython 3 or above installed:
       IRkernel::installspec()
