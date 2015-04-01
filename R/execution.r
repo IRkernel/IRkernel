@@ -34,8 +34,18 @@ namedlist <- function() {
     return(setNames(list(), character(0)))
 }
 
+plot_builds_upon <- function(prev, current) {
+    if (is.null(prev)) {
+        return(TRUE)
+    }
+    lprev = length(prev[[1]])
+    lcurrent = length(current[[1]])
+    return((lcurrent >= lprev) && (identical(current[[1]][1:lprev], prev[[1]][1:lprev])))
+}
+
 Executor = setRefClass("Executor",
-            fields=c("execution_count", "payload", "err", "interrupted", "kernel"),
+            fields=c("execution_count", "payload", "err", "interrupted", "kernel",
+                     "last_recorded_plot"),
             methods = list(
 
 execute = function(request) {
@@ -73,6 +83,14 @@ execute = function(request) {
     payload <<- lappend(payload, list(source='page', text=paste(text, collapse="\n")))
   })
 
+  send_plot = function(plotobj) {
+      tf = tempfile(fileext='.png')
+      do.call(png, c(list(filename=tf), get_plot_options()))
+      replayPlot(plotobj)
+      dev.off()
+      display_png(file=tf)
+  }
+
   err <<- list()
   
   
@@ -102,16 +120,15 @@ execute = function(request) {
                       list(name=streamname, text=paste(output, collapse="\n")))
     }
     handle_graphics = function(plotobj) {
-        tf = tempfile(fileext='.png')
-        do.call(png, c(list(filename=tf), get_plot_options()))
-        replayPlot(plotobj)
-        dev.off()
-        display_png(filename=tf)
+        if (!plot_builds_upon(last_recorded_plot, plotobj)) {
+            send_plot(last_recorded_plot)
+        }
+        last_recorded_plot <<- plotobj
     }
-    handle_message = function(o){     
+    handle_message = function(o){
       stream(paste(o$message, collapse = ''), 'stderr')
     }
-    handle_warning = function(o){    
+    handle_warning = function(o){
       call = if (is.null(o$call)) '' else {
        call = deparse(o$call)[1]
        paste('In', call)
@@ -129,6 +146,7 @@ execute = function(request) {
                           )
 
   interrupted <<- FALSE
+  last_recorded_plot <<- NULL
   
   tryCatch(
     evaluate(request$content$code, envir=.GlobalEnv, output_handler=oh,
@@ -137,6 +155,9 @@ execute = function(request) {
         error = handle_error  # evaluate does not catch errors in parsing
     )
 
+  if ((!silent) & (!is.null(last_recorded_plot))) {
+      send_plot(last_recorded_plot)
+  }
   
   send_response("status", request, 'iopub', list(execution_state="idle"))
   
