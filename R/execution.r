@@ -43,6 +43,17 @@ plot_builds_upon <- function(prev, current) {
     return((lcurrent >= lprev) && (identical(current[[1]][1:lprev], prev[[1]][1:lprev])))
 }
 
+image_formats <- list(
+    png = list(
+        extension = '.png',
+        device = png),
+    pdf = list(
+        extension = '.pdf',
+        device = cairo_pdf),
+    svg = list(
+        extension = '.svg',
+        device = svg))
+
 Executor = setRefClass("Executor",
             fields=c("execution_count", "payload", "err", "interrupted", "kernel",
                      "last_recorded_plot"),
@@ -83,12 +94,19 @@ execute = function(request) {
     payload <<- lappend(payload, list(source='page', text=paste(text, collapse="\n")))
   })
 
-  send_plot = function(plotobj) {
-      tf = tempfile(fileext='.png')
-      do.call(png, c(list(filename=tf), get_plot_options()))
-      replayPlot(plotobj)
-      dev.off()
-      display_png(file=tf)
+  send_plot <- function(plotobj) {
+      params <- list()
+      #TODO: add option to select the ones to be created, instead of all
+      for (fmt in names(image_formats)) {
+          format <- image_formats[[fmt]]
+          tf <- tempfile(fileext = format$extension)
+          #TODO: replace get_plot_options with format-specific options using getOption()/options()
+          do.call(format$device, c(list(filename = tf), get_plot_options()))
+          replayPlot(plotobj)
+          dev.off()
+          params[[fmt]] <- list(file = tf)
+      }
+      do.call(display_multi, params)
   }
 
   err <<- list()
