@@ -11,6 +11,7 @@
 #' @import digest
 #' @import evaluate
 #' @importFrom jsonlite fromJSON toJSON
+#' @importFrom base64enc base64encode
 #' @importFrom IRdisplay display display_png display_multi
 #' @docType package
 #' @name IRkernel

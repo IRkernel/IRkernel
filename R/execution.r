@@ -44,14 +44,17 @@ plot_builds_upon <- function(prev, current) {
 }
 
 image_formats <- list(
-    png = list(
+    'image/png' = list(
         extension = '.png',
+        isbinary = TRUE,
         device = png),
-    pdf = list(
+    'application/pdf' = list(
         extension = '.pdf',
+        isbinary = TRUE,
         device = cairo_pdf),
-    svg = list(
+    'image/svg+xml' = list(
         extension = '.svg',
+        isbinary = FALSE,
         device = svg))
 
 Executor = setRefClass("Executor",
@@ -97,14 +100,14 @@ execute = function(request) {
   send_plot <- function(plotobj) {
       params <- list()
       #TODO: add option to select the ones to be created, instead of all
-      for (fmt in names(image_formats)) {
-          format <- image_formats[[fmt]]
+      for (mime in names(image_formats)) {
+          format <- image_formats[[mime]]
           tf <- tempfile(fileext = format$extension)
           #TODO: replace get_plot_options with format-specific options using getOption()/options()
           do.call(format$device, c(list(filename = tf), get_plot_options()))
           replayPlot(plotobj)
           dev.off()
-          params[[fmt]] <- list(file = tf)
+          params[[mime]] <- if (format$isbinary) base64encode(tf) else readChar(tf, file.info(tf)$size)
       }
       do.call(display_multi, params)
   }
