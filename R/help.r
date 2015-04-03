@@ -12,7 +12,7 @@
 #' @import evaluate
 #' @importFrom jsonlite fromJSON toJSON
 #' @importFrom base64enc base64encode
-#' @importFrom IRdisplay display display_png display_multi
+#' @importFrom IRdisplay display display_png display_alternatives
 #' @docType package
 #' @name IRkernel
 #' @aliases IRkernel IRkernel-package

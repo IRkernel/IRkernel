@@ -43,7 +43,7 @@ plot_builds_upon <- function(prev, current) {
     return((lcurrent >= lprev) && (identical(current[[1]][1:lprev], prev[[1]][1:lprev])))
 }
 
-image_formats <- list(
+plot_formats <- list(
     'image/png' = list(
         extension = '.png',
         isbinary = TRUE,
@@ -100,8 +100,8 @@ execute = function(request) {
   send_plot <- function(plotobj) {
       params <- list()
       #TODO: add option to select the ones to be created, instead of all
-      for (mime in names(image_formats)) {
-          format <- image_formats[[mime]]
+      for (mime in names(plot_formats)) {
+          format <- plot_formats[[mime]]
           tf <- tempfile(fileext = format$extension)
           #TODO: replace get_plot_options with format-specific options using getOption()/options()
           do.call(format$device, c(list(filename = tf), get_plot_options()))
@@ -109,7 +109,7 @@ execute = function(request) {
           dev.off()
           params[[mime]] <- if (format$isbinary) base64encode(tf) else readChar(tf, file.info(tf)$size)
       }
-      do.call(display_multi, params)
+      do.call(display_alternatives, params)
   }
 
   err <<- list()
