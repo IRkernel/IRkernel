@@ -244,7 +244,8 @@ main <- function(connection_file="") {
 #'@export
 installspec <- function(user=T) {
     srcdir = system.file("kernelspec", package="IRkernel")
+    srcdir = paste("\"",srcdir,"\"",sep="")
     user_flag=ifelse(user, "--user", "")
-    cmd = paste("ipython kernelspec install --replace --name ir", user_flag, srcdir, sep=" ")
+    cmd = paste("ipython kernelspec install --replace --name ir", user_flag,srcdir, sep=" ")
     system(cmd, wait=TRUE)
 }
