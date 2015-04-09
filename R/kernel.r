@@ -133,12 +133,12 @@ complete = function(request) {
     c.info <- c(list(comps = utils:::.retrieveCompletions()),
                 utils:::.guessTokenFromLine(update = FALSE))
     
-    comps <- as.list(c.info$comps)    # make single strings not explode into letters
-    comps <- gsub('=$', ' = ', comps) # good coding style for completions
+    # good coding style for completions
+    comps <- gsub('=$', ' = ', c.info$comps)
     
     start_position = chars_before_line + c.info$start
     send_response('complete_reply', request, 'shell', list(
-        matches = comps,
+        matches = as.list(comps),  # make single strings not explode into letters
         metadata = namedlist(),
         status = 'ok',
         cursor_start = start_position,
