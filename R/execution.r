@@ -99,12 +99,17 @@ execute = function(request) {
 
   send_plot <- function(plotobj) {
       params <- list()
-      #TODO: add option to select the ones to be created, instead of all
-      for (mime in names(plot_formats)) {
+      mimes <- getOption('jupyter.plot_formats')
+      if (is.null(mimes)) mimes <- names(plot_formats)
+      for (mime in mimes) {
           format <- plot_formats[[mime]]
           tf <- tempfile(fileext = format$extension)
           #TODO: replace get_plot_options with format-specific options using getOption()/options()
-          do.call(format$device, c(list(filename = tf), get_plot_options()))
+          
+          opts <- get_plot_options()
+          opts <- opts[intersect(names(formals(format$device)), names(opts))]
+          
+          do.call(format$device, c(filename = tf, opts))
           replayPlot(plotobj)
           dev.off()
           params[[mime]] <- if (format$isbinary) base64encode(tf) else readChar(tf, file.info(tf)$size)
