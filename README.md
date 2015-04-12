@@ -62,6 +62,10 @@ you'll lose all your variables if it crashes.
       IRkernel::installspec()
       ```
 
+   Note: It is important that the active `ipython` in the shell, from which `R`
+   is started, will point to the "right" one. This is particularly important in
+   case where more than one IPython is used. (e.g. virtualenv).
+
   3. You'll also need [IPython](http://ipython.org/). If you already have a
     Python environment set up, install IPython using your preferred tools. If
     not, installing [Anaconda](http://continuum.io/downloads) is the quickest
