@@ -65,10 +65,10 @@ execute = function(request) {
   send_plot <- function(plotobj) {
       params <- list()
       for (mime in getOption('jupyter.plot_mimetypes')) {
-          r <- mime2repr[[mime]](plotobj)
+          r <- unclass(mime2repr[[mime]](plotobj))
           params[[mime]] <- if (is.raw(r)) base64encode(r) else r
       }
-      do.call(display_alternatives, params)
+      display(params)
   }
 
   err <<- list()
