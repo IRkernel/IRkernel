@@ -1,28 +1,7 @@
+#' @include options.R
+NULL
+
 displayenv = environment(display)
-
-plot_options=new.env() # environment for storing plot-options
-
-#'Set options for plotting
-#'
-#'IRkernel displays plots in the notebook with calls to png().
-#'This function allows to set the variables that will be passed on to
-#'png(), for example width or height, see help(png).
-#' @param ... options that will be passed to  png()
-#' @export
-set_plot_options <- function(...){
-    options <- list(...)
-    for(opt in names(options)){
-        assign( opt, options[[opt]], plot_options )
-    }
-}
-
-#'Get options for plotting
-#'
-#'Use set_plot_options() for modifying.
-#' @export
-get_plot_options <- function(){
-    return(as.list(plot_options))
-}
 
 lappend <- function(lst, obj) {
     # I hope this isn't the best way to do this.
@@ -42,20 +21,6 @@ plot_builds_upon <- function(prev, current) {
     lcurrent = length(current[[1]])
     return((lcurrent >= lprev) && (identical(current[[1]][1:lprev], prev[[1]][1:lprev])))
 }
-
-plot_formats <- list(
-    'image/png' = list(
-        extension = '.png',
-        isbinary = TRUE,
-        device = png),
-    'application/pdf' = list(
-        extension = '.pdf',
-        isbinary = TRUE,
-        device = cairo_pdf),
-    'image/svg+xml' = list(
-        extension = '.svg',
-        isbinary = FALSE,
-        device = svg))
 
 Executor = setRefClass("Executor",
             fields=c("execution_count", "payload", "err", "interrupted", "kernel",
@@ -99,20 +64,9 @@ execute = function(request) {
 
   send_plot <- function(plotobj) {
       params <- list()
-      mimes <- getOption('jupyter.plot_formats')
-      if (is.null(mimes)) mimes <- names(plot_formats)
-      for (mime in mimes) {
-          format <- plot_formats[[mime]]
-          tf <- tempfile(fileext = format$extension)
-          #TODO: replace get_plot_options with format-specific options using getOption()/options()
-          
-          opts <- get_plot_options()
-          opts <- opts[intersect(names(formals(format$device)), names(opts))]
-          
-          do.call(format$device, c(filename = tf, opts))
-          replayPlot(plotobj)
-          dev.off()
-          params[[mime]] <- if (format$isbinary) base64encode(tf) else readChar(tf, file.info(tf)$size)
+      for (mime in getOption('jupyter.plot_mimetypes')) {
+          r <- mime2repr[[mime]](plotobj)
+          params[[mime]] <- if (is.raw(r)) base64encode(r) else r
       }
       do.call(display_alternatives, params)
   }
