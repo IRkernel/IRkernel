@@ -21,3 +21,8 @@ Imports:
     jsonlite (>= 0.9.6),
     uuid,
     digest
+Collate:
+    'options.R'
+    'execution.r'
+    'help.r'
+    'kernel.r'

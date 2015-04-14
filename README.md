@@ -55,8 +55,9 @@ you'll lose all your variables if it crashes.
       install.packages('RCurl')
       library(devtools)
       install_github('armstrtw/rzmq')
-      install_github("IRkernel/IRdisplay")
-      install_github("IRkernel/IRkernel")
+      install_github('IRkernel/repr')
+      install_github('IRkernel/IRdisplay')
+      install_github('IRkernel/IRkernel')
 
       # Only if you have IPython 3 or above installed:
       IRkernel::installspec()

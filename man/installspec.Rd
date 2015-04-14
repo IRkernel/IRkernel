@@ -4,7 +4,7 @@
 \alias{installspec}
 \title{Install the kernelspec to tell IPython (>= 3) about IRkernel}
 \usage{
-installspec(user = F)
+installspec(user = T)
 }
 \arguments{
 \item{user}{Install into user directory ~/.ipython or globally?}

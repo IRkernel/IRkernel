@@ -11,4 +11,16 @@ protocol to a 'kernel' which is responsible for executing code. This protocol
 is language agnostic, so other languages can take advantage of IPython's rich
 UI by implementing a kernel. This package is a kernel for the R language.
 }
+\section{Options}{
+
+
+The following can be set/read via \code{options(opt.name = ...)} / \code{getOption('opt.name')}
+
+\describe{
+  \item{\code{jupyter.plot_mimetypes}}{
+     The plot formats emitted to the frontend when a plot is displayed.
+     (default: image/png, application/pdf, and image/svg+xml)
+  }
+}
+}
 

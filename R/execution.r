@@ -1,28 +1,7 @@
+#' @include options.R
+NULL
+
 displayenv = environment(display)
-
-plot_options=new.env() # environment for storing plot-options
-
-#'Set options for plotting
-#'
-#'IRkernel displays plots in the notebook with calls to png().
-#'This function allows to set the variables that will be passed on to
-#'png(), for example width or height, see help(png).
-#' @param ... options that will be passed to  png()
-#' @export
-set_plot_options <- function(...){
-    options <- list(...)
-    for(opt in names(options)){
-        assign( opt, options[[opt]], plot_options )
-    }
-}
-
-#'Get options for plotting
-#'
-#'Use set_plot_options() for modifying.
-#' @export
-get_plot_options <- function(){
-    return(as.list(plot_options))
-}
 
 lappend <- function(lst, obj) {
     # I hope this isn't the best way to do this.
@@ -42,6 +21,11 @@ plot_builds_upon <- function(prev, current) {
     lcurrent = length(current[[1]])
     return((lcurrent >= lprev) && (identical(current[[1]][1:lprev], prev[[1]][1:lprev])))
 }
+
+# needed to easily encode reprs as json.
+setOldClass('repr')
+asJSON <- jsonlite:::asJSON
+setMethod('asJSON', 'repr', function(x, ...) jsonlite:::asJSON(structure(x, class = NULL, repr.format = NULL), ...))
 
 Executor = setRefClass("Executor",
             fields=c("execution_count", "payload", "err", "interrupted", "kernel",
@@ -83,12 +67,12 @@ execute = function(request) {
     payload <<- lappend(payload, list(source='page', text=paste(text, collapse="\n")))
   })
 
-  send_plot = function(plotobj) {
-      tf = tempfile(fileext='.png')
-      do.call(png, c(list(filename=tf), get_plot_options()))
-      replayPlot(plotobj)
-      dev.off()
-      display_png(file=tf)
+  send_plot <- function(plotobj) {
+      params <- list()
+      for (mime in getOption('jupyter.plot_mimetypes')) {
+          params[[mime]] <- mime2repr[[mime]](plotobj)
+      }
+      display(params)
   }
 
   err <<- list()
