@@ -10,6 +10,11 @@
 #' The following can be set/read via \code{options(opt.name = ...)} / \code{getOption('opt.name')}
 #' 
 #' \describe{
+#'   \item{\code{jupyter.rich_display}}{Use more than just text display}
+#'   \item{\code{jupyter.result_mimetypes}}{
+#'      The formats emitted when any return value is to be displayed
+#'      (default text/plain, text/html, text/markdown, text/latex) 
+#'   }
 #'   \item{\code{jupyter.plot_mimetypes}}{
 #'      The plot formats emitted to the frontend when a plot is displayed.
 #'      (default: image/png, application/pdf, and image/svg+xml)
