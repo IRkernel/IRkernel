@@ -22,6 +22,11 @@ plot_builds_upon <- function(prev, current) {
     return((lcurrent >= lprev) && (identical(current[[1]][1:lprev], prev[[1]][1:lprev])))
 }
 
+# needed to easily encode reprs as json.
+setOldClass('repr')
+asJSON <- jsonlite:::asJSON
+setMethod('asJSON', 'repr', function(x, ...) jsonlite:::asJSON(structure(x, class = NULL, repr.format = NULL), ...))
+
 Executor = setRefClass("Executor",
             fields=c("execution_count", "payload", "err", "interrupted", "kernel",
                      "last_recorded_plot"),
@@ -65,10 +70,9 @@ execute = function(request) {
   send_plot <- function(plotobj) {
       params <- list()
       for (mime in getOption('jupyter.plot_mimetypes')) {
-          r <- mime2repr[[mime]](plotobj)
-          params[[mime]] <- if (is.raw(r)) base64encode(r) else r
+          params[[mime]] <- mime2repr[[mime]](plotobj)
       }
-      do.call(display_alternatives, params)
+      display(params)
   }
 
   err <<- list()
