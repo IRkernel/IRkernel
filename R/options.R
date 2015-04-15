@@ -33,6 +33,7 @@ opt.defaults <- list(
         'image/svg+xml'),
     jupyter.plot_mimetypes = c(
         'image/png',
+        'image/jpeg',
         'application/pdf',
         'image/svg+xml'))
 
