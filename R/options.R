@@ -16,19 +16,27 @@ get_plot_options <- function() {
     return(as.list(plot.opts))
 }
 
-opt.defaults = list(
+opt.defaults <- list(
     jupyter.rich_display = TRUE,
     jupyter.result_mimetypes = c(
         'text/plain',
         'text/html',
         'text/markdown',
-        'text/latex'),
+        'text/latex',
+        
+        'application/json',
+        'application/javascript',
+        
+        'application/pdf',
+        'image/png',
+        'image/jpeg',
+        'image/svg+xml'),
     jupyter.plot_mimetypes = c(
         'image/png',
         'application/pdf',
         'image/svg+xml'))
 
-.onLoad = function(libname = NULL, pkgname = NULL) {
+.onLoad <- function(libname = NULL, pkgname = NULL) {
     for (option in names(opt.defaults)) {
         if (is.null(getOption(option))) {
             do.call(options, opt.defaults[option])  # single []: preserve name

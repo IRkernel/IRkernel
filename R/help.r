@@ -13,7 +13,7 @@
 #'   \item{\code{jupyter.rich_display}}{Use more than just text display}
 #'   \item{\code{jupyter.result_mimetypes}}{
 #'      The formats emitted when any return value is to be displayed
-#'      (default text/plain, text/html, text/markdown, text/latex) 
+#'      (default: all mimetypes listed \href{http://ipython.org/ipython-doc/stable/api/generated/IPython.core.formatters.html#IPython.core.formatters.format_display_data}{here}) 
 #'   }
 #'   \item{\code{jupyter.plot_mimetypes}}{
 #'      The plot formats emitted to the frontend when a plot is displayed.
