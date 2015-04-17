@@ -22,11 +22,6 @@ plot_builds_upon <- function(prev, current) {
     return((lcurrent >= lprev) && (identical(current[[1]][1:lprev], prev[[1]][1:lprev])))
 }
 
-# needed to easily encode reprs as json.
-setOldClass('repr')
-asJSON <- jsonlite:::asJSON
-setMethod('asJSON', 'repr', function(x, ...) jsonlite:::asJSON(structure(x, class = NULL, repr.format = NULL), ...))
-
 Executor = setRefClass("Executor",
             fields=c("execution_count", "payload", "err", "interrupted", "kernel",
                      "last_recorded_plot"),
