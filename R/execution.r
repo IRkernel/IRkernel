@@ -22,11 +22,6 @@ plot_builds_upon <- function(prev, current) {
     return((lcurrent >= lprev) && (identical(current[[1]][1:lprev], prev[[1]][1:lprev])))
 }
 
-# needed to easily encode reprs as json.
-setOldClass('repr')
-asJSON <- jsonlite:::asJSON
-setMethod('asJSON', 'repr', function(x, ...) jsonlite:::asJSON(structure(x, class = NULL, repr.format = NULL), ...))
-
 Executor = setRefClass("Executor",
             fields=c("execution_count", "payload", "err", "interrupted", "kernel",
                      "last_recorded_plot"),
@@ -92,12 +87,20 @@ execute = function(request) {
     handle_message = identity
     handle_warning = identity
   } else {
-    handle_value = function (obj) {
-        data = list()
-        data['text/plain'] = paste(capture.output(print(obj)), collapse="\n")
-        send_response("execute_result", request, 'iopub',
-                  list(data=data, metadata=namedlist(),
-                  execution_count=execution_count))
+    handle_value <- function (obj) {
+        data <- list()
+        if (getOption('jupyter.rich_display')) {
+            for (mime in getOption('jupyter.result_mimetypes')) {
+                r <- mime2repr[[mime]](obj)
+                if (!is.null(r)) data[[mime]] <- r
+            }
+        } else {
+            data[['text/plain']] <- repr_text(obj)
+        } 
+        send_response('execute_result', request, 'iopub', list(
+            data = data,
+            metadata = namedlist(),
+            execution_count = execution_count))
     }
     stream = function(output, streamname) {
         send_response("stream", request, 'iopub',
