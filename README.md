@@ -10,13 +10,13 @@ you'll lose all your variables if it crashes.
     for R devtools.
       * **Ubuntu/Debian**
 
-        ```Shell
+        ```bash
         sudo apt-get install libzmq3-dev libcurl4-openssl-dev
         ```
 
       * **Homebrew**
 
-        ```Shell
+        ```bash
         brew install zmq
         # or upgrade
         brew update
@@ -27,13 +27,13 @@ you'll lose all your variables if it crashes.
         * make sure an [X server is installed](http://xquartz.macosforge.org/),
           open a terminal and do the following:
 
-          ```
+          ```bash
           sudo port install zmq
           ```
 
         * Direct the compiler to use MacPorts libraries using:
 
-          ```
+          ```bash
           export CPATH=/opt/local/include
           export LIBRARY_PATH=/opt/local/lib
           ```
@@ -74,7 +74,7 @@ If you have IPython 3 installed, you can create a notebook and switch to
 IRkernel from the dropdown menu. In IPython 2.x, you will need to start the
 notebook with this command:
 
-```Shell
+```bash
 ipython notebook --KernelManager.kernel_cmd="['R', '-e', 'IRkernel::main()', '--args', '{connection_file}']"
 ```
 
