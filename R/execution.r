@@ -65,7 +65,10 @@ execute = function(request) {
   send_plot <- function(plotobj) {
       params <- list()
       for (mime in getOption('jupyter.plot_mimetypes')) {
-          params[[mime]] <- mime2repr[[mime]](plotobj)
+          tryCatch(
+            params[[mime]] <- mime2repr[[mime]](plotobj),
+            error = handle_error
+          )
       }
       display(params)
   }
@@ -90,10 +93,13 @@ execute = function(request) {
     handle_value <- function (obj) {
         data <- list()
         if (getOption('jupyter.rich_display')) {
-            for (mime in getOption('jupyter.result_mimetypes')) {
-                r <- mime2repr[[mime]](obj)
-                if (!is.null(r)) data[[mime]] <- r
-            }
+            tryCatch(
+                for (mime in getOption('jupyter.result_mimetypes')) {
+                    r <- mime2repr[[mime]](obj)
+                    if (!is.null(r)) data[[mime]] <- r
+                },
+                error = handle_error
+            )
         } else {
             data[['text/plain']] <- repr_text(obj)
         } 
