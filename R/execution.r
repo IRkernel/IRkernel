@@ -35,7 +35,7 @@ execute = function(request) {
 
   silent = request$content$silent
   
-  display  = function(data, metadata=NULL) {
+  display_data = function(data, metadata=NULL) {
     if (is.null(metadata)) {
         metadata = namedlist()
     }
@@ -49,7 +49,7 @@ execute = function(request) {
   # This looks awkward, but we do need to get a reference to the execution
   # state into a global environment.
   unlockBinding("base_display", displayenv)
-  assign('base_display', display, pos=displayenv)
+  assign('base_display', display_data, pos=displayenv)
   
   payload <<- list()
 
@@ -90,7 +90,7 @@ execute = function(request) {
     handle_value <- function (obj) {
         data <- list()
         if (getOption('jupyter.rich_display')) {
-            for (mime in getOption('jupyter.result_mimetypes')) {
+            for (mime in getOption('jupyter.display_mimetypes')) {
                 r <- mime2repr[[mime]](obj)
                 if (!is.null(r)) data[[mime]] <- r
             }
