@@ -177,7 +177,7 @@ handle_control = function() {
 shutdown = function(request) {
   send_response('shutdown_reply', request, 'control',
                 list(restart=request$content$restart))
-  stop("Shut down by frontend.")
+  quit('no')
 },
 
 initialize = function(connection_file) {
