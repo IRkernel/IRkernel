@@ -30,7 +30,7 @@
 #' @import evaluate
 #' @importFrom jsonlite fromJSON toJSON
 #' @importFrom IRdisplay display display_png
-#' @importFrom repr mime2repr
+#' @importFrom repr mime2repr repr_text
 #' 
 #' @docType package
 #' @name IRkernel
