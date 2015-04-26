@@ -25,7 +25,7 @@ sign_msg = function(msg_lst) {
 wire_to_msg = function(parts) {
     i <- 1
     #print(parts)
-    while (any(parts[[i]] != charToRaw("<IDS|MSG>"))) {
+    while (!identical(parts[[i]], charToRaw("<IDS|MSG>"))) {
         i <- i + 1
     }
     signature <- rawToChar(parts[[i + 1]])
