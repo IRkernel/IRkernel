@@ -1,3 +1,4 @@
+#' @importFrom evaluate parse_all
 Kernel <- setRefClass("Kernel",
                 fields = c("connection_info", "zmqctx", "sockets", "executor"),
                 methods= list(
@@ -101,9 +102,46 @@ handle_shell = function() {
         history(msg)
     } else if (msg$header$msg_type == "complete_request") {
         complete(msg)
+    } else if (msg$header$msg_type == "is_complete_request") {
+        is_complete(msg)
     } else {
         print(c("Got unhandled msg_type:", msg$header$msg_type))
     }
+},
+#'Checks whether the code in the rest is complete
+#'
+#' @param  request the is_complete request 
+#' @export
+is_complete = function(request) {
+    code <- request$content$code
+    message <- tryCatch({
+        parse_all(code)
+        # the code compiles, so we are complete (either no code at all / only
+        # comments or syntactically correct code)
+        "complete" # no function, so no return!
+    }, error = function(e)e$message)
+    # One of 'complete', 'incomplete', 'invalid', 'unknown'
+    status <- if(message == "complete"){
+        # syntactical complete code
+        "complete"
+    } else if (grepl("unexpected end of input", message)){
+        # missing closing parenthesis
+        "incomplete"
+    } else if (grepl("unexpected INCOMPLETE_STRING", message)){
+        # missing closing quotes
+        "incomplete"
+    } else {
+        # all else
+        "invalid"
+    }
+    content <- list(status = status)
+    if (status == "incomplete"){
+        # we don't try to guess the indention level and just return zero indention
+        # That's fine because R has braces... :-)
+        # TODO: do some guessing?
+        content <- c(content, indent = "")
+    }
+    send_response('is_complete_reply', request, 'shell', content)
 },
 
 complete = function(request) {
