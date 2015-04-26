@@ -5,6 +5,8 @@ Description: This package provides a native interface to the R kernel from the
 Version: 0.2
 Authors@R: c(person("Thomas", "Kluyver", role = c("aut", "cre"),
     email = "thomas@kluyver.me.uk"),
+    person("Philipp", "A.", role = "aut",
+    email = "flying-sheep@web.de"),
     person("Karthik", "Ram", role = "aut",
     email = "karthik.ram@gmail.com"))
 Author: Thomas Kluyver <thomas@kluyver.me.uk>
