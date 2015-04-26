@@ -1,7 +1,7 @@
 #' @include options.R
 NULL
 
-displayenv = environment(display)
+displayenv = environment(publish_mimebundle)
 
 lappend <- function(lst, obj) {
     # I hope this isn't the best way to do this.
@@ -70,7 +70,7 @@ execute = function(request) {
             error = handle_error
           )
       }
-      display(params)
+      publish_mimebundle(params)
   }
 
   err <<- list()

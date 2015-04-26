@@ -27,9 +27,9 @@
 #' @import rzmq
 #' @import uuid
 #' @import digest
-#' @import evaluate
+#' @importFrom evaluate evaluate new_output_handler parse_all
 #' @importFrom jsonlite fromJSON toJSON
-#' @importFrom IRdisplay display display_png
+#' @importFrom IRdisplay publish_mimebundle
 #' @importFrom repr mime2repr repr_text
 #' 
 #' @docType package

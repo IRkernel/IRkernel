@@ -1,4 +1,3 @@
-#' @importFrom evaluate parse_all
 Kernel <- setRefClass("Kernel",
                 fields = c("connection_info", "zmqctx", "sockets", "executor"),
                 methods= list(
