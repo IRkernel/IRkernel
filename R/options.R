@@ -17,20 +17,6 @@ get_plot_options <- function() {
 }
 
 opt.defaults <- list(
-    jupyter.rich_display = TRUE,
-    jupyter.result_mimetypes = c(
-        'text/plain',
-        'text/html',
-        'text/markdown',
-        'text/latex',
-        
-        'application/json',
-        'application/javascript',
-        
-        'application/pdf',
-        'image/png',
-        'image/jpeg',
-        'image/svg+xml'),
     jupyter.plot_mimetypes = c(
         'text/plain',
         'image/png',
