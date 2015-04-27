@@ -1,5 +1,7 @@
 .gitignore
+Makefile
 .ipynb_checkpoints
 .*.ipynb
 ^.*\.Rproj$
 ^\.Rproj\.user$
+[.]pdf$
