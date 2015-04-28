@@ -23,7 +23,7 @@ We provide Windows and Mac OS X binary packages of all the needed packages. The 
 and the kernel spec can be installed with the following lines in an R console: 
 
 ```r
-install.packages(c("rzmq","repr","IRkernel","IRdisplay"), repos="https://irkernel.github.io/")
+install.packages(c('rzmq','repr','IRkernel','IRdisplay'), repos = 'https://irkernel.github.io/')
 IRkernel::installspec()
 ```
 
@@ -31,15 +31,15 @@ To update packages, you have to either add the repo to your default ones in your
 file and update afterwards as normal:
 
 ```r
-r <- getOption("repos")
-r["IRkernel"] <- "https://irkernel.github.io/"
+r <- getOption('repos')
+r$IRkernel <- 'https://irkernel.github.io/'
 options(repos = r)
 ```
 
 Or use the `repo` option to `update.packages()` directly:
 
 ```r
-update.packages(repos="https://irkernel.github.io/")
+update.packages(repos = 'https://irkernel.github.io/')
 ```
 
 Please note that during the initial development, these packages can be updated
@@ -49,15 +49,17 @@ In that case, updated packages can be installed by re-running the above
 
 ## Installing from source (Default on Linux, but possible on all platforms)
 
-1. You'll need zmq development headers to compile rzmq, as well curl headers
-   for R devtools.
-  * **Ubuntu/Debian**
+### ZMQ & cURL
+
+You'll need zmq development headers to compile rzmq, as well curl headers for R devtools.
+
+* **Ubuntu/Debian**
 
     ```bash
     sudo apt-get install libzmq3-dev libcurl4-openssl-dev
     ```
 
-  * **Homebrew**
+* **Homebrew**
 
     ```bash
     brew install zmq
@@ -66,62 +68,71 @@ In that case, updated packages can be installed by re-running the above
     brew upgrade zmq
     ```
 
-  * **MacPorts**
-    * make sure an [X server is installed](http://xquartz.macosforge.org/),
-      open a terminal and do the following:
+* **MacPorts**
+
+    1. make sure an [X server is installed](http://xquartz.macosforge.org/),
+       open a terminal and do the following:
 
       ```bash
       sudo port install zmq
       ```
 
-    * Direct the compiler to use MacPorts libraries using:
+    2. Direct the compiler to use MacPorts libraries using:
 
       ```bash
       export CPATH=/opt/local/include
       export LIBRARY_PATH=/opt/local/lib
       ```
-  * **Windows**
+
+* **Windows**
+
     See [this bugreport](https://github.com/IRkernel/IRkernel/issues/54#issuecomment-84467798)
     for instruction on how to compile on windows.
 
-2. Start `R` in the same terminal, and proceed as below:
+### R
 
-  You can install snapshot packages and the kernel spec via
+Start `R` in the same terminal, and proceed as below.
 
-  ```r
-  install.packages(c("rzmq","repr","IRkernel","IRdisplay"), repos="https://irkernel.github.io/", type="source")
-  IRkernel::installspec()
-  ```
+You can install snapshot packages and the kernel spec via
 
-  If you want to compile the latest and greatest (and maybe buggiest...) from git, 
-  the easiest way is via the `devtools` package:
+```r
+install.packages(c('rzmq','repr','IRkernel','IRdisplay'), repos = 'https://irkernel.github.io/', type = 'source')
+IRkernel::installspec()
+```
 
-  ```r
-  install.packages("devtools")
-  # Need RCurl for install_github
-  install.packages('RCurl')
-  library(devtools)
-  # Install the packages
-  install_github('armstrtw/rzmq')
-  install_github('IRkernel/repr')
-  install_github('IRkernel/IRdisplay')
-  install_github('IRkernel/IRkernel')
-  # Install the kernel spec
-  IRkernel::installspec()
-  ```
+To update your source installation, repeat the `install.packages` step.
 
-Updating packages can be done via re-running the installation steps.
-   
+### Development Version
+
+If you want to compile the latest and greatest (and maybe buggiest…) from git, 
+the easiest way is via the `devtools` package. Start a R session and run:
+
+```r
+install.packages('devtools')
+# Need RCurl for install_github
+install.packages('RCurl')
+library(devtools)
+# Install the packages
+install_github('armstrtw/rzmq')
+install_github('IRkernel/repr')
+install_github('IRkernel/IRdisplay')
+install_github('IRkernel/IRkernel')
+# Install the kernel spec
+IRkernel::installspec()
+```
+
+To update the git versions, repeat the `install_github('IRkernel/...')` steps.
+
 ## Running the notebook
 
 If you have IPython 3.0 installed, you can create a notebook and switch to
 IRkernel from the dropdown menu. 
 
-You can also start a 'qtconsole' with an R kernel:
+You can also start a `qtconsole` with an R kernel:
 
 ```bash
-# "ir" is the kernel name installed by the above "IRkernel::installspec()"
+# “ir” is the kernel name installed by the above 'IRkernel::installspec()'
 ipython qtconsole --kernel=ir
 ```
 
-You can also substitute 'console' for 'qtconsole' in this command.
+You can also substitute `console` for `qtconsole` in this command.
