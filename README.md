@@ -17,9 +17,9 @@ To run IPython with an R kernel, you need at least the following:
 
 Installing from source needs additionally header files (see below).
 
-## Installing via supplied binary packages (Windows)
+## Installing via supplied binary packages (Windows + Mac OS X)
 
-We provide windows binary packages of all the needed packages. The packages 
+We provide Windows and Mac OS X binary packages of all the needed packages. The packages 
 and the kernel spec can be installed with the following lines in an R console: 
 
 ```r
@@ -47,7 +47,7 @@ without changing the version number, which prevents updating via `update.package
 In that case, updated packages can be installed by re-running the above 
 `install.packages()` line.
 
-## Installing from source (Linux/Mac)
+## Installing from source (Default on Linux, but possible on all platforms)
 
 1. You'll need zmq development headers to compile rzmq, as well curl headers
    for R devtools.
