@@ -8,10 +8,9 @@ lappend <- function(lst, obj) {
     lst[[length(lst)+1]] = obj
     return(lst)
 }
-namedlist <- function() {
-    # create an empty named list
-    return(setNames(list(), character(0)))
-}
+
+# create an empty named list
+namedlist <- function() setNames(list(), character(0))
 
 plot_builds_upon <- function(prev, current) {
     if (is.null(prev)) {
@@ -63,7 +62,7 @@ execute = function(request) {
   })
 
   send_plot <- function(plotobj) {
-      params <- list()
+      params <- namedlist()
       for (mime in getOption('jupyter.plot_mimetypes')) {
           tryCatch(
             params[[mime]] <- mime2repr[[mime]](plotobj),
