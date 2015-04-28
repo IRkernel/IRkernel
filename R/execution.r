@@ -91,7 +91,7 @@ execute = function(request) {
     handle_warning = identity
   } else {
     handle_value <- function (obj) {
-        data <- list()
+        data <- namedlist()
         if (getOption('jupyter.rich_display')) {
             tryCatch(
                 for (mime in getOption('jupyter.display_mimetypes')) {
