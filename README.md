@@ -49,14 +49,14 @@ In that case, updated packages can be installed by re-running the above
 
 ## Installing from source (Default on Linux, but possible on all platforms)
 
-### ZMQ & cURL
+### ZMQ
 
-You'll need zmq development headers to compile rzmq, as well curl headers for R devtools.
+You'll need zmq development headers to compile rzmq.
 
 * **Ubuntu/Debian**
 
     ```bash
-    sudo apt-get install libzmq3-dev libcurl4-openssl-dev
+    sudo apt-get install libzmq3-dev
     ```
 
 * **Homebrew**
@@ -105,7 +105,15 @@ To update your source installation, repeat the `install.packages` step.
 ### Development Version
 
 If you want to compile the latest and greatest (and maybe buggiest…) from git, 
-the easiest way is via the `devtools` package. Start a R session and run:
+the easiest way is via the `devtools` package.
+
+On Ubuntu/Debian, a header package is needed to compile RCurl:
+
+```bash
+sudo apt-get install libcurl4-openssl-dev
+```
+
+Start a R session and run:
 
 ```r
 install.packages('devtools')
@@ -113,7 +121,6 @@ install.packages('devtools')
 install.packages('RCurl')
 library(devtools)
 # Install the packages
-install_github('armstrtw/rzmq')
 install_github('IRkernel/repr')
 install_github('IRkernel/IRdisplay')
 install_github('IRkernel/IRkernel')
