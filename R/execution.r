@@ -31,7 +31,7 @@ execute = function(request) {
   send_response = kernel$send_response
   send_response("status", request, 'iopub', list(execution_state="busy"))
   send_response("execute_input", request, 'iopub',
-                list(code=request$code, execution_count=execution_count))
+                list(code=request$content$code, execution_count=execution_count))
 
   silent = request$content$silent
   
