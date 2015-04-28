@@ -70,19 +70,19 @@ You'll need zmq development headers to compile rzmq, as well curl headers for R 
 
 * **MacPorts**
 
-    1. make sure an [X server is installed](http://xquartz.macosforge.org/),
-       open a terminal and do the following:
+    1.  make sure an [X server is installed](http://xquartz.macosforge.org/),
+        open a terminal and do the following:
 
-      ```bash
-      sudo port install zmq
-      ```
+        ```bash
+        sudo port install zmq
+        ```
 
-    2. Direct the compiler to use MacPorts libraries using:
+    2.  Direct the compiler to use MacPorts libraries using:
 
-      ```bash
-      export CPATH=/opt/local/include
-      export LIBRARY_PATH=/opt/local/lib
-      ```
+        ```bash
+        export CPATH=/opt/local/include
+        export LIBRARY_PATH=/opt/local/lib
+        ```
 
 * **Windows**
 
