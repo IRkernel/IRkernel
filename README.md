@@ -53,13 +53,13 @@ In that case, updated packages can be installed by re-running the above
 
 You'll need zmq development headers to compile rzmq.
 
-* **Ubuntu/Debian**
+*   **Ubuntu/Debian**
 
     ```bash
     sudo apt-get install libzmq3-dev
     ```
 
-* **Homebrew**
+*   **Homebrew**
 
     ```bash
     brew install zmq
@@ -68,7 +68,7 @@ You'll need zmq development headers to compile rzmq.
     brew upgrade zmq
     ```
 
-* **MacPorts**
+*   **MacPorts**
 
     1.  make sure an [X server is installed](http://xquartz.macosforge.org/),
         open a terminal and do the following:
@@ -84,7 +84,7 @@ You'll need zmq development headers to compile rzmq.
         export LIBRARY_PATH=/opt/local/lib
         ```
 
-* **Windows**
+*   **Windows**
 
     See [this bugreport](https://github.com/IRkernel/IRkernel/issues/54#issuecomment-84467798)
     for instruction on how to compile on windows.
