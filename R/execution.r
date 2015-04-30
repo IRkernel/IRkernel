@@ -58,7 +58,8 @@ execute = function(request) {
         text = c(text, header, readLines(path))
     }
     if (delete.file) file.remove(files)
-    payload <<- lappend(payload, list(source='page', text=paste(text, collapse="\n")))
+    mimebundle = list(`text/plain`=paste(text, collapse="\n"))
+    payload <<- lappend(payload, list(source='page', data=mimebundle))
   })
 
   send_plot <- function(plotobj) {
