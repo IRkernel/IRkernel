@@ -1,7 +1,7 @@
 import unittest
-import kerneltest
+import jupyter_kernel_test as jkt
 
-class IRkernelTests(kerneltest.KernelTests):
+class IRkernelTests(jkt.KernelTests):
     kernel_name = "ir"
 
     language_name = "R"
