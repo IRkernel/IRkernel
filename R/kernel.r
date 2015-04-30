@@ -219,7 +219,6 @@ shutdown = function(request) {
 
 initialize = function(connection_file) {
     connection_info <<- fromJSON(connection_file)
-    print(connection_info)
     url <- paste(connection_info$transport, "://", connection_info$ip, sep = "")
     url_with_port <- function(port_name) {
         return(paste(url, ":", connection_info[port_name], sep = ""))
