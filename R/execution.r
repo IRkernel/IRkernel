@@ -63,14 +63,20 @@ execute = function(request) {
   })
 
   send_plot <- function(plotobj) {
-      params <- namedlist()
+      formats <- namedlist()
+      metadata <- namedlist()
       for (mime in getOption('jupyter.plot_mimetypes')) {
           tryCatch(
-            params[[mime]] <- mime2repr[[mime]](plotobj),
+            formats[[mime]] <- mime2repr[[mime]](plotobj),
             error = handle_error
           )
+          # Isolating SVGs (putting them in an iframe) avoids strange
+          # interactions with CSS on the page.
+          if (identical(mime, 'image/svg+xml')) {
+              metadata[[mime]] <- list(isolated=TRUE)
+          }
       }
-      publish_mimebundle(params)
+      publish_mimebundle(formats, metadata)
   }
 
   err <<- list()
