@@ -98,21 +98,25 @@ execute = function(request) {
   } else {
     handle_value <- function (obj) {
         data <- namedlist()
-        if (getOption('jupyter.rich_display')) {
-            tryCatch(
-                for (mime in getOption('jupyter.display_mimetypes')) {
-                    r <- mime2repr[[mime]](obj)
-                    if (!is.null(r)) data[[mime]] <- r
-                },
-                error = handle_error
-            )
-        } else {
-            data[['text/plain']] <- repr_text(obj)
-        } 
-        send_response('execute_result', request, 'iopub', list(
-            data = data,
-            metadata = namedlist(),
-            execution_count = execution_count))
+        data[['text/plain']] <- repr_text(obj)
+        
+        # Only send a response when there is regular console output
+        if (nchar(data[['text/plain']]) > 0) {
+            if (getOption('jupyter.rich_display')) {
+                tryCatch(
+                    for (mime in getOption('jupyter.display_mimetypes')) {
+                        r <- mime2repr[[mime]](obj)
+                        if (!is.null(r)) data[[mime]] <- r
+                    },
+                    error = handle_error
+                )
+            }
+            
+            send_response('execute_result', request, 'iopub', list(
+                data = data,
+                metadata = namedlist(),
+                execution_count = execution_count))
+        }
     }
     stream = function(output, streamname) {
         send_response("stream", request, 'iopub',
