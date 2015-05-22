@@ -30,7 +30,11 @@ wire_to_msg = function(parts) {
     }
     signature <- rawToChar(parts[[i + 1]])
     expected_signature <- sign_msg(parts[(i + 2):(i + 5)])
-    stopifnot(identical(signature, expected_signature))
+    if (!identical(connection_info$key, "")) {
+        signature <- rawToChar(parts[[i + 1]])
+        expected_signature <- sign_msg(parts[(i + 2):(i + 5)])
+        stopifnot(identical(signature, expected_signature))
+    }
     header <- fromJSON(rawToChar(parts[[i + 2]]))
     parent_header <- fromJSON(rawToChar(parts[[i + 3]]))
     metadata <- fromJSON(rawToChar(parts[[i + 4]]))
