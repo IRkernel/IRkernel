@@ -28,8 +28,6 @@ wire_to_msg = function(parts) {
     while (!identical(parts[[i]], charToRaw("<IDS|MSG>"))) {
         i <- i + 1
     }
-    signature <- rawToChar(parts[[i + 1]])
-    expected_signature <- sign_msg(parts[(i + 2):(i + 5)])
     if (!identical(connection_info$key, "")) {
         signature <- rawToChar(parts[[i + 1]])
         expected_signature <- sign_msg(parts[(i + 2):(i + 5)])
