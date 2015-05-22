@@ -23,7 +23,8 @@ We provide Windows and Mac OS X binary packages of all the needed packages. The 
 and the kernel spec can be installed with the following lines in an R console: 
 
 ```r
-install.packages(c('rzmq','repr','IRkernel','IRdisplay'), repos = 'http://irkernel.github.io/')
+install.packages(c('rzmq','repr','IRkernel','IRdisplay'),
+                 repos = c('http://irkernel.github.io/', getOption('repos')))
 IRkernel::installspec()
 ```
 
@@ -39,7 +40,7 @@ options(repos = r)
 Or use the `repo` option to `update.packages()` directly:
 
 ```r
-update.packages(repos = 'http://irkernel.github.io/')
+update.packages(repos = c('http://irkernel.github.io/', getOption('repos')))
 ```
 
 Please note that during the initial development, these packages can be updated
@@ -96,7 +97,9 @@ Start `R` in the same terminal, and proceed as below.
 You can install snapshot packages and the kernel spec via
 
 ```r
-install.packages(c('rzmq','repr','IRkernel','IRdisplay'), repos = 'http://irkernel.github.io/', type = 'source')
+install.packages(c('rzmq','repr','IRkernel','IRdisplay'),
+                 repos = c('http://irkernel.github.io/', getOption('repos')),
+                 type = 'source')
 IRkernel::installspec()
 ```
 
