@@ -63,6 +63,7 @@ You'll need zmq development headers to compile rzmq.
 *   **Homebrew**
 
     ```bash
+    xcode-select --install
     brew install zmq
     # or upgrade
     brew update
@@ -75,6 +76,7 @@ You'll need zmq development headers to compile rzmq.
         open a terminal and do the following:
 
         ```bash
+        xcode-select --install
         sudo port install zmq
         ```
 
