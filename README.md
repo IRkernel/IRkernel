@@ -20,12 +20,18 @@ Installing from source needs additionally header files (see below).
 ## Installing via supplied binary packages (Windows + Mac OS X)
 
 We provide Windows and Mac OS X binary packages of all the needed packages. The packages 
-and the kernel spec can be installed with the following lines in an R console: 
+and the kernel spec can be installed for the current user with the following lines in an R console: 
 
 ```r
 install.packages(c('rzmq','repr','IRkernel','IRdisplay'),
                  repos = c('http://irkernel.github.io/', getOption('repos')))
 IRkernel::installspec()
+```
+
+To install system-wide, set ``user`` to False in the ``installspec`` command:
+
+```r
+IRkernel::installspec(user=F)
 ```
 
 To update packages, you have to either add the repo to your default ones in your R startup 
