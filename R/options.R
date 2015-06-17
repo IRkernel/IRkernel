@@ -20,8 +20,6 @@ opt.defaults <- list(
     jupyter.plot_mimetypes = c(
         'text/plain',
         'image/png',
-        'image/jpeg',
-        'application/pdf',
         'image/svg+xml'))
 
 .onLoad <- function(libname = NULL, pkgname = NULL) {
