@@ -1,6 +1,8 @@
 #' @include options.R
 NULL
 
+setClassUnion('recordedplotOrNULL', members = c('recordedplot', 'NULL'))
+
 displayenv <- environment(publish_mimebundle)
 
 lappend <- function(lst, obj) {
@@ -29,7 +31,7 @@ Executor <- setRefClass(
         err                = 'list',
         interrupted        = 'logical',
         kernel             = 'ANY', # TODO: are reciprocal dependencies possible?
-        last_recorded_plot = 'recordedplot'),
+        last_recorded_plot = 'recordedplotOrNULL'),
     methods = list(
 
 execute = function(request) {
