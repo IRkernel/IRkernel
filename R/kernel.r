@@ -50,12 +50,12 @@ wire_to_msg = function(parts) {
     } else {
         identities <- NULL
     }
-    return(list(
+    list(
         header        = header,
         parent_header = parent_header,
-        metadata      = metadata, 
+        metadata      = metadata,
         content       = content,
-        identities    = identities))
+        identities    = identities)
 },
 #'<brief desc>
 #'
@@ -71,11 +71,11 @@ msg_to_wire = function(msg) {
         charToRaw(toJSON(msg$content,       auto_unbox = TRUE)))
     
     signature <- sign_msg(bodyparts)
-    return(c(
+    c(
         msg$identities,
         list(charToRaw('<IDS|MSG>')),
         list(charToRaw(signature)),
-        bodyparts))
+        bodyparts)
 },
 #'<brief desc>
 #'
@@ -91,11 +91,12 @@ new_reply = function(msg_type, parent_msg) {
         msg_type = msg_type,
         version  = '5.0')
     
-    return(list(
+    list(
         header        = header,
         parent_header = parent_msg$header,
-        identities    = parent_msg$identities, 
-        metadata      = namedlist()))  # Ensure this is {} in JSON, not []
+        identities    = parent_msg$identities,
+        # Ensure this is {} in JSON, not []
+        metadata      = namedlist())
 },
 #'<brief desc>
 #'
