@@ -18,9 +18,11 @@ plot_builds_upon <- function(prev, current) {
     if (is.null(prev)) {
         return(TRUE)
     }
+    
     lprev <- length(prev[[1]])
     lcurrent <- length(current[[1]])
-    return((lcurrent >= lprev) && (identical(current[[1]][1:lprev], prev[[1]][1:lprev])))
+    
+    lcurrent >= lprev && identical(current[[1]][1:lprev], prev[[1]][1:lprev])
 }
 
 Executor <- setRefClass(

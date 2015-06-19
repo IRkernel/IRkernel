@@ -22,7 +22,7 @@ hb_reply = function() {
 #' @export
 sign_msg = function(msg_lst) {
     concat <- unlist(msg_lst)
-    return(hmac(connection_info$key, concat, 'sha256'))
+    hmac(connection_info$key, concat, 'sha256')
 },
 #'<brief desc>
 #'
@@ -139,7 +139,7 @@ is_complete = function(request) {
         parse_all(code)
         # the code compiles, so we are complete (either no code at all / only
         # comments or syntactically correct code)
-        'complete' # no function, so no return!
+        'complete'
     }, error = function(e) e$message)
     
     # One of 'complete', 'incomplete', 'invalid', 'unknown'
@@ -249,7 +249,7 @@ initialize = function(connection_file) {
     
     url <- paste0(connection_info$transport, '://', connection_info$ip)
     url_with_port <- function(port_name) {
-        return(paste0(url, ':', connection_info[[port_name]]))
+        paste0(url, ':', connection_info[[port_name]])
     }
     
     # ZMQ Socket setup
