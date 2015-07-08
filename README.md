@@ -34,7 +34,7 @@ IRkernel::installspec()
 To install system-wide, set ``user`` to False in the ``installspec`` command:
 
 ```r
-IRkernel::installspec(user=F)
+IRkernel::installspec(user = FALSE)
 ```
 
 To update packages, you have to either add the repo to your default ones in your R startup 
