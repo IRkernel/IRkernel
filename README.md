@@ -69,6 +69,11 @@ You'll need zmq development headers to compile rzmq.
     sudo apt-get install libzmq3-dev
     ```
 
+*   **Arch**
+    ```bash
+    sudo pacman -S zeromq
+    ```
+
 *   **Homebrew**
 
     ```bash
