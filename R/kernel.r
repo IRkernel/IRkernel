@@ -217,7 +217,7 @@ kernel_info = function(request) {
     send_response('kernel_info_reply', request, 'shell', list(
         protocol_version       = '5.0',
         implementation         = 'IRkernel',
-        implementation_version = packageVersion('IRkernel'),
+        implementation_version = as.character(packageVersion('IRkernel')),
         language_info = list(
             name = 'R',
             codemirror_mode = 'r',
