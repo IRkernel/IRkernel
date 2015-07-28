@@ -177,7 +177,7 @@ complete = function(request) {
     lines <- strsplit(code, '\n', fixed = TRUE)[[1]]
     chars_before_line <- 0L
     for (line in lines) {
-        new_cursor_pos <- cursor_pos - nchar(line) + 1L # +1 for the newline
+        new_cursor_pos <- cursor_pos - nchar(line) - 1L # -1 for the newline
         if (new_cursor_pos < 0L) {
             break
         }
