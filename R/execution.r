@@ -1,12 +1,14 @@
 #' @include options.R
 NULL
 
-displayenv = environment(publish_mimebundle)
+setClassUnion('recordedplotOrNULL', members = c('recordedplot', 'NULL'))
+
+displayenv <- environment(publish_mimebundle)
 
 lappend <- function(lst, obj) {
     # I hope this isn't the best way to do this.
-    lst[[length(lst)+1]] = obj
-    return(lst)
+    lst[[length(lst) + 1L]] <- obj
+    lst
 }
 
 # create an empty named list
@@ -16,171 +18,193 @@ plot_builds_upon <- function(prev, current) {
     if (is.null(prev)) {
         return(TRUE)
     }
-    lprev = length(prev[[1]])
-    lcurrent = length(current[[1]])
-    return((lcurrent >= lprev) && (identical(current[[1]][1:lprev], prev[[1]][1:lprev])))
+    
+    lprev <- length(prev[[1]])
+    lcurrent <- length(current[[1]])
+    
+    lcurrent >= lprev && identical(current[[1]][1:lprev], prev[[1]][1:lprev])
 }
 
-Executor = setRefClass("Executor",
-            fields=c("execution_count", "payload", "err", "interrupted", "kernel",
-                     "last_recorded_plot"),
-            methods = list(
+Executor <- setRefClass(
+    'Executor',
+    fields = list(
+        execution_count    = 'integer',
+        payload            = 'list',
+        err                = 'list',
+        interrupted        = 'logical',
+        kernel             = 'ANY', # TODO: are reciprocal dependencies possible?
+        last_recorded_plot = 'recordedplotOrNULL'),
+    methods = list(
 
 execute = function(request) {
-  send_response = kernel$send_response
-  send_response("status", request, 'iopub', list(execution_state="busy"))
-  send_response("execute_input", request, 'iopub',
-                list(code=request$content$code, execution_count=execution_count))
-
-  silent = request$content$silent
-  
-  display_data = function(data, metadata=NULL) {
-    if (is.null(metadata)) {
-        metadata = namedlist()
-    }
-    send_response("display_data", request, 'iopub',
-            list(source='R display func', data=data, metadata=metadata)
-        )
-    invisible(T)
-  }
-  
-  # Push the display function into the IRdisplay namespace
-  # This looks awkward, but we do need to get a reference to the execution
-  # state into a global environment.
-  unlockBinding("base_display", displayenv)
-  assign('base_display', display_data, pos=displayenv)
-  
-  payload <<- list()
-
-  options(pager=function(files, header, title, delete.file) {
-    text=title
-    for (path in files) {
-        text = c(text, header, readLines(path))
-    }
-    if (delete.file) file.remove(files)
-    mimebundle = list(`text/plain`=paste(text, collapse="\n"))
-    payload <<- lappend(payload, list(source='page', data=mimebundle))
-  })
-
-  send_plot <- function(plotobj) {
-      formats <- namedlist()
-      metadata <- namedlist()
-      for (mime in getOption('jupyter.plot_mimetypes')) {
-          tryCatch(
-            formats[[mime]] <- mime2repr[[mime]](plotobj),
-            error = handle_error
-          )
-          # Isolating SVGs (putting them in an iframe) avoids strange
-          # interactions with CSS on the page.
-          if (identical(mime, 'image/svg+xml')) {
-              metadata[[mime]] <- list(isolated=TRUE)
-          }
-      }
-      publish_mimebundle(formats, metadata)
-  }
-
-  err <<- list()
-  
-  
-  handle_error = function(e) {
-    err <<- list(ename="ERROR", evalue=toString(e), traceback=list(toString(e)))
-    if (!silent) {
-      send_response("error", request, 'iopub',
-                    c(err, list(execution_count=execution_count)))
-    }
-  }
-  if (silent) {
-    stream = function(s, n) {}
-    handle_value = identity
-    handle_graphics = identity
-    handle_message = identity
-    handle_warning = identity
-  } else {
-    handle_value <- function (obj) {
-        data <- namedlist()
-        data[['text/plain']] <- repr_text(obj)
+    send_response <- kernel$send_response
+    
+    send_response('status', request, 'iopub', list(
+        execution_state = 'busy'))
+    send_response('execute_input', request, 'iopub', list(
+        code = request$content$code,
+        execution_count = execution_count))
+    
+    silent <- request$content$silent
+    
+    display_data <- function(data, metadata = NULL) {
+        if (is.null(metadata)) {
+            metadata <- namedlist()
+        }
+        send_response('display_data', request, 'iopub', list(
+            source = 'R display func',
+            data = data,
+            metadata = metadata))
         
-        # Only send a response when there is regular console output
-        if (nchar(data[['text/plain']]) > 0) {
-            if (getOption('jupyter.rich_display')) {
-                tryCatch(
-                    for (mime in getOption('jupyter.display_mimetypes')) {
-                        r <- mime2repr[[mime]](obj)
-                        if (!is.null(r)) data[[mime]] <- r
-                    },
-                    error = handle_error
-                )
+        invisible(TRUE)
+    }
+    
+    # Push the display function into the IRdisplay namespace
+    # This looks awkward, but we do need to get a reference to the execution
+    # state into a global environment.
+    unlockBinding('base_display', displayenv)
+    assign('base_display', display_data, pos = displayenv)
+    
+    payload <<- list()
+    
+    options(pager = function(files, header, title, delete.file) {
+        text <- title
+        for (path in files) {
+            text <- c(text, header, readLines(path))
+        }
+        if (delete.file) file.remove(files)
+        mimebundle <- list('text/plain' = paste(text, collapse = '\n'))
+        payload <<- lappend(payload, list(source = 'page', data = mimebundle))
+    })
+    
+    send_plot <- function(plotobj) {
+        formats <- namedlist()
+        metadata <- namedlist()
+        for (mime in getOption('jupyter.plot_mimetypes')) {
+            tryCatch({
+                formats[[mime]] <- mime2repr[[mime]](plotobj)
+            }, error = handle_error)
+            # Isolating SVGs (putting them in an iframe) avoids strange
+            # interactions with CSS on the page.
+            if (identical(mime, 'image/svg+xml')) {
+                metadata[[mime]] <- list(isolated = TRUE)
             }
+        }
+        publish_mimebundle(formats, metadata)
+    }
+    
+    err <<- list()
+    
+    handle_error <- function(e) {
+        err <<- list(ename = 'ERROR', evalue = toString(e), traceback = list(toString(e)))
+        if (!silent) {
+            send_response('error', request, 'iopub', c(err, list(
+                execution_count = execution_count)))
+        }
+    }
+    
+    if (silent) {
+        stream <- function(s, n) {}
+        handle_value    <- identity
+        handle_graphics <- identity
+        handle_message  <- identity
+        handle_warning  <- identity
+    } else {
+        handle_value <- function(obj) {
+            data <- namedlist()
+            data[['text/plain']] <- repr_text(obj)
             
-            send_response('execute_result', request, 'iopub', list(
-                data = data,
-                metadata = namedlist(),
-                execution_count = execution_count))
+            # Only send a response when there is regular console output
+            if (nchar(data[['text/plain']]) > 0) {
+                if (getOption('jupyter.rich_display')) {
+                    tryCatch({
+                        for (mime in getOption('jupyter.display_mimetypes')) {
+                            r <- mime2repr[[mime]](obj)
+                            if (!is.null(r)) data[[mime]] <- r
+                        }
+                    }, error = handle_error)
+                }
+                
+                send_response('execute_result', request, 'iopub', list(
+                    data = data,
+                    metadata = namedlist(),
+                    execution_count = execution_count))
+            }
+        }
+        
+        stream <- function(output, streamname) {
+            send_response('stream', request, 'iopub', list(
+                name = streamname,
+                text = paste(output, collapse = '\n')))
+        }
+        
+        handle_graphics <- function(plotobj) {
+            if (!plot_builds_upon(last_recorded_plot, plotobj)) {
+                send_plot(last_recorded_plot)
+            }
+            last_recorded_plot <<- plotobj
+        }
+        
+        handle_message <- function(o) {
+            stream(paste(o$message, collapse = ''), 'stderr')
+        }
+        
+        handle_warning = function(o) {
+            call <- if (is.null(o$call)) '' else paste('In', deparse(o$call)[[1]])
+            stream(sprintf('Warning message:\n%s: %s', call, o$message), 'stderr')
         }
     }
-    stream = function(output, streamname) {
-        send_response("stream", request, 'iopub',
-                      list(name=streamname, text=paste(output, collapse="\n")))
+    
+    oh <- new_output_handler(
+        text = function(o) stream(o, 'stdout'),
+        graphics = handle_graphics,
+        message = handle_message,
+        warning = handle_warning,
+        error = handle_error,
+        value = handle_value)
+    
+    interrupted <<- FALSE
+    last_recorded_plot <<- NULL
+    
+    tryCatch(
+        evaluate(
+            request$content$code,
+            envir = .GlobalEnv,
+            output_handler = oh,
+            stop_on_error = 0L),
+        interrupt = function(cond) interrupted <<- TRUE,
+        error = handle_error) # evaluate does not catch errors in parsing
+    
+    if ((!silent) & (!is.null(last_recorded_plot))) {
+        send_plot(last_recorded_plot)
     }
-    handle_graphics = function(plotobj) {
-        if (!plot_builds_upon(last_recorded_plot, plotobj)) {
-            send_plot(last_recorded_plot)
-        }
-        last_recorded_plot <<- plotobj
+    
+    send_response('status', request, 'iopub', list(execution_state = 'idle'))
+    
+    if (interrupted) {
+        reply_content <- list(
+            status = 'abort')
+    } else if (!is.null(err$ename)) {
+        reply_content <- c(err, list(
+            status = 'error',
+            execution_count = execution_count))
+    } else {
+        reply_content <- list(
+            status = 'ok',
+            execution_count = execution_count,
+            payload = payload,
+            user_expressions = namedlist())
     }
-    handle_message = function(o){
-      stream(paste(o$message, collapse = ''), 'stderr')
+    
+    send_response('execute_reply', request, 'shell', reply_content)
+    
+    if (!silent) {
+        execution_count <<- execution_count + 1L
     }
-    handle_warning = function(o){
-      call = if (is.null(o$call)) '' else {
-       call = deparse(o$call)[1]
-       paste('In', call)
-      }
-    stream(sprintf('Warning message:\n%s: %s', call, o$message), 'stderr')
-    }
-  }
-  
-  oh = new_output_handler(text=function(o) {stream(o, 'stdout')},
-                          graphics = handle_graphics,
-                          message = handle_message,
-                          warning = handle_warning,
-                          error = handle_error,
-                          value = handle_value
-                          )
-
-  interrupted <<- FALSE
-  last_recorded_plot <<- NULL
-  
-  tryCatch(
-    evaluate(request$content$code, envir=.GlobalEnv, output_handler=oh,
-                stop_on_error=0),
-        interrupt = function(cond) {interrupted <<- TRUE},
-        error = handle_error  # evaluate does not catch errors in parsing
-    )
-
-  if ((!silent) & (!is.null(last_recorded_plot))) {
-      send_plot(last_recorded_plot)
-  }
-  
-  send_response("status", request, 'iopub', list(execution_state="idle"))
-  
-  if (interrupted) {
-    reply_content = list(status='abort')
-  } else if (!is.null(err$ename)) {
-    reply_content = c(err, list(status='error', execution_count=execution_count))
-  } else {
-    reply_content = list(status='ok', execution_count=execution_count,
-          payload=payload, user_expressions=namedlist())
-  }
-  send_response("execute_reply", request, 'shell', reply_content)
-  
-  if (!silent) {
-    execution_count <<- execution_count + 1
-  }
 },
 
 initialize = function(...) {
-    execution_count <<- 1
+    execution_count <<- 1L
     err <<- list()
     callSuper(...)
 })
