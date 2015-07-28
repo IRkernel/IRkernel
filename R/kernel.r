@@ -313,8 +313,18 @@ main <- function(connection_file = '') {
 #'@param user Install into user directory ~/.ipython or globally?
 #'@export
 installspec <- function(user = TRUE) {
+    found_binary <- FALSE
+    for (binary in c('ipython', 'ipython3', 'ipython2'))
+        if (system2(binary, '--version', FALSE, FALSE) == 0) {
+            found_binary <- TRUE
+            break
+        }
+    
+    if (!found_binary)
+        stop('IPython has to be installed but could neither run ipython nor ipython2 or ipython3.')
+    
     srcdir <- system.file('kernelspec', package = 'IRkernel')
     user_flag <- if (user) '--user' else character(0)
     args <- c('kernelspec', 'install', '--replace', '--name', 'ir', user_flag, srcdir)
-    system2('ipython', args, wait = TRUE)
+    system2(binary, args, wait = TRUE)
 }
