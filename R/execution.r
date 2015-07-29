@@ -28,17 +28,15 @@ plot_builds_upon <- function(prev, current) {
 Executor <- setRefClass(
     'Executor',
     fields = list(
+        send_response      = 'function',
         execution_count    = 'integer',
         payload            = 'list',
         err                = 'list',
         interrupted        = 'logical',
-        kernel             = 'ANY', # TODO: are reciprocal dependencies possible?
         last_recorded_plot = 'recordedplotOrNULL'),
     methods = list(
 
 execute = function(request) {
-    send_response <- kernel$send_response
-    
     send_response('status', request, 'iopub', list(
         execution_state = 'busy'))
     send_response('execute_input', request, 'iopub', list(

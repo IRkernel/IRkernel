@@ -267,7 +267,7 @@ initialize = function(connection_file) {
     bind.socket(sockets$stdin,   url_with_port('stdin_port'))
     bind.socket(sockets$shell,   url_with_port('shell_port'))
     
-    executor <<- Executor$new(kernel = .self)
+    executor <<- Executor$new(send_response = .self$send_response)
 },
 
 run = function() {
