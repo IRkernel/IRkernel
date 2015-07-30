@@ -323,8 +323,19 @@ installspec <- function(user = TRUE) {
     if (!found_binary)
         stop('IPython has to be installed but could neither run ipython nor ipython2 or ipython3.')
     
+    # make a kernelspec with the current interpreter's absolute path
     srcdir <- system.file('kernelspec', package = 'IRkernel')
+    tmp_name <- tempfile()
+    dir.create(tmp_name)
+    file.copy(srcdir, tmp_name, recursive = TRUE)
+    spec_path <- file.path(tmp_name, 'kernelspec', 'kernel.json')
+    spec <- fromJSON(spec_path)
+    spec$argv[[1]] <- file.path(R.home('bin'), 'R')
+    write(toJSON(spec, pretty = TRUE), file = spec_path)
+
     user_flag <- if (user) '--user' else character(0)
-    args <- c('kernelspec', 'install', '--replace', '--name', 'ir', user_flag, srcdir)
+    args <- c('kernelspec', 'install', '--replace', '--name', 'ir', user_flag, file.path(tmp_name, 'kernelspec'))
     system2(binary, args, wait = TRUE)
+
+    unlink(tmp_name, recursive = TRUE)
 }
