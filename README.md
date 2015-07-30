@@ -14,9 +14,6 @@ To run IPython with an R kernel, you need at least the following:
   way to get everything you need. Earlier versions of IPython are now 
   unsupported.
 * A current [R installation](http://www.r-project.org/).
-* You must be able to run `R` at a command prompt to start R. On Windows, you will
-  likely need to [edit the system path](http://www.computerhope.com/issues/ch000549.htm)
-  to add the directory containing `R.exe`.
 
 Installing from source needs additionally header files (see below).
 
