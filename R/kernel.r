@@ -331,7 +331,7 @@ installspec <- function(user = TRUE) {
     spec_path <- file.path(tmp_name, 'kernelspec', 'kernel.json')
     spec <- fromJSON(spec_path)
     spec$argv[[1]] <- file.path(R.home('bin'), 'R')
-    write(toJSON(spec, pretty = TRUE), file = spec_path)
+    write(toJSON(spec, pretty = TRUE, auto_unbox = TRUE), file = spec_path)
 
     user_flag <- if (user) '--user' else character(0)
     args <- c('kernelspec', 'install', '--replace', '--name', 'ir', user_flag, file.path(tmp_name, 'kernelspec'))
