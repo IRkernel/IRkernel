@@ -295,7 +295,7 @@ run = function() {
 
 #'Initialise and run the kernel
 #'
-#'@param connection_file The path to the IPython connection file, written by the frontend
+#'@param connection_file The path to the Jupyter connection file, written by the frontend
 #'@export 
 main <- function(connection_file = '') {
     if (connection_file == '') {
@@ -308,20 +308,23 @@ main <- function(connection_file = '') {
     kernel$run()
 }
 
-#'Install the kernelspec to tell IPython (>= 3) about IRkernel
+#'Install the kernelspec to tell Jupyter (or IPython ≥ 3) about IRkernel.
 #'
-#'@param user Install into user directory ~/.ipython or globally?
+#'Will use jupyter and its config directory if available, but fall back to ipython if not.
+#'
+#'@param user Install into user directory (~/.jupyter or ~/.ipython) or globally?
 #'@export
 installspec <- function(user = TRUE) {
     found_binary <- FALSE
-    for (binary in c('ipython', 'ipython3', 'ipython2'))
+    for (binary in c('jupyter', 'ipython', 'ipython3', 'ipython2'))
         if (system2(binary, '--version', FALSE, FALSE) == 0) {
             found_binary <- TRUE
             break
         }
     
     if (!found_binary)
-        stop('IPython has to be installed but could neither run ipython nor ipython2 or ipython3.')
+        stop('Jupyter or IPython 3.0 has to be installed but could neither run “jupyter” nor “ipython”, “ipython2” or “ipython3”.
+             (Note that “ipython2” is just IPython for Python 2, but still may be IPython 3.0)')
     
     # make a kernelspec with the current interpreter's absolute path
     srcdir <- system.file('kernelspec', package = 'IRkernel')

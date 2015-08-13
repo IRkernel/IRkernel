@@ -2,14 +2,14 @@
 % Please edit documentation in R/kernel.r
 \name{installspec}
 \alias{installspec}
-\title{Install the kernelspec to tell IPython (>= 3) about IRkernel}
+\title{Install the kernelspec to tell Jupyter (or IPython ≥ 3) about IRkernel.}
 \usage{
 installspec(user = TRUE)
 }
 \arguments{
-\item{user}{Install into user directory ~/.ipython or globally?}
+\item{user}{Install into user directory (~/.jupyter or ~/.ipython) or globally?}
 }
 \description{
-Install the kernelspec to tell IPython (>= 3) about IRkernel
+Will use jupyter and its config directory if available, but fall back to ipython if not.
 }
 
