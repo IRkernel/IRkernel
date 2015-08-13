@@ -1,4 +1,4 @@
-#' @include options.R
+#' @include options.r
 NULL
 
 setClassUnion('recordedplotOrNULL', members = c('recordedplot', 'NULL'))

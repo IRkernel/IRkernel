@@ -25,7 +25,7 @@ Imports:
     uuid,
     digest
 Collate:
-    'options.R'
+    'options.r'
     'execution.r'
     'help.r'
     'kernel.r'
