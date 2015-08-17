@@ -316,11 +316,13 @@ main <- function(connection_file = '') {
 #'@export
 installspec <- function(user = TRUE) {
     found_binary <- FALSE
-    for (binary in c('jupyter', 'ipython', 'ipython3', 'ipython2'))
-        if (system2(binary, '--version', FALSE, FALSE) == 0) {
+    for (binary in c('jupyter', 'ipython', 'ipython3', 'ipython2')) {
+        version <- tryCatch(system2(binary, '--version', TRUE, FALSE), error = function(e) '0.0.0')
+        if (compareVersion(version, '3.0.0') >= 0) {
             found_binary <- TRUE
             break
         }
+    }
     
     if (!found_binary)
         stop('Jupyter or IPython 3.0 has to be installed but could neither run “jupyter” nor “ipython”, “ipython2” or “ipython3”.
