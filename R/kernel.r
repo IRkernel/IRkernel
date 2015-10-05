@@ -127,6 +127,7 @@ handle_shell = function() {
         history_request     = history(msg),
         complete_request    = complete(msg),
         is_complete_request = is_complete(msg),
+        shutdown_request    = shutdown(msg),
         print(c('Got unhandled msg_type:', msg$header$msg_type)))
 },
 #'Checks whether the code in the rest is complete
