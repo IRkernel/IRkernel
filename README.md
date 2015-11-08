@@ -17,6 +17,12 @@ install.packages(c('rzmq','repr','IRkernel','IRdisplay'),
 IRkernel::installspec()
 ```
 
+### If you encounter problems during installation
+
+1. Have a look at the [full installation instructions](http://irkernel.github.io/installation/)!
+2. [Search the existing open and closed issues](https://github.com/IRkernel/IRkernel/issues?utf8=%E2%9C%93&q=is%3Aissue).
+3. If you are sure that this is a new problem, [file an issue](https://github.com/IRkernel/IRkernel/issues/new).
+
 ## Running the notebook
 
 If you have Jupyter installed, you can create a notebook using IRkernel from the dropdown menu.
