@@ -15,6 +15,7 @@ Depends:
     R (>= 3.0.1)
 License: MIT + file LICENSE
 LazyData: true
+Encoding: UTF-8
 Imports:
     repr,
     methods,
