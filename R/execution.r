@@ -25,6 +25,18 @@ plot_builds_upon <- function(prev, current) {
     lcurrent >= lprev && identical(current[[1]][1:lprev], prev[[1]][1:lprev])
 }
 
+ask <- function(prompt = '') {
+    answer <- NA
+    while (is.na(answer)) {
+        answer <- switch(readline(prompt),
+           y = , Y = TRUE,
+           n = , N = FALSE,
+           c = NULL,
+           NA)
+    }
+    answer
+}
+
 Executor <- setRefClass(
     'Executor',
     fields = list(
@@ -74,6 +86,26 @@ execute = function(request) {
         mimebundle <- list('text/plain' = paste(text, collapse = '\n'))
         payload <<- lappend(payload, list(source = 'page', data = mimebundle))
     })
+    
+    # .Last doesn’t seem to work, so replicating behavior
+    quit <- function(save = 'default', status = 0, runLast = TRUE) {
+        save = switch(save,
+            default = , yes = TRUE,
+            no = FALSE,
+            ask = ask('Save workspace image? [y/n/c]: '),
+            stop('unknown `save` value'))
+        if (is.null(save)) return()  # cancel
+        if (runLast) {
+            if (!is.null(.GlobalEnv$.Last)) .GlobalEnv$.Last()
+            if (!is.null(.GlobalEnv$.Last.sys)) .GlobalEnv$.Last.sys()
+        }
+        if (save) NULL  # TODO: actually save history
+        payload <<- lappend(payload, list(source = 'ask_exit'))
+    }
+    
+    # shade base::quit
+    assign('quit', quit, envir = .GlobalEnv)
+    assign('q',    quit, envir = .GlobalEnv)
     
     send_plot <- function(plotobj) {
         formats <- namedlist()
