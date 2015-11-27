@@ -1,6 +1,11 @@
 #' @include execution.r
 NULL
 
+#' The kernel
+#' 
+#' Has methods able to connect and talk to a Jupyter server.
+#' 
+#' @export
 Kernel <- setRefClass(
     'Kernel',
     fields  = list(
@@ -15,22 +20,16 @@ hb_reply = function() {
     send.socket(sockets$hb, data, serialize = FALSE)
 },
 
-#'<brief desc>
-#'
-#'<full description>
-#' @param msg_lst <what param does>
-#' @export
 sign_msg = function(msg_lst) {
+    "Sign messages"
+    
     concat <- unlist(msg_lst)
     hmac(connection_info$key, concat, 'sha256')
 },
-#'<brief desc>
-#'
-#'<full description>
-#' @param parts <what param does>
-#' @import rjson
-#' @export
+
 wire_to_msg = function(parts) {
+    "Deserialize a message"
+    
     i <- 1
     #print(parts)
     while (!identical(parts[[i]], charToRaw('<IDS|MSG>'))) {
@@ -57,12 +56,10 @@ wire_to_msg = function(parts) {
         content       = content,
         identities    = identities)
 },
-#'<brief desc>
-#'
-#'<full description>
-#' @param msg <what param does>
-#' @export
+
 msg_to_wire = function(msg) {
+    "Serialize a message"
+    
     #print(msg)
     bodyparts <- list(
         charToRaw(toJSON(msg$header,        auto_unbox = TRUE)),
@@ -77,13 +74,10 @@ msg_to_wire = function(msg) {
         list(charToRaw(signature)),
         bodyparts)
 },
-#'<brief desc>
-#'
-#'<full description>
-#' @param msg_type <what param does>
-#' @param  parent_msg <what param does>
-#' @export
+
 new_reply = function(msg_type, parent_msg) {
+    "Prepare a reply"
+    
     header <- list(
         msg_id   = UUIDgenerate(),
         username = parent_msg$header$username, 
@@ -98,26 +92,19 @@ new_reply = function(msg_type, parent_msg) {
         # Ensure this is {} in JSON, not []
         metadata      = namedlist())
 },
-#'<brief desc>
-#'
-#'<full description>
-#' @param msg_type <what param does>
-#' @param  parent_msg <what param does>
-#' @param  socket <what param does>
-#' @param  content <what param does>
-#' @export
+
 send_response = function(msg_type, parent_msg, socket_name, content) {
+    "Send a response"
+    
     msg <- new_reply(msg_type, parent_msg)
     msg$content <- content
     socket <- sockets[[socket_name]]
     send.multipart(socket, msg_to_wire(msg))
 },
-#'<brief desc>
-#'
-#'<full description>
-#' @param  <what param does>
-#' @export
+
 handle_shell = function() {
+    "React to a shell message coming in"
+    
     parts <- receive.multipart(sockets$shell)
     msg <- wire_to_msg(parts)
     switch(
@@ -130,11 +117,10 @@ handle_shell = function() {
         shutdown_request    = shutdown(msg),
         print(c('Got unhandled msg_type:', msg$header$msg_type)))
 },
-#'Checks whether the code in the rest is complete
-#'
-#' @param  request the is_complete request 
-#' @export
+
 is_complete = function(request) {
+    "Checks whether the code in the rest is complete"
+    
     code <- request$content$code
     message <- tryCatch({
         parse_all(code)
@@ -294,10 +280,11 @@ run = function() {
 })
 )
 
-#'Initialise and run the kernel
+#' Initialise and run the kernel
 #'
-#'@param connection_file The path to the Jupyter connection file, written by the frontend
-#'@export 
+#' @param connection_file The path to the Jupyter connection file, written by the frontend
+#' 
+#' @export 
 main <- function(connection_file = '') {
     if (connection_file == '') {
         # On Windows, passing the connection file in as a string literal fails,
@@ -309,12 +296,13 @@ main <- function(connection_file = '') {
     kernel$run()
 }
 
-#'Install the kernelspec to tell Jupyter (or IPython ≥ 3) about IRkernel.
+#' Install the kernelspec to tell Jupyter (or IPython ≥ 3) about IRkernel.
 #'
-#'Will use jupyter and its config directory if available, but fall back to ipython if not.
+#' Will use jupyter and its config directory if available, but fall back to ipython if not.
 #'
-#'@param user Install into user directory (~/.jupyter or ~/.ipython) or globally?
-#'@export
+#' @param user Install into user directory (~/.jupyter or ~/.ipython) or globally?
+#' 
+#' @export
 installspec <- function(user = TRUE) {
     found_binary <- FALSE
     for (binary in c('jupyter', 'ipython', 'ipython3', 'ipython2')) {

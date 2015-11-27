@@ -30,3 +30,4 @@ Collate:
     'execution.r'
     'help.r'
     'kernel.r'
+RoxygenNote: 5.0.1
