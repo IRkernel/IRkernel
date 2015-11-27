@@ -37,6 +37,34 @@ ask <- function(prompt = '') {
     answer
 }
 
+format_stack <- function(calls) {
+    line_refs <- rep('', length(calls))
+    
+    tb <- lapply(seq_along(calls), function(cl) {
+        call <- calls[[cl]]
+        
+        # first_line, first_byte, last_line, last_byte, first_column, last_column, first_parsed, last_parsed
+        ref <- attr(call, 'srcref')
+        
+        filename <- attr(ref, 'srcfile')$filename
+        
+        if (!is.null(ref)) {
+            f <- ref[[1]]
+            l <- ref[[3]]
+            lines <- if (f == l) f else paste0(f, '-', l)
+            line_refs[[cl]] <<- paste0('   # at line ', lines, ' of file ', filename)
+        }
+        
+        white <- paste(rep(' ', nchar(format(cl))), collapse = '')
+        
+        f.call <- format(call)
+        line.prefix <- c(cl, rep(white, length(f.call) - 1))
+        paste(paste0(line.prefix, '. ', f.call), collapse = '\n')
+    })
+    
+    paste0(tb, line_refs)
+}
+
 Executor <- setRefClass(
     'Executor',
     fields = list(
@@ -124,9 +152,19 @@ execute = function(request) {
     }
     
     err <<- list()
+    nframe <- NULL  # find out stack depth in notebook cell
+    tryCatch(evaluate(
+        'stop()',
+        stop_on_error = 1L,
+        output_handler = new_output_handler(error = function(e) nframe <<- sys.nframe())))
     
     handle_error <- function(e) {
-        err <<- list(ename = 'ERROR', evalue = toString(e), traceback = list(toString(e)))
+        calls <- head(sys.calls()[-seq_len(nframe + 1L)], -3)
+        
+        msg <- paste0(toString(e), 'Traceback:\n')
+        stack_info <- format_stack(calls)
+        
+        err <<- list(ename = 'ERROR', evalue = toString(e), traceback = c(msg, stack_info))
         if (!silent) {
             send_response('error', request, 'iopub', c(err, list(
                 execution_count = execution_count)))
