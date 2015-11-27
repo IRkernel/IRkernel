@@ -201,7 +201,7 @@ execute = function(request) {
             request$content$code,
             envir = .GlobalEnv,
             output_handler = oh,
-            stop_on_error = 0L),
+            stop_on_error = 1L),
         interrupt = function(cond) interrupted <<- TRUE,
         error = handle_error) # evaluate does not catch errors in parsing
     
