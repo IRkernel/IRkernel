@@ -40,15 +40,28 @@ wire_to_msg = function(parts) {
         expected_signature <- sign_msg(parts[(i + 2):(i + 5)])
         stopifnot(identical(signature, expected_signature))
     }
-    header        <- fromJSON(rawToChar(parts[[i + 2]]))
-    parent_header <- fromJSON(rawToChar(parts[[i + 3]]))
-    metadata      <- fromJSON(rawToChar(parts[[i + 4]]))
-    content       <- fromJSON(rawToChar(parts[[i + 5]]))
+
+    # Convert the four key parts of the message to strings and parse the JSON
+    s <- rawToChar(parts[[i + 2]])
+    Encoding(s) <- "UTF-8"
+    header      <- fromJSON(s)
+    s <- rawToChar(parts[[i + 3]])
+    Encoding(s) <- "UTF-8"
+    parent_header <- fromJSON(s)
+    s <- rawToChar(parts[[i + 4]])
+    Encoding(s) <- "UTF-8"
+    metadata    <- fromJSON(s)
+    s <- rawToChar(parts[[i + 5]])
+    Encoding(s) <- "UTF-8"
+    content     <- fromJSON(s)
+
+    # ZMQ routing bits
     if (i > 1) {
         identities <- parts[1:(i - 1)]
     } else {
         identities <- NULL
     }
+
     list(
         header        = header,
         parent_header = parent_header,
