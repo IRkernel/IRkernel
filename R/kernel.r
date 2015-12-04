@@ -1,6 +1,12 @@
 #' @include execution.r
 NULL
 
+fromRawJSON <- function(r) {
+    s <- rawToChar(r)
+    Encoding(s) <- 'UTF-8'
+    fromJSON(s)
+}
+
 #' The kernel
 #' 
 #' Has methods able to connect and talk to a Jupyter server.
@@ -42,18 +48,10 @@ wire_to_msg = function(parts) {
     }
 
     # Convert the four key parts of the message to strings and parse the JSON
-    s <- rawToChar(parts[[i + 2]])
-    Encoding(s) <- "UTF-8"
-    header      <- fromJSON(s)
-    s <- rawToChar(parts[[i + 3]])
-    Encoding(s) <- "UTF-8"
-    parent_header <- fromJSON(s)
-    s <- rawToChar(parts[[i + 4]])
-    Encoding(s) <- "UTF-8"
-    metadata    <- fromJSON(s)
-    s <- rawToChar(parts[[i + 5]])
-    Encoding(s) <- "UTF-8"
-    content     <- fromJSON(s)
+    header        <- fromRawJSON(parts[[i + 2]])
+    parent_header <- fromRawJSON(parts[[i + 3]])
+    metadata      <- fromRawJSON(parts[[i + 4]])
+    content       <- fromRawJSON(parts[[i + 5]])
 
     # ZMQ routing bits
     if (i > 1) {
