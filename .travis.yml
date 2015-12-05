@@ -14,7 +14,7 @@ install:
 
   # Replace dep1 dep2 ... with your dependencies
   - conda create -q -n test-environment -c r r r-uuid r-digest r-base64enc
-            r-evaluate r-jsonlite jupyter pip zeromq=4.0* r-rzmq
+            r-evaluate r-jsonlite jupyter pip zeromq=4.0* r-rzmq nose
   - source activate test-environment
   - pip install jupyter_kernel_test
   - R -e "install.packages(c('repr','IRdisplay'),
