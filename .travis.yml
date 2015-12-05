@@ -1,0 +1,23 @@
+language: python
+python:
+  - "3.5"
+install:
+  - sudo apt-get update
+  - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
+  - bash miniconda.sh -b -p $HOME/miniconda
+  - export PATH="$HOME/miniconda/bin:$PATH"
+  - hash -r
+  - conda config --set always_yes yes --set changeps1 no
+  - conda update -q conda
+  # Useful for debugging any issues with conda
+  - conda info -a
+
+  # Replace dep1 dep2 ... with your dependencies
+  - conda create -q -n test-environment -c r r r-base64enc r-evaluate r-jsonlite r-irdisplay r-repr jupyter pip
+  - source activate test-environment
+  - pip install jupyter_kernel_test
+  - R CMD INSTALL $TRAVIS_BUILD_DIR
+  - R -e "IRkernel::installspec()"
+
+script:
+  - python test_ir.py
