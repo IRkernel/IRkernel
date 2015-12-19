@@ -29,5 +29,6 @@ Collate:
     'options.r'
     'execution.r'
     'help.r'
+    'installspec.r'
     'kernel.r'
 RoxygenNote: 5.0.1
