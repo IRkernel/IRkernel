@@ -5,12 +5,6 @@ setClassUnion('recordedplotOrNULL', members = c('recordedplot', 'NULL'))
 
 displayenv <- environment(publish_mimebundle)
 
-lappend <- function(lst, obj) {
-    # I hope this isn't the best way to do this.
-    lst[[length(lst) + 1L]] <- obj
-    lst
-}
-
 # create an empty named list
 namedlist <- function() setNames(list(), character(0))
 
@@ -112,7 +106,7 @@ execute = function(request) {
         }
         if (delete.file) file.remove(files)
         mimebundle <- list('text/plain' = paste(text, collapse = '\n'))
-        payload <<- lappend(payload, list(source = 'page', data = mimebundle))
+        payload <<- c(payload, list(list(source = 'page', data = mimebundle)))
     })
     
     # .Last doesn’t seem to work, so replicating behavior
@@ -128,7 +122,7 @@ execute = function(request) {
             if (!is.null(.GlobalEnv$.Last.sys)) .GlobalEnv$.Last.sys()
         }
         if (save) NULL  # TODO: actually save history
-        payload <<- lappend(payload, list(source = 'ask_exit'))
+        payload <<- c(payload, list(list(source = 'ask_exit')))
     }
     
     # shade base::quit
