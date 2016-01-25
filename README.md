@@ -1,4 +1,7 @@
-# Native R kernel for Jupyter
+# Native R kernel for Jupyter [![Build Status]][Travis]
+
+[Build Status]: https://travis-ci.org/IRkernel/IRkernel.svg?branch=master
+[Travis]: https://travis-ci.org/IRkernel/IRkernel
 
 For detailed requirements and install instructions see [irkernel.github.io](http://irkernel.github.io/)
 
