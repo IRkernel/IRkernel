@@ -270,6 +270,7 @@ initialize = function(connection_file) {
 
 run = function() {
     while (TRUE) {
+      tryCatch({
         zmq.poll(
             c(sockets$hb, sockets$shell, sockets$control),
             rep(.pbd_env$ZMQ.PO$POLLIN, 3))
@@ -282,7 +283,8 @@ run = function() {
         
         if(bitwAnd(zmq.poll.get.revents(3), .pbd_env$ZMQ.PO$POLLIN))
             handle_control()
-        
+      }, interrupt=function(cond) {}
+      )
     }
 })
 )
