@@ -17,9 +17,8 @@ install:
             r-evaluate r-jsonlite jupyter pip zeromq nose
   - source activate test-environment
   - pip install jupyter_kernel_test
-  - R -e "install.packages('pbdZMQ', repos = 'http://cran.rstudio.com/')"
-  - R -e "install.packages(c('repr','IRdisplay'),
-            repos = 'http://irkernel.github.io/')"
+  - R -e "withCallingHandlers(install.packages('pbdZMQ', repos = 'http://cran.rstudio.com/'), warning = stop)"
+  - R -e "withCallingHandlers(install.packages(c('repr','IRdisplay'), repos = 'http://irkernel.github.io/'), warning = stop)"
   - R CMD INSTALL $TRAVIS_BUILD_DIR
   - R -e "IRkernel::installspec()"
 
