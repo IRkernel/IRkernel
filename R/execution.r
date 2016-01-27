@@ -187,10 +187,10 @@ execute = function(request) {
                     }, error = handle_error)
                 }
                 
-                send_response('execute_result', request, 'iopub', list(
+                send_response('display_data', request, 'iopub', list(
                     data = data,
                     metadata = namedlist(),
-                    execution_count = execution_count))
+                ))
             }
         }
         
