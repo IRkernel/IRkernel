@@ -22,8 +22,9 @@ installspec <- function(user = TRUE, name = 'ir', displayname = 'R') {
     }
 
     if (!found_binary)
-        stop('Jupyter or IPython 3.0 has to be installed but could neither run “jupyter” nor “ipython”, “ipython2” or “ipython3”.
-             (Note that “ipython2” is just IPython for Python 2, but still may be IPython 3.0)')
+        stop(paste0('Jupyter or IPython 3.0 has to be installed but could neither run ', qQuote('jupyter'),
+                    ' nor ', qQuote('ipython'), ', ', qQuote('ipython2'), ' or ', qQuote('ipython3'), '.\n',
+                    '(Note that ', qQuote('ipython2'), ' is just IPython for Python 2, but still may be IPython 3.0)'))
 
     # make a kernelspec with the current interpreter's absolute path
     srcdir <- system.file('kernelspec', package = 'IRkernel')
