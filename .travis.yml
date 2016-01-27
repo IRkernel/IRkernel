@@ -21,6 +21,7 @@ install:
   - R -e "withCallingHandlers(install.packages(c('repr','IRdisplay'), repos = 'http://irkernel.github.io/'), warning = stop)"
   - R CMD INSTALL $TRAVIS_BUILD_DIR
   - R -e "IRkernel::installspec()"
+  - R -e "IRkernel::installspec(name='testir', displayname='testir')"
 
 script:
   - python test_ir.py

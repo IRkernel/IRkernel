@@ -4,12 +4,21 @@
 \alias{installspec}
 \title{Install the kernelspec to tell Jupyter (or IPython ≥ 3) about IRkernel.}
 \usage{
-installspec(user = TRUE)
+installspec(user = TRUE, name = "ir", displayname = "R")
 }
 \arguments{
 \item{user}{Install into user directory (~/.jupyter or ~/.ipython) or globally?}
+
+\item{name}{The name of the kernel (default "ir")}
+
+\item{displayname}{The name which is displayed in the notebook (default: "R")}
 }
 \description{
 Will use jupyter and its config directory if available, but fall back to ipython if not.
+}
+\details{
+This can be called multiple times for different R interpreter, but you have to give a
+different name (and displayname to see a difference in the notebook UI). If the same
+name is give, it will overwrite older versions of the kernel spec with that name!
 }
 
