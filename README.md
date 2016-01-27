@@ -15,13 +15,13 @@ For detailed requirements and install instructions see [irkernel.github.io](http
 We provide Windows and Mac OS X binary packages of all the needed packages:
 
 ```r
-install.packages(c('repr','IRkernel','IRdisplay'),
+install.packages(c('repr', 'IRkernel', 'IRdisplay'),
                  repos = c('http://irkernel.github.io/', getOption('repos')))
 IRkernel::installspec()
 ```
 
-Per default `IRkernel::installspec()` will install a kernel with the name `"ir"` and a
-display name of `"R"`. Multiple calls will overwrite the kernel with a kernel spec pointing to the last
+Per default `IRkernel::installspec()` will install a kernel with the name “ir” and a
+display name of “R”. Multiple calls will overwrite the kernel with a kernel spec pointing to the last
 R interpreter you called that commands from. You can install kernels for multiple versions of R
 by supplying a `name` and `displayname` argument to the `installspec()` call (You still need to
 install these packages in all interpreters you want to run as a jupyter kernel!):
@@ -68,4 +68,4 @@ docker run -itp 8888:8888 -v $(pwd):/notebooks/ irkernel
 
 In your browser open the URL <http://localhost:8888/>. All notebooks from your session will be saved in the current directory.
 
-On other platforms without docker, this can be started using docker-machine by replacing localhost with an IP from docker-machine ip <MACHINE>. With the deprecated boot2docker, this IP will be boot2docker ip.
+On other platforms without docker, this can be started using `docker-machine` by replacing “localhost” with an IP from `docker-machine ip <MACHINE>`. With the deprecated `boot2docker`, this IP will be `boot2docker ip`.
