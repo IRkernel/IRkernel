@@ -189,8 +189,7 @@ execute = function(request) {
                 
                 send_response('display_data', request, 'iopub', list(
                     data = data,
-                    metadata = namedlist(),
-                ))
+                    metadata = namedlist() ))
             }
         }
         
