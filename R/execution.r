@@ -157,8 +157,8 @@ execute = function(request) {
         
         msg <- paste0(toString(e), 'Traceback:\n')
         stack_info <- format_stack(calls)
-        
-        err <<- list(ename = 'ERROR', evalue = toString(e), traceback = c(msg, stack_info))
+
+        err <<- list(ename = 'ERROR', evalue = toString(e), traceback = as.list(c(msg, stack_info)))
         if (!silent) {
             send_response('error', request, 'iopub', c(err, list(
                 execution_count = execution_count)))
