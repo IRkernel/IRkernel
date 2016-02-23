@@ -63,6 +63,7 @@ Executor <- setRefClass(
     'Executor',
     fields = list(
         send_response      = 'function',
+        abort_queued_messages = 'function',
         execution_count    = 'integer',
         payload            = 'list',
         err                = 'list',
@@ -258,7 +259,13 @@ execute = function(request) {
     }
     
     send_response('execute_reply', request, 'shell', reply_content)
-    
+
+    if (interrupted || !is.null(err$ename)){
+        # errors or interrupts should interrupt all currently queued messages,
+        # not only the currently running one...
+        abort_queued_messages()
+    }
+
     if (!silent) {
         execution_count <<- execution_count + 1L
     }

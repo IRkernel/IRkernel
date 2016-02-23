@@ -91,7 +91,7 @@ new_reply = function(msg_type, parent_msg) {
     
     header <- list(
         msg_id   = UUIDgenerate(),
-        username = parent_msg$header$username, 
+        username = parent_msg$header$username,
         session  = parent_msg$header$session,
         msg_type = msg_type,
         version  = '5.0')
@@ -127,6 +127,35 @@ handle_shell = function() {
         is_complete_request = is_complete(msg),
         shutdown_request    = shutdown(msg),
         print(c('Got unhandled msg_type:', msg$header$msg_type)))
+},
+
+abort_shell_msg = function(){
+    "Send an abort message for an incoming shell request"
+    # See https://github.com/ipython/ipykernel/blob/1d97cb2a04149387a0d2dbea1b3d0af691d8df6c/ipykernel/kernelbase.py#L623
+
+    parts <- zmq.recv.multipart(sockets$shell, unserialize = FALSE)
+    msg <- wire_to_msg(parts)
+    reply_type <- paste(strsplit(msg$header$msg_type, "_")[1], "_reply")
+    reply_content <- list(status = 'aborted')
+    send_response(reply_type, msg, "shell", reply_content)
+},
+
+abort_queued_messages = function(){
+    "Abort all already queued shell messages after an error"
+
+    while (TRUE) {
+        ret = zmq.poll(
+            c(sockets$shell), # only shell channel
+            c(.pbd_env$ZMQ.PO$POLLIN), # type
+            0) # zero timeout, only what's already there
+
+        if(bitwAnd(zmq.poll.get.revents(1), .pbd_env$ZMQ.PO$POLLIN)) {
+            abort_shell_msg()
+        } else {
+            # no more messages...
+            break
+        }
+    }
 },
 
 is_complete = function(request) {
@@ -264,8 +293,9 @@ initialize = function(connection_file) {
     zmq.bind(sockets$control, url_with_port('control_port'))
     zmq.bind(sockets$stdin,   url_with_port('stdin_port'))
     zmq.bind(sockets$shell,   url_with_port('shell_port'))
-    
-    executor <<- Executor$new(send_response = .self$send_response)
+
+    executor <<- Executor$new(send_response = .self$send_response,
+        abort_queued_messages = .self$abort_queued_messages)
 },
 
 run = function() {
