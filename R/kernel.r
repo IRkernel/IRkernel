@@ -7,6 +7,10 @@ fromRawJSON <- function(r) {
     fromJSON(s)
 }
 
+# Uncomment to get debug printouts to stderr
+#debug <- function(...) cat(sprintf(...), '\n', sep = '', file = stderr())
+debug <- function(...){}
+
 #' The kernel
 #' 
 #' Has methods able to connect and talk to a Jupyter server.
@@ -111,6 +115,7 @@ send_response = function(msg_type, parent_msg, socket_name, content) {
     msg$content <- content
     socket <- sockets[[socket_name]]
     zmq.send.multipart(socket, msg_to_wire(msg), serialize = FALSE)
+    debug('Sending msg %s', msg$header$msg_type)
 },
 
 handle_shell = function() {
@@ -129,33 +134,41 @@ handle_shell = function() {
         print(c('Got unhandled msg_type:', msg$header$msg_type)))
 },
 
-abort_shell_msg = function(){
+abort_shell_msg = function() {
     "Send an abort message for an incoming shell request"
     # See https://github.com/ipython/ipykernel/blob/1d97cb2a04149387a0d2dbea1b3d0af691d8df6c/ipykernel/kernelbase.py#L623
 
     parts <- zmq.recv.multipart(sockets$shell, unserialize = FALSE)
     msg <- wire_to_msg(parts)
-    reply_type <- paste(strsplit(msg$header$msg_type, "_")[1], "_reply")
+    debug('Aborting msg of type %s', msg$header$msg_type)
+    reply_type <- paste0(unlist(strsplit(msg$header$msg_type, '_'))[1], '_reply')
     reply_content <- list(status = 'aborted')
-    send_response(reply_type, msg, "shell", reply_content)
+    send_response(reply_type, msg, 'shell', reply_content)
+    debug('Aborted msg')
 },
 
-abort_queued_messages = function(){
+abort_queued_messages = function() {
     "Abort all already queued shell messages after an error"
 
+    debug('abort loop: aborted all outstanding msg')
     while (TRUE) {
+        debug('abort loop: before poll')
         ret = zmq.poll(
             c(sockets$shell), # only shell channel
             c(.pbd_env$ZMQ.PO$POLLIN), # type
             0) # zero timeout, only what's already there
-
+        debug('abort loop: after poll')
         if(bitwAnd(zmq.poll.get.revents(1), .pbd_env$ZMQ.PO$POLLIN)) {
+            debug('abort loop: found msg')
             abort_shell_msg()
         } else {
             # no more messages...
+            debug('abort loop: breaking')
             break
         }
     }
+    debug('abort loop: end')
+
 },
 
 is_complete = function(request) {
@@ -256,9 +269,12 @@ kernel_info = function(request) {
 },
 
 handle_control = function() {
+    debug('Control: beginning')
     parts <- zmq.recv.multipart(sockets$control, unserialize = FALSE)
     msg <- wire_to_msg(parts)
+    debug('Control: recv msg of type %s', msg$header$msg_type)
     if (msg$header$msg_type == 'shutdown_request') {
+        debug('Control: shutdown...')
         shutdown(msg)
     } else {
         print(paste('Unhandled control message, msg_type:', msg$header$msg_type))
@@ -300,20 +316,35 @@ initialize = function(connection_file) {
 
 run = function() {
     while (TRUE) {
+        debug('main loop: beginning')
         zmq.poll(
             c(sockets$hb, sockets$shell, sockets$control),
             rep(.pbd_env$ZMQ.PO$POLLIN, 3))
-        
-        if(bitwAnd(zmq.poll.get.revents(1), .pbd_env$ZMQ.PO$POLLIN))
+        debug('main loop: after poll')
+
+        # It's important that these messages are handler one  by one in each
+        # look. The problem is that during the handler, a new zmq.poll could be
+        # done (and is done in case of errors in a execution request) and this
+        # invalidates the zmq.poll.get.revents call leading to "funny" results
+        # with found control message even if there are no control messages. So
+        # the easiest seems to be to handle this in a big if .. else if .. else
+        # clause...
+        # https://github.com/IRkernel/IRkernel/pull/266
+        if(bitwAnd(zmq.poll.get.revents(1), .pbd_env$ZMQ.PO$POLLIN)) {
+            debug('main loop: hb')
             hb_reply()
-        
-        if(bitwAnd(zmq.poll.get.revents(2), .pbd_env$ZMQ.PO$POLLIN))
+        } else if(bitwAnd(zmq.poll.get.revents(2), .pbd_env$ZMQ.PO$POLLIN)) {
+            debug('main loop: shell')
             handle_shell()
-        
-        if(bitwAnd(zmq.poll.get.revents(3), .pbd_env$ZMQ.PO$POLLIN))
+        } else if(bitwAnd(zmq.poll.get.revents(3), .pbd_env$ZMQ.PO$POLLIN)) {
+            debug('main loop: control')
             handle_control()
-        
+        } else {
+           # else shouldn't be possible
+           debug('main loop: zmq.poll returned but no message found?')
+        }
     }
+    debug('main loop: end')
 })
 )
 
