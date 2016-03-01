@@ -1,4 +1,4 @@
-#' @include execution.r help.r
+#' @include execution.r help.r comm_manager.r
 NULL
 
 fromRawJSON <- function(r) {
@@ -22,7 +22,8 @@ Kernel <- setRefClass(
         connection_info = 'list',
         zmqctx          = 'externalptr',
         sockets         = 'list',
-        executor        = 'Executor'),
+        executor        = 'Executor',
+        comm_manager    = 'Comm_Manager'),
     methods = list(
 
 hb_reply = function() {
@@ -74,7 +75,7 @@ wire_to_msg = function(parts) {
 
 msg_to_wire = function(msg) {
     "Serialize a message"
-    
+
     #print(msg)
     bodyparts <- list(
         charToRaw(toJSON(msg$header,        auto_unbox = TRUE)),
@@ -110,7 +111,7 @@ new_reply = function(msg_type, parent_msg) {
 
 send_response = function(msg_type, parent_msg, socket_name, content) {
     "Send a response"
-    
+
     msg <- new_reply(msg_type, parent_msg)
     msg$content <- content
     socket <- sockets[[socket_name]]
@@ -125,6 +126,9 @@ handle_shell = function() {
     msg <- wire_to_msg(parts)
     switch(
         msg$header$msg_type,
+        comm_open           = comm_manager$on_comm_open(msg),
+        comm_msg            = comm_manager$on_comm_msg(msg),
+        comm_close          = comm_manager$on_comm_close(msg),
         execute_request     = executor$execute(msg),
         kernel_info_request = kernel_info(msg),
         history_request     = history(msg),
@@ -312,6 +316,8 @@ initialize = function(connection_file) {
 
     executor <<- Executor$new(send_response = .self$send_response,
         abort_queued_messages = .self$abort_queued_messages)
+    comm_manager <<- Comm_Manager$new(send_response = .self$send_response)
+    assign('kernel', .self, envir = .GlobalEnv)
 },
 
 run = function() {

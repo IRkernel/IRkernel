@@ -26,6 +26,7 @@ Imports:
     uuid,
     digest
 Collate:
+    'comm_manager.r'
     'options.r'
     'execution.r'
     'help.r'
