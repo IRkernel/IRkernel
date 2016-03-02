@@ -75,7 +75,7 @@ wire_to_msg = function(parts) {
 
 msg_to_wire = function(msg) {
     "Serialize a message"
-
+    
     #print(msg)
     bodyparts <- list(
         charToRaw(toJSON(msg$header,        auto_unbox = TRUE)),
@@ -111,7 +111,7 @@ new_reply = function(msg_type, parent_msg) {
 
 send_response = function(msg_type, parent_msg, socket_name, content) {
     "Send a response"
-
+    
     msg <- new_reply(msg_type, parent_msg)
     msg$content <- content
     socket <- sockets[[socket_name]]
@@ -126,6 +126,7 @@ handle_shell = function() {
     msg <- wire_to_msg(parts)
     switch(
         msg$header$msg_type,
+        comm_info_request   = comm_manager$on_comm_info_request(msg),
         comm_open           = comm_manager$on_comm_open(msg),
         comm_msg            = comm_manager$on_comm_msg(msg),
         comm_close          = comm_manager$on_comm_close(msg),
@@ -317,7 +318,7 @@ initialize = function(connection_file) {
     executor <<- Executor$new(send_response = .self$send_response,
         abort_queued_messages = .self$abort_queued_messages)
     comm_manager <<- Comm_Manager$new(send_response = .self$send_response)
-    assign('kernel', .self, envir = .GlobalEnv)
+    comm_manager_env$comm_manager <- comm_manager
 },
 
 run = function() {
@@ -353,6 +354,13 @@ run = function() {
     debug('main loop: end')
 })
 )
+
+comm_manager_env <- new.env()
+#' Get global CommManager instance
+#'
+#' @return \link{CommManager} instance if a kernel is running, else NULL
+#' @export
+comm_manager <- function() comm_manager_env$comm_manager
 
 #' Initialise and run the kernel
 #'
