@@ -11,6 +11,10 @@ Has methods able to connect and talk to a Jupyter server.
 \section{Methods}{
 
 \describe{
+\item{\code{abort_queued_messages()}}{Abort all already queued shell messages after an error}
+
+\item{\code{abort_shell_msg()}}{Send an abort message for an incoming shell request}
+
 \item{\code{handle_shell()}}{React to a shell message coming in}
 
 \item{\code{is_complete(request)}}{Checks whether the code in the rest is complete}
