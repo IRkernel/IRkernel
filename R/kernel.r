@@ -315,6 +315,7 @@ initialize = function(connection_file) {
 },
 
 run = function() {
+    options(jupyter.in_kernel = TRUE)
     while (TRUE) {
         debug('main loop: beginning')
         zmq.poll(
