@@ -8,6 +8,7 @@
 #' The following can be set/read via \code{options(opt.name = ...)} / \code{getOption('opt.name')}
 #' 
 #' \describe{
+#'   \item{\code{jupyter.in_kernel}}{\code{TRUE} if this code is executed in a running kernel}
 #'   \item{\code{jupyter.rich_display}}{Use more than just text display}
 #'   \item{\code{jupyter.result_mimetypes}}{
 #'      The formats emitted when any return value is to be displayed
