@@ -1,4 +1,4 @@
-#' @include execution.r help.r
+#' @include execution.r help.r comm_manager.r
 NULL
 
 fromRawJSON <- function(r) {
@@ -22,7 +22,8 @@ Kernel <- setRefClass(
         connection_info = 'list',
         zmqctx          = 'externalptr',
         sockets         = 'list',
-        executor        = 'Executor'),
+        executor        = 'Executor',
+        comm_manager    = 'Comm_Manager'),
     methods = list(
 
 hb_reply = function() {
@@ -125,6 +126,10 @@ handle_shell = function() {
     msg <- wire_to_msg(parts)
     switch(
         msg$header$msg_type,
+        comm_info_request   = comm_manager$on_comm_info_request(msg),
+        comm_open           = comm_manager$on_comm_open(msg),
+        comm_msg            = comm_manager$on_comm_msg(msg),
+        comm_close          = comm_manager$on_comm_close(msg),
         execute_request     = executor$execute(msg),
         kernel_info_request = kernel_info(msg),
         history_request     = history(msg),
@@ -312,6 +317,8 @@ initialize = function(connection_file) {
 
     executor <<- Executor$new(send_response = .self$send_response,
         abort_queued_messages = .self$abort_queued_messages)
+    comm_manager <<- Comm_Manager$new(send_response = .self$send_response)
+    comm_manager_env$comm_manager <- comm_manager
 },
 
 run = function() {
@@ -348,6 +355,13 @@ run = function() {
     debug('main loop: end')
 })
 )
+
+comm_manager_env <- new.env()
+#' Get global CommManager instance
+#'
+#' @return \link{CommManager} instance if a kernel is running, else NULL
+#' @export
+comm_manager <- function() comm_manager_env$comm_manager
 
 #' Initialise and run the kernel
 #'
