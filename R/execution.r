@@ -148,7 +148,7 @@ execute = function(request) {
     
     err <<- list()
     nframe <- NULL  # find out stack depth in notebook cell
-    
+
     tryCatch(evaluate(
         'stop()',
         stop_on_error = 1L,
@@ -174,6 +174,19 @@ execute = function(request) {
         handle_message  <- identity
         handle_warning  <- identity
     } else {
+        # We only want a short error in the notebook/... because the usual case
+        # is just a problem in one of the display methods which are not relevant
+        # right now.
+        handle_display_error <- function(e){
+            calls <- head(sys.calls()[-seq_len(nframe + 1L)], -3)
+            stack_info <- format_stack(calls)
+            log_debug('ERROR: %s\nTraceback:\n%s\n', toString(e), paste(stack_info, collapse='\n'))
+            if (!silent) {
+                send_response('stream', request, 'iopub', list(
+                    name = 'stderr',
+                    text = sprintf('Error while rich displaying an object: %s', toString(e))))
+            }
+        }
         handle_value <- function(obj) {
             data <- namedlist()
             data[['text/plain']] <- repr_text(obj)
@@ -181,12 +194,12 @@ execute = function(request) {
             # Only send a response when there is regular console output
             if (nchar(data[['text/plain']]) > 0) {
                 if (getOption('jupyter.rich_display')) {
-                    tryCatch({
-                        for (mime in getOption('jupyter.display_mimetypes')) {
+                    for (mime in getOption('jupyter.display_mimetypes')) {
+                        tryCatch({
                             r <- mime2repr[[mime]](obj)
                             if (!is.null(r)) data[[mime]] <- r
-                        }
-                    }, error = handle_error)
+                            }, error = handle_display_error)
+                    }
                 }
                 
                 send_response('display_data', request, 'iopub', list(
