@@ -178,7 +178,9 @@ execute = function(request) {
         # is just a problem in one of the display methods which are not relevant
         # right now.
         handle_display_error <- function(e){
-            calls <- head(sys.calls()[-seq_len(nframe + 1L)], -3)
+            # This is used with withCallingHandler and only has two additional
+            # calls at the end instead of the 3 for tryCatch...
+            calls <- head(sys.calls()[-seq_len(nframe + 1L)], -2)
             stack_info <- format_stack(calls)
             log_debug('ERROR: %s\nTraceback:\n%s\n', toString(e), paste(stack_info, collapse='\n'))
             if (!silent) {
@@ -195,10 +197,15 @@ execute = function(request) {
             if (nchar(data[['text/plain']]) > 0) {
                 if (getOption('jupyter.rich_display')) {
                     for (mime in getOption('jupyter.display_mimetypes')) {
-                        tryCatch({
-                            r <- mime2repr[[mime]](obj)
-                            if (!is.null(r)) data[[mime]] <- r
-                            }, error = handle_display_error)
+                        # Use withCallingHandlers as that shows the inner stacktrace:
+                        # https://stackoverflow.com/questions/15282471/get-stack-trace-on-trycatched-error-in-r
+                        # the tryCatch is  still needed to prevent the error from showing
+                        # up outside further up the stack :-/
+                        tryCatch(withCallingHandlers({
+                                r <- mime2repr[[mime]](obj)
+                                if (!is.null(r)) data[[mime]] <- r
+                            }, error = handle_display_error),
+                            error = function(x) {})
                     }
                 }
                 
