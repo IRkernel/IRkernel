@@ -182,15 +182,19 @@ execute = function(request) {
         # right now.
         handle_display_error <- function(e){
             # This is used with withCallingHandler and only has two additional
-            # calls at the end instead of the 3 for tryCatch...
-            calls <- head(sys.calls()[-seq_len(nframe + 1L)], -2)
+            # calls at the end instead of the 3 for tryCatch... (-2 at the end)
+            # we also remove the tryCatch and mime2repr stuff at the head of the callstack (+7)
+            calls <- head(sys.calls()[-seq_len(nframe + 7L)], -2)
             stack_info <- format_stack(calls)
             # TODO: replace with proper logging
-            cat(sprintf('ERROR: %s\nTraceback:\n%s\n', toString(e), paste(stack_info, collapse='\n')), file = stderror)
+            msg <- sprintf('ERROR while rich displaying an object: %s\nTraceback:\n%s\n',
+                           toString(e),
+                           paste(stack_info, collapse='\n'))
+            cat(msg, file = stderror)
             if (!silent) {
                 send_response('stream', request, 'iopub', list(
                     name = 'stderr',
-                    text = sprintf('Error while rich displaying an object: %s', toString(e))))
+                    text = msg))
             }
         }
         handle_value <- function(obj) {
