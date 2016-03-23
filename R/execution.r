@@ -148,6 +148,10 @@ execute = function(request) {
     
     err <<- list()
     nframe <- NULL  # find out stack depth in notebook cell
+
+    # handle to stderr if stderr() is sink'ed
+    stderror <- stderr()
+
     tryCatch(evaluate(
         'stop()',
         stop_on_error = 1L,
@@ -173,6 +177,26 @@ execute = function(request) {
         handle_message  <- identity
         handle_warning  <- identity
     } else {
+        # We only want a short error in the notebook/... because the usual case
+        # is just a problem in one of the display methods which are not relevant
+        # right now.
+        handle_display_error <- function(e){
+            # This is used with withCallingHandler and only has two additional
+            # calls at the end instead of the 3 for tryCatch... (-2 at the end)
+            # we also remove the tryCatch and mime2repr stuff at the head of the callstack (+7)
+            calls <- head(sys.calls()[-seq_len(nframe + 7L)], -2)
+            stack_info <- format_stack(calls)
+            # TODO: replace with proper logging
+            msg <- sprintf('ERROR while rich displaying an object: %s\nTraceback:\n%s\n',
+                           toString(e),
+                           paste(stack_info, collapse='\n'))
+            cat(msg, file = stderror)
+            if (!silent) {
+                send_response('stream', request, 'iopub', list(
+                    name = 'stderr',
+                    text = msg))
+            }
+        }
         handle_value <- function(obj) {
             data <- namedlist()
             data[['text/plain']] <- repr_text(obj)
@@ -180,12 +204,17 @@ execute = function(request) {
             # Only send a response when there is regular console output
             if (nchar(data[['text/plain']]) > 0) {
                 if (getOption('jupyter.rich_display')) {
-                    tryCatch({
-                        for (mime in getOption('jupyter.display_mimetypes')) {
-                            r <- mime2repr[[mime]](obj)
-                            if (!is.null(r)) data[[mime]] <- r
-                        }
-                    }, error = handle_error)
+                    for (mime in getOption('jupyter.display_mimetypes')) {
+                        # Use withCallingHandlers as that shows the inner stacktrace:
+                        # https://stackoverflow.com/questions/15282471/get-stack-trace-on-trycatched-error-in-r
+                        # the tryCatch is  still needed to prevent the error from showing
+                        # up outside further up the stack :-/
+                        tryCatch(withCallingHandlers({
+                                r <- mime2repr[[mime]](obj)
+                                if (!is.null(r)) data[[mime]] <- r
+                            }, error = handle_display_error),
+                            error=function(x){})
+                    }
                 }
                 
                 send_response('display_data', request, 'iopub', list(
