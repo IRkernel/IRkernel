@@ -1,3 +1,6 @@
+#' @include logging.r
+NULL
+
 setClassUnion('functionOrNULL', members = c('function', 'NULL'))
 
 #' The Comm_Manager
@@ -117,11 +120,10 @@ Comm_Manager <- setRefClass(
                 tryCatch({
                     target_to_handler_map[[target_name]](comm, data)
                 }, error = function(e) {
-                    debug("error invoking the handler for target")
-                    debug(e)
+                    log_debug('error invoking the handler for target: %s', e)
                 })
             } else {
-                debug("target_name not found in comm_open")
+                log_debug('target_name not found in comm_open')
                 #reply with a comm_close message as target_name not found
                 send_close(comm_id, target_name, list())
             }
@@ -141,11 +143,10 @@ Comm_Manager <- setRefClass(
                 tryCatch({
                     comm$handle_msg(data)
                 }, error = function(e) {
-                    debug("error invoking comm handle msg")
-                    debug(e)
+                    log_debug('error invoking comm handle msg: %s', e)
                 })
             } else {
-                debug("comm_id not found in comm_msg")
+                log_debug('comm_id not found in comm_msg')
             }
         },
 
@@ -162,12 +163,11 @@ Comm_Manager <- setRefClass(
                 tryCatch({
                     comm$handle_close()
                 }, error = function(e) {
-                    debug("error invoking comm handle close")
-                    debug(e)
+                    log_debug('error invoking comm handle close: %s', e)
                 })
                 unregister_comm(comm)
             } else {
-                debug("comm_id not found in comm_msg")
+                log_debug('comm_id not found in comm_msg')
             }
         },
         initialize = function(...) {
@@ -196,14 +196,14 @@ Comm <- setRefClass(
                 comm_manager$register_comm(.self)
                 comm_manager$send_open(id, target_name, msg)
             } else {
-                debug("Comm already opened!")
+                log_debug('Comm already opened!')
             }
         },
         send = function(msg = list()) {
             if(comm_manager$is_comm_registered(.self)) {
                 comm_manager$send_msg(id, target_name, msg)
             } else {
-                debug("Comm is not opened. Cannot send!")
+                log_debug('Comm is not opened. Cannot send!')
             }
         },
         close = function(msg = list()) {
@@ -211,7 +211,7 @@ Comm <- setRefClass(
                 comm_manager$send_close(id, target_name, msg)
                 comm_manager$unregister_comm(.self)
             } else {
-                debug("Comm is already closed!")
+                log_debug('Comm is already closed!')
             }
         },
         on_msg = function(a_msg_callback) {

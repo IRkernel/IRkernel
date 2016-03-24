@@ -16,7 +16,13 @@ get_plot_options <- function() {
     return(as.list(plot.opts))
 }
 
+getenv_default <- function(varname, default) {
+    value <- Sys.getenv(varname)
+    if (identical(value, '')) default else value
+}
+
 opt.defaults <- list(
+    jupyter.log_level = as.integer(getenv_default('JUPYTER_LOG_LEVEL', 1L)),
     jupyter.plot_mimetypes = c(
         'text/plain',
         'image/png',
