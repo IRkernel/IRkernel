@@ -192,6 +192,8 @@ execute = function(request) {
         }
         handle_value <- function(obj) {
             data <- namedlist()
+            metadata <- namedlist()
+
             data[['text/plain']] <- repr_text(obj)
             
             # Only send a response when there is regular console output
@@ -203,17 +205,26 @@ execute = function(request) {
                         # the tryCatch is  still needed to prevent the error from showing
                         # up outside further up the stack :-/
                         tryCatch(withCallingHandlers({
-                                r <- mime2repr[[mime]](obj)
-                                if (!is.null(r)) data[[mime]] <- r
-                            }, error = handle_display_error),
-                            error = function(x) {})
+                            r <- mime2repr[[mime]](obj)
+                            if (!is.null(r)) {
+                                data[[mime]] <- r
+                                # Isolating full html pages (putting them in an iframe)
+                                if (identical(mime, 'text/html')) {
+                                    if (grepl("<html.*>", r, ignore.case = TRUE)){
+                                        jupyter_debug("Found full html page: %s", strtrim(r, 100))
+                                        metadata[[mime]] <- list(isolated = TRUE)
+                                    }
+                                }
+                            }
+                        }, error = handle_display_error),
+                        error = function(x) {})
                     }
                 }
-                
-                send_response('display_data', request, 'iopub', list(
-                    data = data,
-                    metadata = namedlist() ))
             }
+            log_debug("Sending display_data: %s", paste(capture.output(str(data)), collapse = "\n"))
+            send_response('display_data', request, 'iopub', list(
+                data = data,
+                metadata = metadata))
         }
         
         stream <- function(output, streamname) {
