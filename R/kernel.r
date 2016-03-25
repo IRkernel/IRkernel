@@ -39,7 +39,6 @@ wire_to_msg = function(parts) {
     "Deserialize a message"
     
     i <- 1
-    #print(lapply(parts, function(r) tryCatch(rawToChar(r), error = function(r) r)))
     while (!identical(parts[[i]], charToRaw('<IDS|MSG>'))) {
         i <- i + 1
     }
@@ -73,7 +72,6 @@ wire_to_msg = function(parts) {
 msg_to_wire = function(msg) {
     "Serialize a message"
     
-    #print(msg)
     bodyparts <- list(
         charToRaw(toJSON(msg$header,        auto_unbox = TRUE)),
         charToRaw(toJSON(msg$parent_header, auto_unbox = TRUE)),
@@ -155,7 +153,7 @@ abort_queued_messages = function() {
     log_debug('abort loop: aborted all outstanding msg')
     while (TRUE) {
         log_debug('abort loop: before poll')
-        ret = zmq.poll(
+        ret <- zmq.poll(
             c(sockets$shell), # only shell channel
             c(.pbd_env$ZMQ.PO$POLLIN), # type
             0) # zero timeout, only what's already there
@@ -370,7 +368,7 @@ main <- function(connection_file = '') {
         # On Windows, passing the connection file in as a string literal fails,
         # because the \U in C:\Users looks like a unicode escape. So, we have to
         # pass it as a separate command line argument.
-        connection_file = commandArgs(TRUE)[[1]]
+        connection_file <- commandArgs(TRUE)[[1]]
     }
     kernel <- Kernel$new(connection_file = connection_file)
     kernel$run()

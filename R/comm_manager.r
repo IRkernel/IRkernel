@@ -19,7 +19,7 @@ Comm_Manager <- setRefClass(
     methods = list(
         new_comm = function(target_name, comm_id = NULL) {
             if(is.null(comm_id)) {
-                comm_id = UUIDgenerate()
+                comm_id <- UUIDgenerate()
             }
             return (Comm$new(id = comm_id, target_name = target_name, comm_manager = .self))
         },
@@ -35,10 +35,10 @@ Comm_Manager <- setRefClass(
         unregister_comm = function(comm) {
             commid_to_comm[[comm$id]] <<- NULL
         },
-        is_comm_registered = function(comm){
+        is_comm_registered = function(comm) {
             return (!is.null(commid_to_comm[[comm$id]]))
         },
-        send_open = function(comm_id, target_name, data, metadata = list()){
+        send_open = function(comm_id, target_name, data, metadata = list()) {
             send_response('comm_open', parent_request, 'iopub', list(
                 metadata = metadata,
                 comm_id = comm_id,
@@ -64,11 +64,8 @@ Comm_Manager <- setRefClass(
         },
         make_comm_list = function(comm_list) {
             all_comms <- list()
-            for(the_comm in comm_list) {
-                the_target_name <- the_comm$target_name
-                the_target_name_list <- list()
-                the_target_name_list[['target_name']] <- the_target_name
-                all_comms[[the_comm$id]] <- the_target_name_list
+            for (the_comm in comm_list) {
+                all_comms[[the_comm$id]] <- list(target_name = the_comm$target_name)
             }
             return (all_comms)
         },
@@ -89,7 +86,7 @@ Comm_Manager <- setRefClass(
             #Else target_name not in the request return all commids accross all targets
             reply_msg <- list()
             comms <- list()
-            if("target_name" %in% names(request$content)) {
+            if('target_name' %in% names(request$content)) {
                 #reply with comms only for the specified target_name
                 target_name_requested <- request$content$target_name
                 filtered_comms <- Filter(function(x) x$target_name == target_name_requested, commid_to_comm)
@@ -191,7 +188,7 @@ Comm <- setRefClass(
         close_callback = 'functionOrNULL'
     ),
     methods = list(
-        open = function(msg = list()){
+        open = function(msg = list()) {
             if(!comm_manager$is_comm_registered(.self)) {
                 comm_manager$register_comm(.self)
                 comm_manager$send_open(id, target_name, msg)

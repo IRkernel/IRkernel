@@ -8,9 +8,10 @@
 #' The following can be set/read via \code{options(opt.name = ...)} / \code{getOption('opt.name')}
 #' 
 #' \describe{
-#'   \item{\code{jupyter.in_kernel}}{\code{TRUE} if this code is executed in a running kernel}
+#'   \item{\code{jupyter.log_level}}{1L (errors), 2L (warnings), or 3L (debug). 1L is the default.}
+#'   \item{\code{jupyter.in_kernel}}{\code{TRUE} if this code is executed in a running kernel. Set to pretend being/not being in a kernel}
 #'   \item{\code{jupyter.rich_display}}{Use more than just text display}
-#'   \item{\code{jupyter.result_mimetypes}}{
+#'   \item{\code{jupyter.display_mimetypes}}{
 #'      The formats emitted when any return value is to be displayed
 #'      (default: all mimetypes listed \href{http://ipython.org/ipython-doc/stable/api/generated/IPython.core.formatters.html#IPython.core.formatters.format_display_data}{here}) 
 #'   }

@@ -112,7 +112,7 @@ execute = function(request) {
     
     # .Last doesn’t seem to work, so replicating behavior
     quit <- function(save = 'default', status = 0, runLast = TRUE) {
-        save = switch(save,
+        save <- switch(save,
             default = , yes = TRUE,
             no = FALSE,
             ask = ask('Save workspace image? [y/n/c]: '),
@@ -148,6 +148,7 @@ execute = function(request) {
     
     err <<- list()
     nframe <- NULL  # find out stack depth in notebook cell
+    
     tryCatch(evaluate(
         'stop()',
         stop_on_error = 1L,
@@ -211,7 +212,7 @@ execute = function(request) {
             stream(paste(o$message, collapse = ''), 'stderr')
         }
         
-        handle_warning = function(o) {
+        handle_warning <- function(o) {
             call <- if (is.null(o$call)) '' else paste('In', deparse(o$call)[[1]])
             stream(sprintf('Warning message:\n%s: %s', call, o$message), 'stderr')
         }
