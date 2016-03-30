@@ -26,6 +26,16 @@ class InstallspecTests(jkt.KernelTests):
 
     code_hello_world = 'print("hello, world")'
 
+class DisplaySystem(jkt.KernelTests):
+    kernel_name = 'ir'
+
+    language_name = 'R'
+
+    code_display_data = [
+    {'code': 'options(jupyter.rich_display = FALSE);cat("a")', 'mime': {'text/plain':'a'}},
+    {'code': '"a"', 'mime': {'text/plain':'"a"'}},
+    {'code': '1:3', 'mime': {'text/plain':'[1] 1 2 3'}},
+    ]
 
 if __name__ == '__main__':
     unittest.main()
