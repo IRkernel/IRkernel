@@ -129,6 +129,34 @@ execute = function(request) {
     # shade base::quit
     assign('quit', quit, envir = .GlobalEnv)
     assign('q',    quit, envir = .GlobalEnv)
+
+    # This is needed to get htmlwidgets displayed on print
+    print.htmlwidget <- function(x, ...){
+
+        if (!requireNamespace("htmlwidgets", quietly = TRUE)) {
+            stop("print.htmlwidget called without htmlwidgets loaded")
+        }
+
+        htmlfile <- tempfile(fileext = ".html")
+
+        # save the widget to HTML
+        htmlwidgets::saveWidget(
+            widget = x,
+            file = htmlfile,
+            selfcontained = TRUE
+        )
+
+        html_string <- readChar(htmlfile, file.info(htmlfile)$size)
+        content <- namedlist()
+        metadata <- namedlist()
+        content[['text/html']] <- html_string
+        # self contained -> it's a complete html file which needs to go into
+        # a iframe.
+        metadata[['text/html']] <- list(isolated = TRUE)
+        publish_mimebundle(content, metadata)
+    }
+
+    assign('print.htmlwidget', print.htmlwidget, envir = .GlobalEnv)
     
     send_plot <- function(plotobj) {
         formats <- namedlist()
