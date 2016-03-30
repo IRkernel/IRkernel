@@ -210,8 +210,8 @@ execute = function(request) {
                                 data[[mime]] <- r
                                 # Isolating full html pages (putting them in an iframe)
                                 if (identical(mime, 'text/html')) {
-                                    if (grepl("<html.*>", r, ignore.case = TRUE)){
-                                        jupyter_debug("Found full html page: %s", strtrim(r, 100))
+                                    if (grepl('<html.*>', r, ignore.case = TRUE)) {
+                                        log_debug('Found full html page: %s', strtrim(r, 100))
                                         metadata[[mime]] <- list(isolated = TRUE)
                                     }
                                 }
