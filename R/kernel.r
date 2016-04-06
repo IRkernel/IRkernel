@@ -289,10 +289,12 @@ shutdown = function(request) {
 
 initialize = function(connection_file) {
     connection_info <<- fromJSON(connection_file)
+    stopifnot(connection_info$transport %in% c('tcp', 'ipc'))
     
     url <- paste0(connection_info$transport, '://', connection_info$ip)
     url_with_port <- function(port_name) {
-        paste0(url, ':', connection_info[[port_name]])
+        sep <- switch(connection_info$transport, tcp = ':', ipc = '-')
+        paste0(url, sep, connection_info[[port_name]])
     }
     
     # ZMQ Socket setup
