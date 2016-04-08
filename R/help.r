@@ -32,7 +32,7 @@
 #' @importFrom evaluate evaluate new_output_handler parse_all
 #' @importFrom jsonlite fromJSON toJSON
 #' @importFrom IRdisplay publish_mimebundle
-#' @importFrom repr mime2repr repr_text
+#' @importFrom repr mime2repr repr_text repr_option_defaults
 #' 
 #' @docType package
 #' @name IRkernel

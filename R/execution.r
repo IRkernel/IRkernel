@@ -138,7 +138,7 @@ execute = function(request) {
         metadata <- namedlist()
         for (mime in getOption('jupyter.plot_mimetypes')) {
             tryCatch({
-                formats[[mime]] <- mime2repr[[mime]](plotobj)
+                formats[[mime]] <- mime2repr[[mime]](plotobj, attr(plotobj, '.irkernel_width'), attr(plotobj, '.irkernel_height'))
             }, error = handle_error)
             # Isolating SVGs (putting them in an iframe) avoids strange
             # interactions with CSS on the page.
@@ -214,6 +214,9 @@ execute = function(request) {
             if (!plot_builds_upon(last_recorded_plot, plotobj)) {
                 send_plot(last_recorded_plot)
             }
+            # need to be set here to capture the size and have it available when the plot is sent
+            attr(plotobj, '.irkernel_width')  <- getOption('repr.plot.width',  repr_option_defaults$repr.plot.width)
+            attr(plotobj, '.irkernel_height') <- getOption('repr.plot.height', repr_option_defaults$repr.plot.height)
             last_recorded_plot <<- plotobj
         }
         
