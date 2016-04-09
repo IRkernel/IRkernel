@@ -9,6 +9,7 @@
 #' 
 #' \describe{
 #'   \item{\code{jupyter.log_level}}{1L (errors), 2L (warnings), or 3L (debug). 1L is the default.}
+#'   \item{\code{jupyter.pager_classes}}{Classes to use the pager for instead of displaying them inline. Default: help pages}
 #'   \item{\code{jupyter.in_kernel}}{\code{TRUE} if this code is executed in a running kernel. Set to pretend being/not being in a kernel}
 #'   \item{\code{jupyter.rich_display}}{Use more than just text display}
 #'   \item{\code{jupyter.display_mimetypes}}{
