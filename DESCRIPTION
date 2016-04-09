@@ -30,6 +30,7 @@ Collate:
     'comm_manager.r'
     'options.r'
     'execution.r'
+    'handlers.r'
     'help.r'
     'installspec.r'
     'kernel.r'

@@ -100,14 +100,17 @@ execute = function(request) {
     
     payload <<- list()
     
+    page <- function(mimebundle) {
+        payload <<- c(payload, list(list(source = 'page', data = mimebundle)))
+    }
+    
     options(pager = function(files, header, title, delete.file) {
         text <- title
         for (path in files) {
             text <- c(text, header, readLines(path))
         }
         if (delete.file) file.remove(files)
-        mimebundle <- list('text/plain' = paste(text, collapse = '\n'))
-        payload <<- c(payload, list(list(source = 'page', data = mimebundle)))
+        page(list('text/plain' = paste(text, collapse = '\n')))
     })
     
     # .Last doesn’t seem to work, so replicating behavior
@@ -191,40 +194,14 @@ execute = function(request) {
             }
         }
         handle_value <- function(obj) {
-            data <- namedlist()
-            metadata <- namedlist()
-
-            data[['text/plain']] <- repr_text(obj)
-            
-            # Only send a response when there is regular console output
-            if (nchar(data[['text/plain']]) > 0) {
-                if (getOption('jupyter.rich_display')) {
-                    for (mime in getOption('jupyter.display_mimetypes')) {
-                        # Use withCallingHandlers as that shows the inner stacktrace:
-                        # https://stackoverflow.com/questions/15282471/get-stack-trace-on-trycatched-error-in-r
-                        # the tryCatch is  still needed to prevent the error from showing
-                        # up outside further up the stack :-/
-                        tryCatch(withCallingHandlers({
-                            r <- mime2repr[[mime]](obj)
-                            if (!is.null(r)) {
-                                data[[mime]] <- r
-                                # Isolating full html pages (putting them in an iframe)
-                                if (identical(mime, 'text/html')) {
-                                    if (grepl('<html.*>', r, ignore.case = TRUE)) {
-                                        log_debug('Found full html page: %s', strtrim(r, 100))
-                                        metadata[[mime]] <- list(isolated = TRUE)
-                                    }
-                                }
-                            }
-                        }, error = handle_display_error),
-                        error = function(x) {})
-                    }
-                }
+            mimebundle <- prepare_mimebundle(obj, handle_display_error)
+            if (length(intersect(class(obj), getOption('jupyter.pager_classes'))) > 0) {
+                log_debug('Showing pager: %s', paste(capture.output(str(mimebundle$data)), collapse = '\n'))
+                page(mimebundle)
+            } else {
+                log_debug('Sending display_data: %s', paste(capture.output(str(mimebundle$data)), collapse = '\n'))
+                send_response('display_data', request, 'iopub', mimebundle)
             }
-            log_debug("Sending display_data: %s", paste(capture.output(str(data)), collapse = "\n"))
-            send_response('display_data', request, 'iopub', list(
-                data = data,
-                metadata = metadata))
         }
         
         stream <- function(output, streamname) {

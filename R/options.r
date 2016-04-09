@@ -5,6 +5,8 @@ getenv_default <- function(varname, default) {
 
 opt.defaults <- list(
     jupyter.log_level = as.integer(getenv_default('JUPYTER_LOG_LEVEL', 1L)),
+    jupyter.pager_classes = c(
+        'help_files_with_topic'),
     jupyter.plot_mimetypes = c(
         'text/plain',
         'image/png',
