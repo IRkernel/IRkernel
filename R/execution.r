@@ -135,7 +135,7 @@ execute = function(request) {
         metadata <- namedlist()
         for (mime in getOption('jupyter.plot_mimetypes')) {
             tryCatch({
-                formats[[mime]] <- mime2repr[[mime]](plotobj)
+                formats[[mime]] <- mime2repr[[mime]](plotobj, attr(plotobj, '.irkernel_width'), attr(plotobj, '.irkernel_height'))
             }, error = handle_error)
             # Isolating SVGs (putting them in an iframe) avoids strange
             # interactions with CSS on the page.
@@ -221,7 +221,7 @@ execute = function(request) {
                     }
                 }
             }
-            log_debug("Sending display_data: %s", paste(capture.output(str(data)), collapse = "\n"))
+            log_debug('Sending display_data: %s', paste(capture.output(str(data)), collapse = "\n"))
             send_response('display_data', request, 'iopub', list(
                 data = data,
                 metadata = metadata))
@@ -237,6 +237,12 @@ execute = function(request) {
             if (!plot_builds_upon(last_recorded_plot, plotobj)) {
                 send_plot(last_recorded_plot)
             }
+            # need to be set here to capture the size and have it available
+            # when the plot is sent
+            # 7 is the default in repr...
+            # TODO: get default from repr when the defaults are exported there and in a release
+            attr(plotobj, '.irkernel_width') <- getOption('repr.plot.width', 7)
+            attr(plotobj, '.irkernel_height') <- getOption('repr.plot.height', 7)
             last_recorded_plot <<- plotobj
         }
         
