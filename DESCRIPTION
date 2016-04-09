@@ -17,7 +17,7 @@ License: MIT + file LICENSE
 LazyData: true
 Encoding: UTF-8
 Imports:
-    repr,
+    repr (>= 0.4.99),
     methods,
     evaluate (>= 0.5.4),
     IRdisplay,
