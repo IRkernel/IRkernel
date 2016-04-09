@@ -5,4 +5,5 @@ Makefile
 ^.*\.Rproj$
 ^\.Rproj\.user$
 [.]pdf$
+^\.travis-build.sh$
 example-notebooks/.*$

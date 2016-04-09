@@ -1,27 +1,16 @@
-language: python
+language: r
 sudo: false
-python:
-  - "3.5"
-install:
-  - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
-  - bash miniconda.sh -b -p $HOME/miniconda
-  - export PATH="$HOME/miniconda/bin:$PATH"
-  - hash -r
-  - conda config --set always_yes yes --set changeps1 no
-  - conda update -q conda
-  # Useful for debugging any issues with conda
-  - conda info -a
+cache: packages
 
-  # Replace dep1 dep2 ... with your dependencies
-  - conda create -q -n test-environment -c r r r-uuid r-digest r-base64enc
-            r-evaluate r-jsonlite jupyter pip zeromq nose
-  - source activate test-environment
-  - pip install jupyter_kernel_test
-  - R --slave -e "withCallingHandlers(install.packages(c('pbdZMQ', 'devtools'), repos = 'http://cran.rstudio.com/'), warning = stop)"
-  - R --slave -e "for (repo in c('IRkernel/repr', 'IRkernel/IRdisplay')) devtools::install_github(repo, dependencies = TRUE, repos = 'http://cran.rstudio.com/')"
-  - R CMD INSTALL $TRAVIS_BUILD_DIR
-  - R --slave -e "IRkernel::installspec()"
-  - R --slave -e "IRkernel::installspec(name='testir', displayname='testir')"
+r_github_packages:
+  - IRkernel/repr
+  - IRkernel/IRdisplay
+
+addons:
+  apt:
+    packages:
+      - python3
+      - python3-setuptools
 
 script:
-  - python test_ir.py
+  - source .travis-build.sh
