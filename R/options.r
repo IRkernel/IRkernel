@@ -3,7 +3,14 @@ getenv_default <- function(varname, default) {
     if (identical(value, '')) default else value
 }
 
-opt.defaults <- list(
+#' @usage \code{
+#' options(jupyter.* = ...)
+#' getOption('jupyter.*')
+#' jupyter_option_defaults$jupyter.*
+#' }
+#' @name IRkernel
+#' @export
+jupyter_option_defaults <- list(
     jupyter.log_level = as.integer(getenv_default('JUPYTER_LOG_LEVEL', 1L)),
     jupyter.pager_classes = c(
         'help_files_with_topic'),
@@ -14,9 +21,9 @@ opt.defaults <- list(
     jupyter.in_kernel = FALSE)
 
 .onLoad <- function(libname = NULL, pkgname = NULL) {
-    for (option in names(opt.defaults)) {
-        if (is.null(getOption(option))) {
-            do.call(options, opt.defaults[option])  # single []: preserve name
+    for (opt_name in names(jupyter_option_defaults)) {
+        if (is.null(getOption(opt_name))) {
+            do.call(options, jupyter_option_defaults[opt_name])  # single []: preserve name
         }
     }
 }

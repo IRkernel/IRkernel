@@ -2,6 +2,7 @@
 
 export(comm_manager)
 export(installspec)
+export(jupyter_option_defaults)
 export(main)
 exportClasses(Comm)
 exportClasses(Comm_Manager)
