@@ -205,6 +205,7 @@ execute = function(request) {
         }
         
         stream <- function(output, streamname) {
+            log_debug('Stream output: %s', output)
             send_response('stream', request, 'iopub', list(
                 name = streamname,
                 text = paste(output, collapse = '\n')))
@@ -212,6 +213,7 @@ execute = function(request) {
         
         handle_graphics <- function(plotobj) {
             if (!plot_builds_upon(last_recorded_plot, plotobj)) {
+                log_debug('Sending plot...')
                 send_plot(last_recorded_plot)
             }
             # need to be set here to capture the size and have it available when the plot is sent
@@ -221,11 +223,13 @@ execute = function(request) {
         }
         
         handle_message <- function(o) {
+            log_debug('Message output: %s', o)
             stream(paste(o$message, collapse = ''), 'stderr')
         }
         
         handle_warning <- function(o) {
             call <- if (is.null(o$call)) '' else paste('In', deparse(o$call)[[1]])
+            log_debug('Warning output: %s', sprintf('Warning message:\n%s: %s', call, o$message))
             stream(sprintf('Warning message:\n%s: %s', call, o$message), 'stderr')
         }
     }
@@ -240,7 +244,7 @@ execute = function(request) {
     
     interrupted <<- FALSE
     last_recorded_plot <<- NULL
-    
+    log_debug('Executing code: %s', request$content$code)
     tryCatch(
         evaluate(
             request$content$code,
