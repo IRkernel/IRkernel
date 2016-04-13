@@ -59,6 +59,7 @@ format_stack <- function(calls) {
     paste0(tb, line_refs)
 }
 
+
 Executor <- setRefClass(
     'Executor',
     fields = list(
@@ -133,6 +134,14 @@ execute = function(request) {
     assign('quit', quit, envir = .GlobalEnv)
     assign('q',    quit, envir = .GlobalEnv)
     
+    send_error_msg <- function(msg){
+        if (!silent) {
+            send_response('stream', request, 'iopub', list(
+                name = 'stderr',
+                text = msg))
+        }
+    }
+
     send_plot <- function(plotobj) {
         formats <- namedlist()
         metadata <- namedlist()
@@ -187,10 +196,7 @@ execute = function(request) {
                            toString(e),
                            paste(stack_info, collapse='\n'))
             log_debug(msg)
-            if (!silent) {
-                send_response('stream', request, 'iopub', list(
-                    name = 'stderr',
-                    text = msg))
+            send_error_msg(msg)
             }
         }
         handle_value <- function(obj) {
