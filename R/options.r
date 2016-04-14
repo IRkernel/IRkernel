@@ -12,8 +12,7 @@ getenv_default <- function(varname, default) {
 #' @export
 jupyter_option_defaults <- list(
     jupyter.log_level = as.integer(getenv_default('JUPYTER_LOG_LEVEL', 1L)),
-    jupyter.log_to_file = FALSE,
-    jupyter.logfile = getenv_default('JUPYTER_LOGFILE', 'irkernel.log'),
+    jupyter.logfile = getenv_default('JUPYTER_LOGFILE', NULL),
     jupyter.pager_classes = c(
         'help_files_with_topic'),
     jupyter.plot_mimetypes = c(
