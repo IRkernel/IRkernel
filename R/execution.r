@@ -167,6 +167,7 @@ execute = function(request) {
         output_handler = new_output_handler(error = function(e) nframe <<- sys.nframe())))
     
     handle_error <- function(e) {
+        log_debug('Error output: %s', toString(e))
         calls <- head(sys.calls()[-seq_len(nframe + 1L)], -3)
         
         msg <- paste0(toString(e), 'Traceback:\n')
@@ -197,9 +198,9 @@ execute = function(request) {
                            paste(stack_info, collapse='\n'))
             log_debug(msg)
             send_error_msg(msg)
-            }
         }
         handle_value <- function(obj) {
+            log_debug("Value output...")
             mimebundle <- prepare_mimebundle(obj, handle_display_error)
             if (length(intersect(class(obj), getOption('jupyter.pager_classes'))) > 0) {
                 log_debug('Showing pager: %s', paste(capture.output(str(mimebundle$data)), collapse = '\n'))
@@ -218,6 +219,7 @@ execute = function(request) {
         }
         
         handle_graphics <- function(plotobj) {
+            log_debug("Graphics output...")
             if (!plot_builds_upon(last_recorded_plot, plotobj)) {
                 log_debug('Sending plot...')
                 send_plot(last_recorded_plot)
