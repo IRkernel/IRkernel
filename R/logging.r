@@ -46,14 +46,14 @@ log_msg_stderror <- function(lvl, msg){
 	}
 })
 
-log_msg_logfile <- function(lvl, msg){
+log_msg_logfile <- function(lvl, msg) {
 	if (!is.null(getOption('jupyter.logfile'))) {
 		cur_logfile <- getOption('jupyter.logfile')
 		if (.is_changed_logfile(cur_logfile)) {
 			log_msg_stderror('INFO', sprintf('Logging to %s', cur_logfile))
 		}
 		log_con <- file(cur_logfile, open='ab')
-		writeBin(charToRaw(sprintf('%s %s: %s\n', format(Sys.time()), lvl, msg)), log_con, endian='little')
+		writeBin(charToRaw(sprintf('%s %s: %s\n', format(Sys.time()), lvl, msg)), log_con, endian = 'little')
 		close(log_con)
 	}
 }

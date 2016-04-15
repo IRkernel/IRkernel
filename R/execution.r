@@ -134,7 +134,7 @@ execute = function(request) {
     assign('quit', quit, envir = .GlobalEnv)
     assign('q',    quit, envir = .GlobalEnv)
     
-    send_error_msg <- function(msg){
+    send_error_msg <- function(msg) {
         if (!silent) {
             send_response('stream', request, 'iopub', list(
                 name = 'stderr',
@@ -195,7 +195,7 @@ execute = function(request) {
             stack_info <- format_stack(calls)
             msg <- sprintf('ERROR while rich displaying an object: %s\nTraceback:\n%s\n',
                            toString(e),
-                           paste(stack_info, collapse='\n'))
+                           paste(stack_info, collapse = '\n'))
             log_debug(msg)
             send_error_msg(msg)
         }
