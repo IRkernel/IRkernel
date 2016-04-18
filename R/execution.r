@@ -72,15 +72,24 @@ Executor <- setRefClass(
         last_recorded_plot    = 'recordedplotOrNULL'),
     methods = list(
 
+is.silent = function(request) {
+    request$content$silent
+},
+
+send_error_msg = function(request, msg) {
+    if (!is_silent(request)) return()
+    send_response('stream', request, 'iopub',
+                  list(name = 'stderr', text = msg))
+
+},
+
 execute = function(request) {
     send_response('status', request, 'iopub', list(
         execution_state = 'busy'))
     send_response('execute_input', request, 'iopub', list(
         code = request$content$code,
         execution_count = execution_count))
-    
-    silent <- request$content$silent
-    
+        
     display_data <- function(data, metadata = NULL) {
         if (is.null(metadata)) {
             metadata <- namedlist()
@@ -134,14 +143,6 @@ execute = function(request) {
     assign('quit', quit, envir = .GlobalEnv)
     assign('q',    quit, envir = .GlobalEnv)
     
-    send_error_msg <- function(msg) {
-        if (!silent) {
-            send_response('stream', request, 'iopub', list(
-                name = 'stderr',
-                text = msg))
-        }
-    }
-
     send_plot <- function(plotobj) {
         formats <- namedlist()
         metadata <- namedlist()
@@ -174,13 +175,13 @@ execute = function(request) {
         stack_info <- format_stack(calls)
 
         err <<- list(ename = 'ERROR', evalue = toString(e), traceback = as.list(c(msg, stack_info)))
-        if (!silent) {
+        if (!is.silent(request)) {
             send_response('error', request, 'iopub', c(err, list(
                 execution_count = execution_count)))
         }
     }
     
-    if (silent) {
+    if (is.silent(request)) {
         stream <- function(s, n) {}
         handle_value    <- identity
         handle_graphics <- identity
@@ -262,7 +263,7 @@ execute = function(request) {
         interrupt = function(cond) interrupted <<- TRUE,
         error = handle_error) # evaluate does not catch errors in parsing
     
-    if ((!silent) & (!is.null(last_recorded_plot))) {
+    if ((!is.silent(request)) & (!is.null(last_recorded_plot))) {
         send_plot(last_recorded_plot)
     }
     
@@ -291,7 +292,7 @@ execute = function(request) {
         abort_queued_messages()
     }
 
-    if (!silent) {
+    if (!is.silent(request)) {
         execution_count <<- execution_count + 1L
     }
 },
