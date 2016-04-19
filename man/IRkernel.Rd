@@ -9,11 +9,9 @@
 \title{An R kernel for Jupyter.}
 \format{An object of class \code{list} of length 5.}
 \usage{
-\code{
 options(jupyter.* = ...)
 getOption('jupyter.*')
 jupyter_option_defaults$jupyter.*
-}
 }
 \description{
 Jupyter speaks a JSON+ZMQ protocol to a 'kernel' which is responsible for executing code.

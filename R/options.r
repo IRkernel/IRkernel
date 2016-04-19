@@ -1,8 +1,8 @@
-#' @usage \code{
+#' @usage
 #' options(jupyter.* = ...)
 #' getOption('jupyter.*')
 #' jupyter_option_defaults$jupyter.*
-#' }
+#' 
 #' @name IRkernel
 #' @export
 jupyter_option_defaults <- list(
