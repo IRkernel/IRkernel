@@ -372,6 +372,7 @@ main <- function(connection_file = '') {
         # pass it as a separate command line argument.
         connection_file <- commandArgs(TRUE)[[1]]
     }
+    log_debug('Starting the R kernel...')
     kernel <- Kernel$new(connection_file = connection_file)
     kernel$run()
 }
