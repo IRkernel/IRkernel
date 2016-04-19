@@ -256,6 +256,25 @@ execute = function(request) {
     interrupted <<- FALSE
     last_recorded_plot <<- NULL
     log_debug('Executing code: %s', request$content$code)
+    
+    # Workaround to warn user when code contains potential problematic code
+    # https://github.com/IRkernel/repr/issues/28#issuecomment-208810772
+    # See https://github.com/hadley/evaluate/issues/66
+    if(.Platform$OS.type == 'windows') {
+        # strip whitespace, because trailing newlines would trip the test...
+        code <- gsub('^\\s+|\\s+$', '', request$content$code)
+        real_len <- nchar(code)
+        r_len <- nchar(paste(capture.output(cat(code)), collapse = '\n'))
+        if (real_len != r_len){
+            msg = c('Your code contains a unicode char which cannot be displayed in your ',
+                    'current locale and R will silently convert it to an escaped form when the ',
+                    'R kernel executes this code. This can lead to subtle errors if you use ',
+                    'such chars to do comparisons. For more information, please see ',
+                    'https://github.com/IRkernel/repr/wiki/Problems-with-unicode-on-windows')
+            send_error_msg(paste(msg, collapse = '\n'))
+        }
+    }
+
     tryCatch(
         evaluate(
             request$content$code,
