@@ -7,7 +7,7 @@
 \alias{IRkernel-package}
 \alias{jupyter_option_defaults}
 \title{An R kernel for Jupyter.}
-\format{An object of class \code{list} of length 4.}
+\format{An object of class \code{list} of length 5.}
 \usage{
 \code{
 options(jupyter.* = ...)

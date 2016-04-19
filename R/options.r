@@ -1,8 +1,3 @@
-getenv_default <- function(varname, default) {
-    value <- Sys.getenv(varname)
-    if (identical(value, '')) default else value
-}
-
 #' @usage \code{
 #' options(jupyter.* = ...)
 #' getOption('jupyter.*')
@@ -11,8 +6,8 @@ getenv_default <- function(varname, default) {
 #' @name IRkernel
 #' @export
 jupyter_option_defaults <- list(
-    jupyter.log_level = as.integer(getenv_default('JUPYTER_LOG_LEVEL', 1L)),
-    jupyter.logfile = getenv_default('JUPYTER_LOGFILE', NULL),
+    jupyter.log_level = 1L,
+    jupyter.logfile = NA,
     jupyter.pager_classes = c(
         'help_files_with_topic'),
     jupyter.plot_mimetypes = c(
@@ -21,10 +16,28 @@ jupyter_option_defaults <- list(
         'image/svg+xml'),
     jupyter.in_kernel = FALSE)
 
+from_env <- list(
+    JUPYTER_LOG_LEVEL = as.integer,
+    JUPYTER_LOGFILE = function(f) if (nchar(f) == 0) NA else f)
+
+# converts e.g. jupyter.log_level to JUPYTER_LOG_LEVEL
+opt_to_env <- function(nms) gsub('.', '_', toupper(nms), fixed = TRUE)
+
 .onLoad <- function(libname = NULL, pkgname = NULL) {
     for (opt_name in names(jupyter_option_defaults)) {
+        # skip option if it is set to NULL (unset)
         if (is.null(getOption(opt_name))) {
-            do.call(options, jupyter_option_defaults[opt_name])  # single []: preserve name
+            # prepare `options` call from the default
+            call_arg <- jupyter_option_defaults[opt_name]  # single [] preserve names
+            
+            # if an env var is set, get value from it.
+            env_name <- opt_to_env(opt_name)
+            convert <- from_env[[env_name]]
+            env_val <- Sys.getenv(env_name, unset = NA)
+            if (!is.null(convert) && !is.na(env_val))
+                call_arg[[opt_name]] <- convert(env_val)
+            
+            do.call(options, call_arg)
         }
     }
 }
