@@ -163,7 +163,7 @@ handle_display_error = function(e){
 },
 
 handle_value = function(obj) {
-    log_debug("Value output...")
+    log_debug('Value output...')
     mimebundle <- prepare_mimebundle(obj, .self$handle_display_error)
     if (length(intersect(class(obj), getOption('jupyter.pager_classes'))) > 0) {
         log_debug('Showing pager: %s', paste(capture.output(str(mimebundle$data)), collapse = '\n'))
@@ -182,7 +182,7 @@ stream = function(output, streamname) {
 },
 
 handle_graphics = function(plotobj) {
-    log_debug("Graphics output...")
+    log_debug('Graphics output...')
     if (!plot_builds_upon(last_recorded_plot, plotobj)) {
         log_debug('Sending plot...')
         send_plot(last_recorded_plot)

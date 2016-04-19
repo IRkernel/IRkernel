@@ -35,7 +35,7 @@ log_msg_stderror <- function(lvl, msg){
 }
 
 .is_changed_logfile <- local({
-    old_logfile <- ""
+    old_logfile <- ''
     function(logfile) {
         if (old_logfile != logfile) {
             old_logfile <<- logfile
