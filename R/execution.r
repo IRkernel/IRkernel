@@ -100,7 +100,7 @@ display_data = function(data, metadata = NULL) {
 },
 
 page = function(mimebundle) {
-    payload <<- c(payload, list(list(source = 'page', data = mimebundle)))
+    payload <<- c(payload, list(c(source = 'page', mimebundle)))
 },
 
 # .Last doesn’t seem to work, so replicating behavior
