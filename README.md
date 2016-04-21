@@ -15,6 +15,7 @@ For detailed requirements and install instructions see [irkernel.github.io](http
 We provide Windows and Mac OS X binary packages of all the needed packages:
 
 ```r
+install.packages('rzmq')
 install.packages(c('repr', 'IRkernel', 'IRdisplay'),
                  repos = c('http://irkernel.github.io/', getOption('repos')))
 IRkernel::installspec()
