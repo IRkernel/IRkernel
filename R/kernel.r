@@ -119,6 +119,11 @@ handle_shell = function() {
     
     parts <- zmq.recv.multipart(sockets$shell, unserialize = FALSE)
     msg <- wire_to_msg(parts)
+    
+    # protocol 5.0: send busy/idle around all of these
+    send_response('status', msg, 'iopub', list(
+        execution_state = 'busy'))
+    
     switch(
         msg$header$msg_type,
         comm_info_request   = comm_manager$on_comm_info_request(msg),
@@ -132,6 +137,9 @@ handle_shell = function() {
         is_complete_request = is_complete(msg),
         shutdown_request    = shutdown(msg),
         print(c('Got unhandled msg_type:', msg$header$msg_type)))
+        
+    send_response('status', msg, 'iopub', list(
+        execution_state = 'idle'))
 },
 
 abort_shell_msg = function() {
