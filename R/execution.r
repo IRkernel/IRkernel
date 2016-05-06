@@ -205,8 +205,6 @@ handle_warning = function(o) {
 },
 
 execute = function(request) {
-    send_response('status', request, 'iopub', list(
-        execution_state = 'busy'))
     send_response('execute_input', request, 'iopub', list(
         code = request$content$code,
         execution_count = execution_count))
@@ -287,8 +285,6 @@ execute = function(request) {
     if ((!is.silent()) & (!is.null(last_recorded_plot))) {
         send_plot(last_recorded_plot)
     }
-    
-    send_response('status', request, 'iopub', list(execution_state = 'idle'))
     
     if (interrupted) {
         reply_content <- list(
