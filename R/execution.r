@@ -5,7 +5,8 @@ setClassUnion('recordedplotOrNULL', members = c('recordedplot', 'NULL'))
 
 setClassUnion('listOrNULL', members = c('list', 'NULL'))
 
-# create an empty named list
+# Create an empty named list
+#' @importFrom stats setNames
 namedlist <- function() setNames(list(), character(0))
 
 plot_builds_upon <- function(prev, current) {

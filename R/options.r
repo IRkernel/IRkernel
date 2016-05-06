@@ -1,7 +1,5 @@
 #' @usage
-#' options(jupyter.* = ...)
-#' getOption('jupyter.*')
-#' jupyter_option_defaults$jupyter.*
+#' jupyter_option_defaults
 #' 
 #' @name IRkernel
 #' @export

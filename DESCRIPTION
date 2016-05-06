@@ -1,7 +1,7 @@
 Package: IRkernel
 Title: Native R kernel for the Jupyter notebook
 Description: This package provides a native interface to the R kernel from the
-    Jupyter notebook
+    Jupyter notebook.
 Version: 0.6
 Authors@R: c(person("Thomas", "Kluyver", role = c("aut", "cre"),
     email = "thomas@kluyver.me.uk"),

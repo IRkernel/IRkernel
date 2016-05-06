@@ -7,3 +7,6 @@ Makefile
 [.]pdf$
 ^\.travis-build.sh$
 example-notebooks/.*$
+^\.travis.yml$
+Dockerfile
+test_ir.py
