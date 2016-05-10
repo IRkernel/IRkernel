@@ -5,8 +5,6 @@ setClassUnion('recordedplotOrNULL', members = c('recordedplot', 'NULL'))
 
 setClassUnion('listOrNULL', members = c('list', 'NULL'))
 
-displayenv <- environment(publish_mimebundle)
-
 # create an empty named list
 namedlist <- function() setNames(list(), character(0))
 
@@ -214,13 +212,6 @@ execute = function(request) {
     # reset ...
     payload <<- list()
     err <<- list()
-
-    # Push the display function into the IRdisplay namespace
-    # This looks awkward, but we do need to get a reference to the execution
-    # state into a global environment.
-    # TODO: move to initialize?
-    unlockBinding('base_display', displayenv)
-    assign('base_display', .self$display_data, pos = displayenv)
     
     # shade base::quit
     assign('quit', .self$quit, envir = .GlobalEnv)
@@ -325,6 +316,7 @@ initialize = function(...) {
         if (delete.file) file.remove(files)
         page(list('text/plain' = paste(text, collapse = '\n')))
     })
+    options(jupyter.base_display_func = .self$display_data)
 
     callSuper(...)
 })
