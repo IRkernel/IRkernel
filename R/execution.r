@@ -115,7 +115,7 @@ quit = function(save = 'default', status = 0, runLast = TRUE) {
         if (!is.null(.GlobalEnv$.Last.sys)) .GlobalEnv$.Last.sys()
     }
     if (save) NULL  # TODO: actually save history
-    payload <<- c(payload, list(list(source = 'ask_exit')))
+    payload <<- c(payload, list(list(source = 'ask_exit', keepkernel = FALSE)))
 },
 
 handle_error = function(e) {
