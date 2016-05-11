@@ -62,7 +62,7 @@ format_stack <- function(calls) {
 
 
 Executor <- setRefClass(
-    'Executor',
+    Class = 'Executor',
     fields = list(
         send_response         = 'function',
         abort_queued_messages = 'function',
@@ -272,7 +272,7 @@ execute = function(request) {
             output_handler = oh,
             stop_on_error = 1L),
         interrupt = function(cond) interrupted <<- TRUE,
-        error = handle_error) # evaluate does not catch errors in parsing
+        error = .self$handle_error) # evaluate does not catch errors in parsing
     
     if ((!is.silent()) & (!is.null(last_recorded_plot))) {
         send_plot(last_recorded_plot)
