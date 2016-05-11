@@ -1,3 +1,4 @@
+#' @importFrom utils compareVersion
 find_jupyter <- function() {
     for (binary in c('jupyter', 'ipython', 'ipython3', 'ipython2')) {
         version <- tryCatch(system2(binary, '--version', TRUE, FALSE), error = function(e) '0.0.0')

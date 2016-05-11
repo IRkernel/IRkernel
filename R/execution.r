@@ -5,7 +5,8 @@ setClassUnion('recordedplotOrNULL', members = c('recordedplot', 'NULL'))
 
 setClassUnion('listOrNULL', members = c('list', 'NULL'))
 
-# create an empty named list
+# Create an empty named list
+#' @importFrom stats setNames
 namedlist <- function() setNames(list(), character(0))
 
 plot_builds_upon <- function(prev, current) {
@@ -61,7 +62,7 @@ format_stack <- function(calls) {
 
 
 Executor <- setRefClass(
-    'Executor',
+    Class = 'Executor',
     fields = list(
         send_response         = 'function',
         abort_queued_messages = 'function',
@@ -114,7 +115,7 @@ quit = function(save = 'default', status = 0, runLast = TRUE) {
         if (!is.null(.GlobalEnv$.Last.sys)) .GlobalEnv$.Last.sys()
     }
     if (save) NULL  # TODO: actually save history
-    payload <<- c(payload, list(list(source = 'ask_exit')))
+    payload <<- c(payload, list(list(source = 'ask_exit', keepkernel = FALSE)))
 },
 
 handle_error = function(e) {
@@ -271,7 +272,7 @@ execute = function(request) {
             output_handler = oh,
             stop_on_error = 1L),
         interrupt = function(cond) interrupted <<- TRUE,
-        error = handle_error) # evaluate does not catch errors in parsing
+        error = .self$handle_error) # evaluate does not catch errors in parsing
     
     if ((!is.silent()) & (!is.null(last_recorded_plot))) {
         send_plot(last_recorded_plot)

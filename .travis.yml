@@ -2,15 +2,26 @@ language: r
 sudo: false
 cache: packages
 
+r:
+  - devel # reverse order, so devel and release start first
+  - release
+  - oldrel
+
+env:
+  - DEPS=github
+  - DEPS=cran
+
+r_packages:
+  - devtools
+
 r_github_packages:
-  - IRkernel/repr
+  # we currently still need IRdisplay from github in all cases...
   - IRkernel/IRdisplay
 
-addons:
-  apt:
-    packages:
-      - python3
-      - python3-setuptools
 
 script:
   - source .travis-build.sh
+  - grep -q -R 'WARNING' "$CHECK_LOG" ; [ $? -ne 0 ]
+  # TODO: currently we do have 1 NOTE: Found the following assignments to the global environment...
+  #- grep -q -R 'NOTE' "$CHECK_LOG"; [ $? -ne 0 ]
+
