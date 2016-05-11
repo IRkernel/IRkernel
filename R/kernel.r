@@ -382,17 +382,19 @@ main <- function(connection_file = '') {
     }
     log_debug('Starting the R kernel...')
     # Environment which will take functions which shadow main R stuff like q()
-    # This has to be done here, because a) it didn't work when I tried to add
-    # it as a notmal package item and not here in the codepath of the startup
-    # function and b) so the on.exit can detach the env when main is finished
+    # This has to be created here, because a) it didn't work when I tried to add
+    # it as a normal package item and not here in the codepath of the startup
+    # function and b) so the on.exit can detach the env when main is finished and
+    # c) it can't be created elsewhere because attach copies the env, so it would
+    # need to be reassigned afterwards...
     .irk.env <- attach(NULL, name = "jupyter:irkernel")
     on.exit({
         detach("jupyter:irkernel")
     })
-    assign(".irk.get_userenv", function() {.irk.env})
+    assign(".irk.get_userenv", function() {.irk.env}, .irk.env)
     assign(".irk.add_to_user_searchpath", function(name, FN, attrs = list()) {
-        assign(name, FN, .irk.get_userenv())
-    }, .irk.get_userenv())
+        assign(name, FN, .irk.env)
+    }, .irk.env)
     kernel <- Kernel$new(connection_file = connection_file)
     kernel$run()
 }
