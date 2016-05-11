@@ -115,7 +115,7 @@ quit = function(save = 'default', status = 0, runLast = TRUE) {
         if (!is.null(.GlobalEnv$.Last.sys)) .GlobalEnv$.Last.sys()
     }
     if (save) NULL  # TODO: actually save history
-    payload <<- c(payload, list(list(source = 'ask_exit', keepkernel = FALSE)))
+    payload <<- c(.self$payload, list(list(source = 'ask_exit', keepkernel = FALSE)))
 },
 
 handle_error = function(e) {
@@ -215,9 +215,9 @@ execute = function(request) {
     err <<- list()
     
     # shade base::quit
-    assign('quit', .self$quit, envir = .GlobalEnv)
-    assign('q',    .self$quit, envir = .GlobalEnv)
-    
+    .irk.add_to_user_searchpath('quit', .self$quit)
+    .irk.add_to_user_searchpath('q', .self$quit)
+
     # find out stack depth in notebook cell
     # TODO: maybe replace with a single call on first execute and rest reuse the value?
     tryCatch(evaluate(
@@ -250,12 +250,12 @@ execute = function(request) {
     # Workaround to warn user when code contains potential problematic code
     # https://github.com/IRkernel/repr/issues/28#issuecomment-208810772
     # See https://github.com/hadley/evaluate/issues/66
-    if(.Platform$OS.type == 'windows') {
+    if (.Platform$OS.type == 'windows') {
         # strip whitespace, because trailing newlines would trip the test...
         code <- gsub('^\\s+|\\s+$', '', request$content$code)
         real_len <- nchar(code)
         r_len <- nchar(paste(capture.output(cat(code)), collapse = '\n'))
-        if (real_len != r_len){
+        if (real_len != r_len) {
             msg = c('Your code contains a unicode char which cannot be displayed in your ',
                     'current locale and R will silently convert it to an escaped form when the ',
                     'R kernel executes this code. This can lead to subtle errors if you use ',
@@ -264,7 +264,6 @@ execute = function(request) {
             send_error_msg(paste(msg, collapse = '\n'))
         }
     }
-
     tryCatch(
         evaluate(
             request$content$code,

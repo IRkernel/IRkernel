@@ -166,7 +166,7 @@ abort_queued_messages = function() {
             c(.pbd_env$ZMQ.PO$POLLIN), # type
             0) # zero timeout, only what's already there
         log_debug('abort loop: after poll')
-        if(bitwAnd(zmq.poll.get.revents(1), .pbd_env$ZMQ.PO$POLLIN)) {
+        if (bitwAnd(zmq.poll.get.revents(1), .pbd_env$ZMQ.PO$POLLIN)) {
             log_debug('abort loop: found msg')
             abort_shell_msg()
         } else {
@@ -343,13 +343,13 @@ run = function() {
         # the easiest seems to be to handle this in a big if .. else if .. else
         # clause...
         # https://github.com/IRkernel/IRkernel/pull/266
-        if(bitwAnd(zmq.poll.get.revents(1), .pbd_env$ZMQ.PO$POLLIN)) {
+        if (bitwAnd(zmq.poll.get.revents(1), .pbd_env$ZMQ.PO$POLLIN)) {
             log_debug('main loop: hb')
             hb_reply()
-        } else if(bitwAnd(zmq.poll.get.revents(2), .pbd_env$ZMQ.PO$POLLIN)) {
+        } else if (bitwAnd(zmq.poll.get.revents(2), .pbd_env$ZMQ.PO$POLLIN)) {
             log_debug('main loop: shell')
             handle_shell()
-        } else if(bitwAnd(zmq.poll.get.revents(3), .pbd_env$ZMQ.PO$POLLIN)) {
+        } else if (bitwAnd(zmq.poll.get.revents(3), .pbd_env$ZMQ.PO$POLLIN)) {
             log_debug('main loop: control')
             handle_control()
         } else {
@@ -381,6 +381,18 @@ main <- function(connection_file = '') {
         connection_file <- commandArgs(TRUE)[[1]]
     }
     log_debug('Starting the R kernel...')
+    # Environment which will take functions which shadow main R stuff like q()
+    # This has to be done here, because a) it didn't work when I tried to add
+    # it as a notmal package item and not here in the codepath of the startup
+    # function and b) so the on.exit can detach the env when main is finished
+    .irk.env <- attach(NULL, name = "jupyter:irkernel")
+    on.exit({
+        detach("jupyter:irkernel")
+    })
+    assign(".irk.get_userenv", function() {.irk.env})
+    assign(".irk.add_to_user_searchpath", function(name, FN, attrs = list()) {
+        assign(name, FN, .irk.get_userenv())
+    }, .irk.get_userenv())
     kernel <- Kernel$new(connection_file = connection_file)
     kernel$run()
 }
