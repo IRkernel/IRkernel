@@ -15,11 +15,11 @@ For detailed requirements and install instructions see [irkernel.github.io](http
 We are currently in the process of submitting our packages to CRAN. Until then, you can install via the `devtools` package:
 
 ```R
-install.packages(c('pbdZMQ', 'repr', 'devtools')) # repr is already on CRAN
-# devtools::install_github('irkernel/repr') # or get the latest repr from master
+install.packages(c('pbdZMQ', 'repr', 'devtools'))  # repr is already on CRAN
+# devtools::install_github('irkernel/repr')        # or get the latest repr from master
 devtools::install_github('irkernel/IRdisplay')
 devtools::install_github('irkernel/IRkernel')
-IRkernel::installspec() # to register the kernel in the current R installation
+IRkernel::installspec()  # to register the kernel in the current R installation
 ```
 
 Per default `IRkernel::installspec()` will install a kernel with the name “ir” and a
@@ -50,7 +50,7 @@ If you have Jupyter installed, you can create a notebook using IRkernel from the
 You can also start other interfaces with an R kernel:
 
 ```bash
-# 'ir' is the kernel name installed by the above 'IRkernel::installspec()'
+# “ir” is the kernel name installed by the above `IRkernel::installspec()`
 # change if you used a different name!
 jupyter qtconsole --kernel=ir
 jupyter console --kernel=ir
