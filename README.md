@@ -12,12 +12,14 @@ For detailed requirements and install instructions see [irkernel.github.io](http
 
 ## Installation
 
-We provide Windows and Mac OS X binary packages of all the needed packages:
+We are currently in the process of submitting our packages to CRAN. Until then, you can install via the `devtools` package:
 
-```r
-install.packages(c('repr', 'IRkernel', 'IRdisplay'),
-                 repos = c('http://irkernel.github.io/', getOption('repos')))
-IRkernel::installspec()
+```R
+install.packages(c('pbdZMQ', 'repr', 'devtools')) # repr is already on CRAN
+# devtools::install_github('irkernel/repr') # or get the latest repr from master
+devtools::install_github('irkernel/IRdisplay')
+devtools::install_github('irkernel/IRkernel')
+IRkernel::installspec() # to register the kernel in the current R installation
 ```
 
 Per default `IRkernel::installspec()` will install a kernel with the name “ir” and a
@@ -27,10 +29,10 @@ by supplying a `name` and `displayname` argument to the `installspec()` call (Yo
 install these packages in all interpreters you want to run as a jupyter kernel!):
 
 ```r
+# in R 3.3
+IRkernel::installspec(name = 'ir33', displayname = 'R 3.3')
 # in R 3.2
 IRkernel::installspec(name = 'ir32', displayname = 'R 3.2')
-# in R 3.1
-IRkernel::installspec(name = 'ir31', displayname = 'R 3.1')
 ```
 
 Now both R versions are available as an R kernel in the notebook.
@@ -48,7 +50,7 @@ If you have Jupyter installed, you can create a notebook using IRkernel from the
 You can also start other interfaces with an R kernel:
 
 ```bash
-# “ir” is the kernel name installed by the above 'IRkernel::installspec()'
+# 'ir' is the kernel name installed by the above 'IRkernel::installspec()'
 # change if you used a different name!
 jupyter qtconsole --kernel=ir
 jupyter console --kernel=ir
