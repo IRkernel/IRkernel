@@ -387,14 +387,14 @@ main <- function(connection_file = '') {
     # function and b) so the on.exit can detach the env when main is finished and
     # c) it can't be created elsewhere because attach copies the env, so it would
     # need to be reassigned afterwards...
-    .irk.env <- attach(NULL, name = "jupyter:irkernel")
+    .irk.shadowenv <- attach(NULL, name = "jupyter:irkernel")
     on.exit({
         detach("jupyter:irkernel")
     })
-    assign(".irk.get_userenv", function() {.irk.env}, .irk.env)
+    assign(".irk.get_shadowenv", function() {.irk.shadowenv}, .irk.shadowenv)
     assign(".irk.add_to_user_searchpath", function(name, FN, attrs = list()) {
-        assign(name, FN, .irk.env)
-    }, .irk.env)
+        assign(name, FN, .irk.shadowenv)
+    }, .irk.shadowenv)
     kernel <- Kernel$new(connection_file = connection_file)
     kernel$run()
 }
