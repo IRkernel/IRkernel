@@ -381,20 +381,13 @@ main <- function(connection_file = '') {
         connection_file <- commandArgs(TRUE)[[1]]
     }
     log_debug('Starting the R kernel...')
-    # Environment which will take functions which shadow main R stuff like q()
-    # This has to be created here, because a) it didn't work when I tried to add
-    # it as a normal package item and not here in the codepath of the startup
-    # function and b) so the on.exit can detach the env when main is finished and
-    # c) it can't be created elsewhere because attach copies the env, so it would
-    # need to be reassigned afterwards...
-    .irk.shadowenv <- attach(NULL, name = "jupyter:irkernel")
+    # Create the shadow env here
+    # This has to be here so the on.exit can detach the env when main is finished
+    # = available for the whole lifetime of the kernel.
+    init_shadowenv()
     on.exit({
         detach("jupyter:irkernel")
     })
-    assign(".irk.get_shadowenv", function() {.irk.shadowenv}, .irk.shadowenv)
-    assign(".irk.add_to_user_searchpath", function(name, FN, attrs = list()) {
-        assign(name, FN, .irk.shadowenv)
-    }, .irk.shadowenv)
     kernel <- Kernel$new(connection_file = connection_file)
     kernel$run()
 }

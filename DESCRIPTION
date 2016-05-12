@@ -31,4 +31,5 @@ Collate:
     'help.r'
     'installspec.r'
     'kernel.r'
+    'environment.r'
 RoxygenNote: 5.0.1
