@@ -16,14 +16,14 @@ There are no WARNINGs and 1 NOTEs.
 Note:
 
 * Found the following calls to attach():
-  File 'IRkernel/R/environment.r':
+  File 'IRkernel/R/execution.r':
     attach(NULL, name = "jupyter:irkernel")
   See section 'Good practice' in '?attach'.
 
   We use this additional environment to add functions so that regular "stuff"
   like `quit()` works in the IRkernel environment (in this case to shutdown the
-  kernel). We added the "good practice" `on.exit` call to `detach` in R\kernel.r ->
-  `main()` so that this environment is available as long as the R kernel is running..
+  kernel). We added the "good practice" call to `detach` in `finalize` so that
+  this environment is available as long as the R kernel is running..
 
 ## Downstream dependencies
 

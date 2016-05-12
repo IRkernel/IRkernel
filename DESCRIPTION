@@ -1,6 +1,6 @@
 Package: IRkernel
 Title: Native R Kernel for the Jupyter Notebook
-Description: The R kernel for the jupyter environment executes R code which the 
+Description: The R kernel for the jupyter environment executes R code which the
     frontend (Jupyter Notebook or other frontends) submits to the kernel via the
     network.
 Version: 0.6
@@ -25,11 +25,11 @@ Imports:
 Collate:
     'logging.r'
     'comm_manager.r'
+    'environment.r'
     'options.r'
     'execution.r'
     'handlers.r'
     'help.r'
     'installspec.r'
     'kernel.r'
-    'environment.r'
 RoxygenNote: 5.0.1

@@ -2,17 +2,19 @@
 # This is needed to build in our own needs, like properly shutting down the kernel
 # when `quit()` is called.
 
-# The real env is created and attach'ed in the main() via the call to init_shadowenv()!
-init_shadowenv <- function(){
-    .irk.shadowenv <- attach(NULL, name = "jupyter:irkernel")
+add_to_user_searchpath <- function(name, FN) {
+    assign(name, FN, 'jupyter:irkernel')
+}
 
-    add_to_user_searchpath <- function(name, FN, attrs = list()) {
-        assign(name, FN, .irk.shadowenv)
-    }
+get_shadowenv <- function() {
+    as.environment('jupyter:irkernel')
+}
 
-    # add the accessors to the shadow env to that env, so they are actually accessable 
+# Adds functions which do not need any access to the executer into the users searchpath
+init_shadowenv <- function() {
+    # add the accessors to the shadow env itself, so they are actually accessable 
     # from everywhere...
-    add_to_user_searchpath(".irk.get_shadowenv", function() {.irk.shadowenv})
-    add_to_user_searchpath(".irk.add_to_user_searchpath", add_to_user_searchpath)
-    
+    add_to_user_searchpath('.irk.get_shadowenv', get_shadowenv)
+    add_to_user_searchpath('.irk.add_to_user_searchpath', add_to_user_searchpath)
+
 }

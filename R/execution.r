@@ -215,8 +215,8 @@ execute = function(request) {
     err <<- list()
     
     # shade base::quit
-    .irk.add_to_user_searchpath('quit', .self$quit)
-    .irk.add_to_user_searchpath('q', .self$quit)
+    add_to_user_searchpath('quit', .self$quit)
+    add_to_user_searchpath('q', .self$quit)
 
     # find out stack depth in notebook cell
     # TODO: maybe replace with a single call on first execute and rest reuse the value?
@@ -317,7 +317,14 @@ initialize = function(...) {
         page(list('text/plain' = paste(text, collapse = '\n')))
     })
     options(jupyter.base_display_func = .self$display_data)
+    # Create the shadow env here and detach it finalize
+    # so it's available for the whole lifetime of the kernel.
+    attach(NULL, name = 'jupyter:irkernel')
+    init_shadowenv()
 
     callSuper(...)
+},
+finalize = function() {
+    detach("jupyter:irkernel")
 })
 )

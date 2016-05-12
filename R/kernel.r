@@ -381,13 +381,6 @@ main <- function(connection_file = '') {
         connection_file <- commandArgs(TRUE)[[1]]
     }
     log_debug('Starting the R kernel...')
-    # Create the shadow env here
-    # This has to be here so the on.exit can detach the env when main is finished
-    # = available for the whole lifetime of the kernel.
-    init_shadowenv()
-    on.exit({
-        detach("jupyter:irkernel")
-    })
     kernel <- Kernel$new(connection_file = connection_file)
     kernel$run()
 }
