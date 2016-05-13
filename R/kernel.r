@@ -166,7 +166,7 @@ abort_queued_messages = function() {
             c(.pbd_env$ZMQ.PO$POLLIN), # type
             0) # zero timeout, only what's already there
         log_debug('abort loop: after poll')
-        if(bitwAnd(zmq.poll.get.revents(1), .pbd_env$ZMQ.PO$POLLIN)) {
+        if (bitwAnd(zmq.poll.get.revents(1), .pbd_env$ZMQ.PO$POLLIN)) {
             log_debug('abort loop: found msg')
             abort_shell_msg()
         } else {
@@ -343,13 +343,13 @@ run = function() {
         # the easiest seems to be to handle this in a big if .. else if .. else
         # clause...
         # https://github.com/IRkernel/IRkernel/pull/266
-        if(bitwAnd(zmq.poll.get.revents(1), .pbd_env$ZMQ.PO$POLLIN)) {
+        if (bitwAnd(zmq.poll.get.revents(1), .pbd_env$ZMQ.PO$POLLIN)) {
             log_debug('main loop: hb')
             hb_reply()
-        } else if(bitwAnd(zmq.poll.get.revents(2), .pbd_env$ZMQ.PO$POLLIN)) {
+        } else if (bitwAnd(zmq.poll.get.revents(2), .pbd_env$ZMQ.PO$POLLIN)) {
             log_debug('main loop: shell')
             handle_shell()
-        } else if(bitwAnd(zmq.poll.get.revents(3), .pbd_env$ZMQ.PO$POLLIN)) {
+        } else if (bitwAnd(zmq.poll.get.revents(3), .pbd_env$ZMQ.PO$POLLIN)) {
             log_debug('main loop: control')
             handle_control()
         } else {

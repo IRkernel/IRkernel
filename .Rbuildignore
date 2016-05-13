@@ -10,3 +10,4 @@ example-notebooks/.*$
 ^\.travis.yml$
 Dockerfile
 test_ir.py
+cran-comments.md
