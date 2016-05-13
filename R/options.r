@@ -7,6 +7,7 @@ jupyter_option_defaults <- list(
     jupyter.log_level = 1L,
     jupyter.logfile = NA,
     jupyter.pager_classes = c(
+        'packageIQR',
         'help_files_with_topic'),
     jupyter.plot_mimetypes = c(
         'text/plain',
