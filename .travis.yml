@@ -2,14 +2,42 @@ language: r
 sudo: false
 cache: packages
 
-r:
-  - devel # reverse order, so devel and release start first
-  - release
-  - oldrel
-
-env:
-  - DEPS=github
-  - DEPS=cran
+# travis handles 5 builds in parallel,
+# so restrict the build matrix to multiples of that.
+# Also put the most important builds (-> release on both os)
+# into the first batch
+matrix:
+  include:
+    - r: release
+      envs: DEPS=cran
+      os: linux
+    - r: release
+      envs: DEPS=github
+      os: linux
+    - r: release
+      envs: DEPS=cran
+      os: osx
+    - r: release
+      envs: DEPS=github
+      os: osx
+    - r: devel
+      envs: DEPS=cran
+      os: linux
+    - r: devel
+      envs: DEPS=github
+      os: linux
+    - r: devel
+      envs: DEPS=cran
+      os: osx
+    - r: devel
+      envs: DEPS=github
+      os: osx
+    - r: oldrel
+      envs: DEPS=cran
+      os: linux
+    - r: oldrel
+      envs: DEPS=cran
+      os: osx
 
 r_packages:
   - devtools
@@ -18,10 +46,39 @@ r_github_packages:
   # we currently still need IRdisplay from github in all cases...
   - IRkernel/IRdisplay
 
+before_install:
+  - source .travis-build.sh
+  # currently the pbdZMQ package on cran is borked on Mac OS X, so install it here in all cases
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]] ; then Rscript -e "devtools::install_github('snoweye/pbdZMQ')" ; fi
+  # Cairo was missing on OSX, no idea why this wasn't installed :-( Needed for repr
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]] ; then Rscript -e "install.packages('Cairo')" ; fi
+  # Also test newer versions so that we catch errors earlier
+  - if [[ "${DEPS}" == "github" ]] ; then install_github_dependencies ; fi 
+  - install_and_activate_conda_env
 
 script:
-  - source .travis-build.sh
-  - grep -q -R 'WARNING' "$CHECK_LOG" ; [ $? -ne 0 ]
-  # TODO: currently we do have 1 NOTE: Found the following assignments to the global environment...
-  #- grep -q -R 'NOTE' "$CHECK_LOG"; [ $? -ne 0 ]
-
+  - headline 'R CMD check'
+  - export PKG_TARBALL=$(Rscript -e "with(as.list(read.dcf('DESCRIPTION')[1, ]), cat(sprintf('%s_%s.tar.gz', Package, Version)))")
+  - R CMD build .
+  # we don't have test_that tests yet.
+  #- Rscript -e 'devtools::test(reporter="check")'
+  - R CMD check ${PKG_TARBALL} --as-cran
+  - export CHECK_LOG=${TRAVIS_BUILD_DIR}/IRkernel.Rcheck/00check.log
+  - grep -q 'WARNING' "$CHECK_LOG" ; [ $? -ne 0 ]
+  # .. because ': ' was resulting in an replacement by travis and an error
+  - grep -q 'Status..1 NOTE' "$CHECK_LOG"
+  # Code problems are only one note, so make sure that we catch new ones...
+  # This is horrible, but it works... counting the lines which are 
+  - LINES=$(grep -v "* .*$" "$CHECK_LOG" | wc -l); echo ${LINES}
+  #  4 lines from the "attach" NOTE, 1 lines from the "Status" at the end
+  - if [[ 5 != ${LINES} ]] ; then grep -v "* .*$" "$CHECK_LOG" ; false ; fi
+  - headline 'Kernel tests'
+  - R CMD INSTALL "${PKG_TARBALL}"
+  - export INSTALL_LOG=${TRAVIS_BUILD_DIR}/IRkernel.Rcheck/00install.out
+  - Rscript -e "IRkernel::installspec()"
+  - Rscript -e "IRkernel::installspec(name = 'testir', displayname = 'testir')"
+  - python -W ignore::DeprecationWarning test_ir.py
+    
+after_failure:
+  - cat "${CHECK_LOG}"
+  - cat "${INSTALL_LOG}"
