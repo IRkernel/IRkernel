@@ -17,4 +17,14 @@ init_shadowenv <- function() {
     add_to_user_searchpath('.irk.get_shadowenv', get_shadowenv)
     add_to_user_searchpath('.irk.add_to_user_searchpath', add_to_user_searchpath)
 
+    # workaround for problems with vignette(xxx) not bringing up the vignette
+    # content in the browser: https://github.com/IRkernel/IRkernel/issues/267
+    add_to_user_searchpath('print.vignette', function(...) {
+        utils:::print.vignette(...)
+        # returning immediately will run into trouble with zmq and its polling
+        # preventing the vignette server to startup. So wait a little to let
+        # it startup...
+        # 0.1 is too little, so add some margin...
+        Sys.sleep(0.5)
+    })
 }
