@@ -17,6 +17,9 @@ init_shadowenv <- function() {
     add_to_user_searchpath('.irk.get_shadowenv', get_shadowenv)
     add_to_user_searchpath('.irk.add_to_user_searchpath', add_to_user_searchpath)
 
+    # For the rest of the functions, please explain why the workaround is needed
+    # (=the problem) and link to the issue describing the problem.
+
     # workaround for problems with vignette(xxx) not bringing up the vignette
     # content in the browser: https://github.com/IRkernel/IRkernel/issues/267
     add_to_user_searchpath('print.vignette', function(...) {
@@ -26,5 +29,14 @@ init_shadowenv <- function() {
         # it startup...
         # 0.1 is too little, so add some margin...
         Sys.sleep(0.5)
+    })
+
+    # we simply have currently no way to view or edit dfs:
+    # https://github.com/IRkernel/IRkernel/issues/280
+    add_to_user_searchpath('View', function(...) {
+        stop("'View()' not yet supported in the Jupyter R kernel")
+    })
+    add_to_user_searchpath('edit', function(...) {
+        stop("'edit()' not yet supported in the Jupyter R kernel")
     })
 }
