@@ -320,7 +320,11 @@ initialize = function(...) {
     # Create the shadow env here and detach it finalize
     # so it's available for the whole lifetime of the kernel.
     attach(NULL, name = 'jupyter:irkernel')
+
+    # Add stuff to the user environment and configure a few options
+    # in the current session
     init_shadowenv()
+    init_session()
 
     callSuper(...)
 },
