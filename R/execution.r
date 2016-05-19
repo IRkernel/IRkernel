@@ -325,6 +325,7 @@ initialize = function(...) {
     # in the current session
     init_shadowenv()
     init_session()
+    init_null_device()
 
     callSuper(...)
 },

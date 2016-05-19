@@ -61,3 +61,13 @@ init_cran_repo <- function() {
 init_session <- function() {
     init_cran_repo()
 }
+
+
+init_null_device <- function() {
+    null_file <- switch(.Platform$OS.type, windows = 'NUL', unix = '/dev/null')
+    null_device <- function(filename = null_file, ...) png(filename, ...)
+    
+    if (identical(getOption('device'), pdf)) {
+        options(device = null_device)
+    }
+}
