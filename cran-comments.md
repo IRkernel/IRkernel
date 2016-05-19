@@ -11,7 +11,7 @@ other frontends) submits to the kernel via the network.
 
 ## R CMD check results
 
-There are no WARNINGs and 1 NOTEs.
+There are no ERRORS and no WARNINGs and 1 NOTEs.
 
 Note:
 
@@ -23,7 +23,7 @@ Note:
   We use this additional environment to add functions so that regular "stuff"
   like `quit()` works in the IRkernel environment (in this case to shutdown the
   kernel). We added the "good practice" call to `detach` in `finalize` so that
-  this environment is available as long as the R kernel is running..
+  this environment is available as long as the R kernel is running.
 
 ## Downstream dependencies
 
