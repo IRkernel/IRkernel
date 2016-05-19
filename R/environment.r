@@ -44,3 +44,20 @@ init_shadowenv <- function() {
         stop("'edit()' not yet supported in the Jupyter R kernel")
     })
 }
+
+init_cran_repo <- function() {
+    r <- getOption('repos')
+    is_unuseable_mirror <- identical(r, c(CRAN = '@CRAN@'))
+    if (is_unuseable_mirror) {
+        # the default repo according to https://cran.r-project.org/mirrors.html
+        # uses geo-redirects
+        r[['CRAN']] <- 'https://cran.r-project.org'
+        # attribute indicating the repos was set by us...
+        attr(r, 'irkernel') <- TRUE
+        options(repos = r)
+    }
+}
+
+init_session <- function() {
+    init_cran_repo()
+}
