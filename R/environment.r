@@ -63,10 +63,13 @@ init_session <- function() {
 }
 
 
-#' @importFrom grDevices pdf png
+#' @importFrom grDevices pdf pictex
 init_null_device <- function() {
     null_file <- switch(.Platform$OS.type, windows = 'NUL', unix = '/dev/null')
-    null_device <- function(filename = null_file, ...) png(filename, ...)
+    # use a device that
+    # 1. prints no warnings for unicode (unlike pdf/postscript)
+    # 2. can handle /dev/null (unlike OSX devices)
+    null_device <- function(filename = null_file, ...) pictex(filename, ...)
     
     if (identical(getOption('device'), pdf)) {
         options(device = null_device)
