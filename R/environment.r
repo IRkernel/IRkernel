@@ -63,6 +63,7 @@ init_session <- function() {
 }
 
 
+#' @importFrom grDevices pdf png
 init_null_device <- function() {
     null_file <- switch(.Platform$OS.type, windows = 'NUL', unix = '/dev/null')
     null_device <- function(filename = null_file, ...) png(filename, ...)
