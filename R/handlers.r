@@ -2,10 +2,10 @@ prepare_mimebundle <- function(obj, handle_display_error = log_error) {
     data <- namedlist()
     metadata <- namedlist()
     
-    data[['text/plain']] <- repr_text(obj)
+    data[['text/plain']] <- text_repr <- repr_text(obj)
     
     # Only send a response when there is regular console output
-    if (nchar(data[['text/plain']]) > 0) {
+    if (!is.null(text_repr) && nchar(text_repr) > 0L) {
         if (getOption('jupyter.rich_display')) {
             for (mime in getOption('jupyter.display_mimetypes')) {
                 # Use withCallingHandlers as that shows the inner stacktrace:
