@@ -35,8 +35,9 @@ matrix:
     - r: oldrel
       envs: DEPS=cran
       os: linux
+    # oldrel on macosx has no working pbdZMQ, so use github ones
     - r: oldrel
-      envs: DEPS=cran
+      envs: DEPS=github
       os: osx
 
 r_packages:
@@ -49,7 +50,7 @@ r_github_packages:
 before_install:
   - source .travis-build.sh
   # currently the pbdZMQ package on cran is borked on Mac OS X, so install it here in all cases
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]] ; then Rscript -e "devtools::install_github('snoweye/pbdZMQ')" ; fi
+  #- if [[ "$TRAVIS_OS_NAME" == "osx" ]] ; then Rscript -e "devtools::install_github('snoweye/pbdZMQ')" ; fi
   # Cairo was missing on OSX, no idea why this wasn't installed :-( Needed for repr
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]] ; then Rscript -e "install.packages('Cairo')" ; fi
   # Also test newer versions so that we catch errors earlier
