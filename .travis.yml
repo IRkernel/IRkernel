@@ -35,9 +35,8 @@ matrix:
     - r: oldrel
       envs: DEPS=cran
       os: linux
-    # oldrel on macosx has no working pbdZMQ, so use github ones
     - r: oldrel
-      envs: DEPS=github
+      envs: DEPS=cran
       os: osx
 
 r_packages:
