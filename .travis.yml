@@ -53,8 +53,24 @@ before_install:
   # Cairo was missing on OSX, no idea why this wasn't installed :-( Needed for repr
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]] ; then Rscript -e "install.packages('Cairo')" ; fi
   # Also test newer versions so that we catch errors earlier
-  - if [[ "${DEPS}" == "github" ]] ; then install_github_dependencies ; fi 
-  - install_and_activate_conda_env
+  - if [[ "${DEPS}" == "github" ]] ; then Rscript -e "devtools::install_github('snoweye/pbdZMQ')" ; fi
+  - if [[ "${DEPS}" == "github" ]] ; then Rscript -e "devtools::install_github('irkernel/repr')" ; fi
+  - if [[ "${DEPS}" == "github" ]] ; then Rscript -e "devtools::install_github('irkernel/IRdisplay')"; fi
+  # http://conda.pydata.org/docs/travis.html
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]] ; then os=MacOSX ; else os=Linux ; fi
+  - wget "https://repo.continuum.io/miniconda/Miniconda3-latest-$os-x86_64.sh" -O miniconda.sh
+  - bash miniconda.sh -b -p $HOME/miniconda
+  - export PATH="$HOME/miniconda/bin:$PATH"
+  - hash -r
+  - rm miniconda.sh # needed to prevent a error in the R CMD check part
+  - conda config --set always_yes yes --set changeps1 no
+  - conda update -q conda
+  #Useful for debugging any issues with conda
+  - conda info -a
+  - conda create -q -n test-environment python=3.5 jupyter nose
+  - source activate test-environment
+  - pip install jupyter_kernel_test
+
 
 script:
   - headline 'R CMD check'
