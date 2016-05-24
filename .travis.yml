@@ -9,34 +9,34 @@ cache: packages
 matrix:
   include:
     - r: release
-      envs: DEPS=cran
+      env: DEPS=cran
       os: linux
     - r: release
-      envs: DEPS=github
+      env: DEPS=github
       os: linux
     - r: release
-      envs: DEPS=cran
+      env: DEPS=cran
       os: osx
     - r: release
-      envs: DEPS=github
+      env: DEPS=github
       os: osx
     - r: devel
-      envs: DEPS=cran
+      env: DEPS=cran
       os: linux
     - r: devel
-      envs: DEPS=github
+      env: DEPS=github
       os: linux
     - r: devel
-      envs: DEPS=cran
+      env: DEPS=cran
       os: osx
     - r: devel
-      envs: DEPS=github
+      env: DEPS=github
       os: osx
     - r: oldrel
-      envs: DEPS=cran
+      env: DEPS=cran
       os: linux
     - r: oldrel
-      envs: DEPS=cran
+      env: DEPS=cran
       os: osx
 
 r_packages:
@@ -46,56 +46,21 @@ r_github_packages:
   # we currently still need IRdisplay from github in all cases...
   - IRkernel/IRdisplay
 
-before_install:
-  - source .travis-build.sh
-  # currently the pbdZMQ package on cran is borked on Mac OS X, so install it here in all cases
-  #- if [[ "$TRAVIS_OS_NAME" == "osx" ]] ; then Rscript -e "devtools::install_github('snoweye/pbdZMQ')" ; fi
-  # Cairo was missing on OSX, no idea why this wasn't installed :-( Needed for repr
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]] ; then Rscript -e "install.packages('Cairo')" ; fi
-  # Also test newer versions so that we catch errors earlier
-  - if [[ "${DEPS}" == "github" ]] ; then Rscript -e "devtools::install_github('snoweye/pbdZMQ')" ; fi
-  - if [[ "${DEPS}" == "github" ]] ; then Rscript -e "devtools::install_github('irkernel/repr')" ; fi
-  - if [[ "${DEPS}" == "github" ]] ; then Rscript -e "devtools::install_github('irkernel/IRdisplay')"; fi
-  # http://conda.pydata.org/docs/travis.html
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]] ; then os=MacOSX ; else os=Linux ; fi
-  - wget "https://repo.continuum.io/miniconda/Miniconda3-latest-$os-x86_64.sh" -O miniconda.sh
-  - bash miniconda.sh -b -p $HOME/miniconda
+before_script:
+  - source .travis.sh
+  - install_r_packages
   - export PATH="$HOME/miniconda/bin:$PATH"
-  - hash -r
-  - rm miniconda.sh # needed to prevent a error in the R CMD check part
-  - conda config --set always_yes yes --set changeps1 no
-  - conda update -q conda
-  #Useful for debugging any issues with conda
-  - conda info -a
-  - conda create -q -n test-environment python=3.5 jupyter nose
+  - create_conda_environment
   - source activate test-environment
   - pip install jupyter_kernel_test
 
 
 script:
-  - headline 'R CMD check'
-  - export PKG_TARBALL=$(Rscript -e "with(as.list(read.dcf('DESCRIPTION')[1, ]), cat(sprintf('%s_%s.tar.gz', Package, Version)))")
-  - R CMD build .
-  # we don't have test_that tests yet.
-  #- Rscript -e 'devtools::test(reporter="check")'
-  - R CMD check ${PKG_TARBALL} --as-cran
-  - export CHECK_LOG=${TRAVIS_BUILD_DIR}/IRkernel.Rcheck/00check.log
-  - grep -q 'WARNING' "$CHECK_LOG" ; [ $? -ne 0 ]
-  # .. because ': ' was resulting in an replacement by travis and an error
-  - grep -q 'Status..1 NOTE' "$CHECK_LOG"
-  # Code problems are only one note, so make sure that we catch new ones...
-  # count the lines with real note sin it... remove leading whitespace because
-  # wc -l on OSX has some there...
-  - LINES=$(grep -v "* .*$" "$CHECK_LOG" | wc -l | sed -e 's/^[[:space:]]*//'); echo x${LINES}x
-  #  4 lines from the "attach" NOTE, 1 lines from the "Status" at the end
-  - if [[ x5x != x${LINES}x ]] ; then grep -v "* .*$" "$CHECK_LOG" ; false ; fi
-  - headline 'Kernel tests'
-  - R CMD INSTALL "${PKG_TARBALL}"
-  - export INSTALL_LOG=${TRAVIS_BUILD_DIR}/IRkernel.Rcheck/00install.out
-  - Rscript -e "IRkernel::installspec()"
-  - Rscript -e "IRkernel::installspec(name = 'testir', displayname = 'testir')"
-  - python -W ignore::DeprecationWarning test_ir.py
+  - fold_wrap 'Exporting variables' export_variables
+  - fold_wrap 'Building Package' build_package
+  - fold_wrap 'Checking Package' check_package
+  - fold_wrap 'Testing Kernel' test_kernel
     
 after_failure:
-  - cat "${CHECK_LOG}"
-  - cat "${INSTALL_LOG}"
+  - cat "$CHECK_LOG"
+  - cat "$INSTALL_LOG"

@@ -5,9 +5,8 @@ Makefile
 ^.*\.Rproj$
 ^\.Rproj\.user$
 [.]pdf$
-^\.travis-build.sh$
 example-notebooks/.*$
-^\.travis.yml$
+^\.travis\.(sh|yml)$
 Dockerfile
 test_ir.py
 cran-comments.md
