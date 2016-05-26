@@ -63,7 +63,7 @@ init_session <- function() {
 }
 
 
-#' @importFrom grDevices pdf pictex
+#' @importFrom grDevices pdf png
 init_null_device <- function() {
     # if possible, use a device that
     # 1. prints no warnings for unicode (unlike pdf/postscript)
