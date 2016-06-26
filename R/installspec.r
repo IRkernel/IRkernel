@@ -9,7 +9,7 @@ find_jupyter <- function() {
     NULL
 }
 
-#' Install the kernelspec to tell Jupyter (or IPython ≥ 3) about IRkernel.
+#' Install the kernelspec to tell Jupyter (or IPython \eqn{\ge} 3) about IRkernel.
 #'
 #' Will use jupyter and its config directory if available, but fall back to ipython if not.
 #'

@@ -2,7 +2,7 @@
 % Please edit documentation in R/installspec.r
 \name{installspec}
 \alias{installspec}
-\title{Install the kernelspec to tell Jupyter (or IPython ≥ 3) about IRkernel.}
+\title{Install the kernelspec to tell Jupyter (or IPython \eqn{\ge} 3) about IRkernel.}
 \usage{
 installspec(user = TRUE, name = "ir", displayname = "R")
 }
