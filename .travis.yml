@@ -42,10 +42,6 @@ matrix:
 r_packages:
   - devtools
 
-r_github_packages:
-  # we currently still need IRdisplay from github in all cases...
-  - IRkernel/IRdisplay
-
 before_script:
   - source .travis.sh
   - install_r_packages
