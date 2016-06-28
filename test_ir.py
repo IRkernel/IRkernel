@@ -76,6 +76,10 @@ data.frame(x = 1:3)
         # we currently send three formats: text/plain, html, and latex
         self.assertEqual(len(output_msgs[0]['content']['data']), 3)
 
+    def test_in_kernel_set(self):
+        reply, output_msgs = self._execute_code("getOption('jupyter.in_kernel')")
+        self.assertEqual(output_msgs[0]['content']['data']['text/plain'], "[1] TRUE")
+
 
 class OptionsDependendTests(AbstractIRKernel):
     """Test cases which need to get a new kernel because the options are changed"""

@@ -10,6 +10,9 @@ Authors@R: c(person("Thomas", "Kluyver", role = c("aut", "cre"), email = "thomas
     person("Karthik", "Ram", role = "aut", email = "karthik.ram@gmail.com"))
 Depends:
     R (>= 3.0.1)
+Suggests:
+	testthat,
+	roxygen2
 License: MIT + file LICENSE
 LazyData: true
 Encoding: UTF-8
