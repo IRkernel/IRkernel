@@ -4,8 +4,12 @@ import jupyter_kernel_test as jkt
 from jupyter_client.manager import start_new_kernel
 
 
-reset_rich_display = "options(jupyter.rich_display = FALSE);%s;options(jupyter.rich_display = TRUE);"
-
+without_rich_display = '''\
+options(jupyter.rich_display = FALSE)
+{}
+options(jupyter.rich_display = TRUE)
+'''
+#withr::with_options(list(jupyter.rich_display = FALSE), {})
 
 
 class InstallspecTests(jkt.KernelTests):
@@ -15,6 +19,7 @@ class InstallspecTests(jkt.KernelTests):
     language_name = 'R'
 
     code_hello_world = 'print("hello, world")'
+
 
 class IRkernelTests(jkt.KernelTests):
     kernel_name = 'ir'
@@ -47,46 +52,54 @@ class IRkernelTests(jkt.KernelTests):
     incomplete_code_samples = ['print("hello', 'f <- function(x) {\n  x*2']
 
     code_display_data = [
-    {'code': '"a"', 'mime': 'text/plain'},
-    {'code': '"a"', 'mime': 'text/html'},
-    {'code': '"a"', 'mime': 'text/latex'},
-    {'code': '1:3', 'mime': 'text/plain'},
-    {'code': '1:3', 'mime': 'text/html'},
-    {'code': '1:3', 'mime': 'text/latex'},
-    {'code': (reset_rich_display%'"a"'), 'mime': 'text/plain'},
-    {'code': (reset_rich_display%'1:3'), 'mime': 'text/plain'},
+        {'code': '"a"', 'mime': 'text/plain'},
+        {'code': '"a"', 'mime': 'text/html'},
+        {'code': '"a"', 'mime': 'text/latex'},
+        {'code': '1:3', 'mime': 'text/plain'},
+        {'code': '1:3', 'mime': 'text/html'},
+        {'code': '1:3', 'mime': 'text/latex'},
+        {'code': without_rich_display.format('"a"'), 'mime': 'text/plain'},
+        {'code': without_rich_display.format('1:3'), 'mime': 'text/plain'},
     ]
 
     def test_display_vector(self):
-        code = "1:3"
+        code = '1:3'
         reply, output_msgs = self._execute_code(code)
-        # we currently send three formats: text/plain, text/html, text/latex, and text/markdown
-        self.assertEqual(len(output_msgs[0]['content']['data']), 4)
-        self.assertEqual(output_msgs[0]['content']['data']['text/plain'], "[1] 1 2 3")
-        self.assertIn('text/html', output_msgs[0]['content']['data'])
+        
+        # we currently send those formats: text/plain, text/html, text/latex, and text/markdown
+        data = output_msgs[0]['content']['data']
+        self.assertEqual(len(data), 4, data.keys())
+        self.assertEqual(data['text/plain'], '[1] 1 2 3')
+        self.assertIn('text/html', data)
+        
         # this should not be a test of the repr functionality...
-        self.assertIn("</li>", output_msgs[0]['content']['data']['text/html'])
+        self.assertIn('</li>', output_msgs[0]['content']['data']['text/html'])
         self.assertIn('text/latex', output_msgs[0]['content']['data'])
         self.assertIn('text/markdown', output_msgs[0]['content']['data'])
 
     def test_display_vector_only_plaintext(self):
-        code = reset_rich_display%"1:3"
+        code = without_rich_display.format('1:3')
         reply, output_msgs = self._execute_code(code)
-        self.assertEqual(len(output_msgs[0]['content']['data']), 1)
-        self.assertEqual(output_msgs[0]['content']['data']['text/plain'], "[1] 1 2 3")
+        data = output_msgs[0]['content']['data']
+        self.assertEqual(len(data), 1, data.keys())
+        self.assertEqual(data['text/plain'], '[1] 1 2 3')
 
     def test_irkernel_plots(self):
-        code = "plot(1:3)"
+        code = 'plot(1:3)'
         reply, output_msgs = self._execute_code(code)
+        
         # we currently send three formats: png, svg and text/plain
-        self.assertEqual(len(output_msgs[0]['content']['data']), 3)
-        self.assertEqual(output_msgs[0]['content']['data']['text/plain'], "plot without title")
-        self.assertIn('image/svg+xml', output_msgs[0]['content']['data'])
-        self.assertIn('image/png', output_msgs[0]['content']['data'])
+        data = output_msgs[0]['content']['data']
+        self.assertEqual(len(data), 3, data.keys())
+        self.assertEqual(data['text/plain'], 'plot without title')
+        self.assertIn('image/svg+xml', data)
+        self.assertIn('image/png', data)
+        
         # we isolate only svg plots
-        self.assertEqual(len(output_msgs[0]['content']['metadata']), 1)
-        self.assertEqual(len(output_msgs[0]['content']['metadata']['image/svg+xml']), 1)
-        self.assertEqual(output_msgs[0]['content']['metadata']['image/svg+xml']['isolated'], True)
+        metadata = output_msgs[0]['content']['metadata']
+        self.assertEqual(len(metadata), 1, metadata.keys())
+        self.assertEqual(len(metadata['image/svg+xml']), 1)
+        self.assertEqual(metadata['image/svg+xml']['isolated'], True)
 
     def test_irkernel_plots_only_PNG(self):
         # the reset needs to happen in another execute because plots are sent after either
@@ -94,37 +107,46 @@ class IRkernelTests(jkt.KernelTests):
         # command is actually happening.
         # (we have a similar problem with width/... but we worked around it by setting the
         # appropriate options to the recorderdplot object)
-        code = """
-old_options <- options(jupyter.plot_mimetypes = c('image/png'))
-plot(1:3)
-"""
+        code = '''\
+            old_options <- options(jupyter.plot_mimetypes = c('image/png'))
+            plot(1:3)
+        '''
         reply, output_msgs = self._execute_code(code)
+        
         # Only png, no svg or plain/text
-        self.assertEqual(len(output_msgs[0]['content']['data']), 1)
-        self.assertIn('image/png', output_msgs[0]['content']['data'])
+        data = output_msgs[0]['content']['data']
+        self.assertEqual(len(data), 1, data.keys())
+        self.assertIn('image/png', data)
+        
         # And reset
-        code = "options(old_options)"
+        code = 'options(old_options)'
         reply, output_msgs = self._execute_code(code, tests=False)
 
     def test_irkernel_df_default_rich_output(self):
-        code = "data.frame(x = 1:3)"
+        code = 'data.frame(x = 1:3)'
         reply, output_msgs = self._execute_code(code)
+        
         # we currently send three formats: text/plain, html, and latex
-        self.assertEqual(len(output_msgs[0]['content']['data']), 3)
+        data = output_msgs[0]['content']['data']
+        self.assertEqual(len(data), 3, data.keys())
 
     def test_irkernel_df_no_rich_output(self):
-        code = """
-options(jupyter.rich_display = FALSE)
-data.frame(x = 1:3)
-options(jupyter.rich_display = TRUE)
-"""
+        code = '''
+            options(jupyter.rich_display = FALSE)
+            data.frame(x = 1:3)
+            options(jupyter.rich_display = TRUE)
+        '''
         reply, output_msgs = self._execute_code(code)
+        
         # only text/plain
-        self.assertEqual(len(output_msgs[0]['content']['data']), 1)
+        data = output_msgs[0]['content']['data']
+        self.assertEqual(len(data), 1, data.keys())
 
     def test_in_kernel_set(self):
-        reply, output_msgs = self._execute_code("getOption('jupyter.in_kernel')")
-        self.assertEqual(output_msgs[0]['content']['data']['text/plain'], "[1] TRUE")
+        reply, output_msgs = self._execute_code('getOption("jupyter.in_kernel")')
+        data = output_msgs[0]['content']['data']
+        self.assertEqual(data['text/plain'], '[1] TRUE')
+
 
 if __name__ == '__main__':
     unittest.main()
