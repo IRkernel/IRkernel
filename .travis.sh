@@ -71,7 +71,7 @@ check_package() (
     set -ex
     
     # we don't have test_that tests yet.
-    #Rscript -e 'devtools::test(reporter="check")'
+    Rscript -e 'devtools::test(reporter="check")'
     R CMD check "$PKG_TARBALL" --as-cran
     ! grep -q 'WARNING' "$CHECK_LOG"
     # .. because ': ' was resulting in an replacement by travis and an error

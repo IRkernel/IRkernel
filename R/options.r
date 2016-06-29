@@ -4,6 +4,7 @@
 #' @name IRkernel
 #' @export
 jupyter_option_defaults <- list(
+    jupyter.rich_display = TRUE, # moved from IRdisplay
     jupyter.log_level = 1L,
     jupyter.logfile = NA,
     jupyter.pager_classes = c(
@@ -24,7 +25,7 @@ opt_to_env <- function(nms) gsub('.', '_', toupper(nms), fixed = TRUE)
 
 .onLoad <- function(libname = NULL, pkgname = NULL) {
     for (opt_name in names(jupyter_option_defaults)) {
-        # skip option if it is set to NULL (unset)
+        # skip option if it is already set, e.g. in the Rprofile
         if (is.null(getOption(opt_name))) {
             # prepare `options` call from the default
             call_arg <- jupyter_option_defaults[opt_name]  # single [] preserve names
