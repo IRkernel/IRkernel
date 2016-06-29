@@ -142,6 +142,19 @@ class IRkernelTests(jkt.KernelTests):
         data = output_msgs[0]['content']['data']
         self.assertEqual(len(data), 1, data.keys())
 
+    def test_html_isolated(self):
+        code = '''
+            repr_html.full_page <- function(obj) sprintf('<html><body>%s</body></html>', obj)
+            structure(0, class = 'full_page')
+        '''
+        reply, output_msgs = self._execute_code(code)
+        
+        data = output_msgs[0]['content']['data']
+        self.assertEqual(data['text/html'], '<html><body>0</body></html>')
+        
+        metadata = output_msgs[0]['content']['metadata']
+        self.assertEqual(metadata['text/html']['isolated'], True)
+
     def test_in_kernel_set(self):
         reply, output_msgs = self._execute_code('getOption("jupyter.in_kernel")')
         data = output_msgs[0]['content']['data']
