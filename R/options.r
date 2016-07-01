@@ -12,8 +12,7 @@ jupyter_option_defaults <- list(
         'help_files_with_topic'),
     jupyter.plot_mimetypes = c(
         'text/plain',
-        'image/png',
-        'image/svg+xml'),
+        'image/png'),
     jupyter.in_kernel = FALSE)
 
 from_env <- list(

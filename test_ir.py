@@ -88,18 +88,15 @@ class IRkernelTests(jkt.KernelTests):
         code = 'plot(1:3)'
         reply, output_msgs = self._execute_code(code)
         
-        # we currently send three formats: png, svg and text/plain
+        # we currently send two formats: png, and text/plain
         data = output_msgs[0]['content']['data']
-        self.assertEqual(len(data), 3, data.keys())
+        self.assertEqual(len(data), 2, data.keys())
         self.assertEqual(data['text/plain'], 'plot without title')
-        self.assertIn('image/svg+xml', data)
         self.assertIn('image/png', data)
         
-        # we isolate only svg plots
+        # we isolate only svg plots, which are not included in the default types
         metadata = output_msgs[0]['content']['metadata']
-        self.assertEqual(len(metadata), 1, metadata.keys())
-        self.assertEqual(len(metadata['image/svg+xml']), 1)
-        self.assertEqual(metadata['image/svg+xml']['isolated'], True)
+        self.assertEqual(len(metadata), 0, metadata.keys())
 
     def test_irkernel_plots_only_PNG(self):
         # the reset needs to happen in another execute because plots are sent after either
@@ -117,9 +114,53 @@ class IRkernelTests(jkt.KernelTests):
         data = output_msgs[0]['content']['data']
         self.assertEqual(len(data), 1, data.keys())
         self.assertIn('image/png', data)
-        
+
+        # nothing in metadata
+        metadata = output_msgs[0]['content']['metadata']
+        self.assertEqual(len(metadata), 0, metadata.keys())
+
         # And reset
         code = 'options(old_options)'
+        reply, output_msgs = self._execute_code(code, tests=False)
+
+    def test_irkernel_plots_only_SVG(self):
+        # again the reset dance (see PNG)
+        code = '''\
+            old_options <- options(jupyter.plot_mimetypes = c('image/svg+xml'))
+            plot(1:3)
+        '''
+        reply, output_msgs = self._execute_code(code)
+
+        # Only svg, no png or plain/text
+        data = output_msgs[0]['content']['data']
+        self.assertEqual(len(data), 1, data.keys())
+        self.assertIn('image/svg+xml', data)
+        
+        # svg output is currently isolated
+        metadata = output_msgs[0]['content']['metadata']
+        self.assertEqual(len(metadata), 1, metadata.keys())
+        self.assertEqual(len(metadata['image/svg+xml']), 1)
+        self.assertEqual(metadata['image/svg+xml']['isolated'], True)
+
+        # And reset
+        code = 'options(old_options)'
+        reply, output_msgs = self._execute_code(code, tests=False)
+
+    def test_irkernel_plots_without_rich_display(self):
+        code = '''\
+            options(jupyter.rich_display = FALSE)
+            plot(1:3)
+        '''
+        reply, output_msgs = self._execute_code(code)
+
+        # Even with rich output as false, we send plots
+        data = output_msgs[0]['content']['data']
+        self.assertEqual(len(data), 2, data.keys())
+        self.assertEqual(data['text/plain'], 'plot without title')
+        self.assertIn('image/png', data)
+
+        # And reset
+        code = 'options(jupyter.rich_display = TRUE)'
         reply, output_msgs = self._execute_code(code, tests=False)
 
     def test_irkernel_df_default_rich_output(self):
