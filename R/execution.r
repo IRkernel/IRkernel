@@ -163,7 +163,7 @@ handle_display_error = function(e){
 
 handle_value = function(obj) {
     log_debug('Value output...')
-    mimebundle <- prepare_mimebundle(obj, .self$handle_display_error)
+    mimebundle <- prepare_mimebundle_kernel(obj, .self$handle_display_error)
     if (length(intersect(class(obj), getOption('jupyter.pager_classes'))) > 0) {
         log_debug('Showing pager: %s', paste(capture.output(str(mimebundle$data)), collapse = '\n'))
         page(mimebundle)

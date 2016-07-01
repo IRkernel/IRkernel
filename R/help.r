@@ -32,8 +32,8 @@
 #' @importFrom pbdZMQ zmq.poll zmq.poll.get.revents
 #' @importFrom evaluate evaluate new_output_handler parse_all
 #' @importFrom jsonlite fromJSON toJSON
-#' @importFrom IRdisplay publish_mimebundle
-#' @importFrom repr mime2repr repr_text repr_option_defaults
+#' @importFrom IRdisplay publish_mimebundle prepare_mimebundle
+#' @importFrom repr mime2repr repr_option_defaults
 #' 
 #' @docType package
 #' @seealso \link{Kernel-class}, \link{installspec}

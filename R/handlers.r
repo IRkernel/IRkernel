@@ -1,32 +1,18 @@
-prepare_mimebundle <- function(obj, handle_display_error = log_error) {
-    data <- namedlist()
-    metadata <- namedlist()
-    
+prepare_mimebundle_kernel <- function(obj, handle_display_error = log_error) {
     # we always send text/plain, even if the user removed that from the option!
-    data[['text/plain']] <- text_repr <- repr_text(obj)
+    text_bundle <- prepare_mimebundle(obj, 'text/plain', error_handler = handle_display_error)
+    text_repr <- text_bundle$data[['text/plain']]
     
-    # Only send a response when there is regular console output
-    if (!is.null(text_repr) && nchar(text_repr) > 0L) {
-        if (getOption('jupyter.rich_display')) {
-            for (mime in getOption('jupyter.display_mimetypes')) {
-                if (mime == 'text/plain') {
-                    # doing a print(obj) can be expensive and we don't want to do it twice!
-                    next
-                }
-                # Use withCallingHandlers as that shows the inner stacktrace:
-                # https://stackoverflow.com/questions/15282471/get-stack-trace-on-trycatched-error-in-r
-                # the tryCatch is  still needed to prevent the error from showing
-                # up outside further up the stack :-/
-                tryCatch(withCallingHandlers({
-                    r <- mime2repr[[mime]](obj)
-                    if (!is.null(r)) {
-                        data[[mime]] <- r
-                    }
-                }, error = handle_display_error),
-                error = function(x) {})
-            }
-        }
+    # if the text/plain repr returns nothing, we also do
+    if (is.null(text_repr) || nchar(text_repr) == 0L)
+        return(list(data = NULL, metadata = NULL))
+    
+    if (getOption('jupyter.rich_display')) {
+        mimetypes <- setdiff(getOption('jupyter.display_mimetypes'), 'text/plain')
+        bundle <- prepare_mimebundle(obj, mimetypes, error_handler = handle_display_error)
+        bundle$data[['text/plain']] <- text_repr
+        bundle
+    } else {
+        text_bundle
     }
-    
-    list(data = data, metadata = metadata)
 }

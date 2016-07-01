@@ -31,7 +31,7 @@ class IRkernelTests(jkt.KernelTests):
 
         reply, output_msgs = self.execute_helper(code)
 
-        self.assertEqual(reply['content']['status'], 'ok')
+        self.assertEqual(reply['content']['status'], 'ok', '{0}: {0}'.format(reply['content'].get('ename'), reply['content'].get('evalue')))
         if tests:
             self.assertGreaterEqual(len(output_msgs), 1)
             # the irkernel only sends display_data, not execute_results
@@ -150,15 +150,19 @@ class IRkernelTests(jkt.KernelTests):
         reply, output_msgs = self._execute_code(code)
         
         data = output_msgs[0]['content']['data']
+        self.assertEqual(len(data), 2, data.keys())
         self.assertEqual(data['text/html'], '<html><body>0</body></html>')
         
         metadata = output_msgs[0]['content']['metadata']
+        self.assertEqual(len(metadata), 1, metadata.keys())
+        self.assertEqual(len(metadata['text/html']), 1, metadata['text/html'].keys())
         self.assertEqual(metadata['text/html']['isolated'], True)
 
     def test_in_kernel_set(self):
         reply, output_msgs = self._execute_code('getOption("jupyter.in_kernel")')
         data = output_msgs[0]['content']['data']
-        self.assertEqual(data['text/plain'], '[1] TRUE')
+        self.assertGreaterEqual(len(data), 1, data.keys())
+        self.assertEqual(data['text/plain'], '[1] TRUE', data.keys())
 
 
 if __name__ == '__main__':

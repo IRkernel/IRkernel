@@ -20,7 +20,7 @@ Imports:
     repr (>= 0.4.99),
     methods,
     evaluate (>= 0.5.4),
-    IRdisplay (>= 0.3.0.9990),
+    IRdisplay (>= 0.3.0.9999),
     pbdZMQ (>= 0.2-1),
     jsonlite (>= 0.9.6),
     uuid,
