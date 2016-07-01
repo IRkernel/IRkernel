@@ -26,15 +26,16 @@ matrix:
     - r: devel
       env: DEPS=github
       os: linux
+    - r: oldrel
+      env: DEPS=cran
+      os: linux
+  allow_failures:
     - r: devel
       env: DEPS=cran
       os: osx
     - r: devel
       env: DEPS=github
       os: osx
-    - r: oldrel
-      env: DEPS=cran
-      os: linux
     - r: oldrel
       env: DEPS=cran
       os: osx
