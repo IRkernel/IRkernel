@@ -9,8 +9,7 @@ test_that('default options are set', {
         'help_files_with_topic'))
     expect_equal(getOption('jupyter.plot_mimetypes'), c(
         'text/plain',
-        'image/png',
-        'image/svg+xml'))
+        'image/png'))
     # this is not a kernel itself, only the loaded package!
     expect_equal(getOption('jupyter.in_kernel'), FALSE)
 })
