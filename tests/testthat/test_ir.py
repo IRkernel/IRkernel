@@ -9,6 +9,7 @@ options(jupyter.rich_display = FALSE)
 {}
 options(jupyter.rich_display = TRUE)
 '''
+#this will not work!
 #withr::with_options(list(jupyter.rich_display = FALSE), {})
 
 
@@ -63,6 +64,7 @@ class IRkernelTests(jkt.KernelTests):
     ]
 
     def test_display_vector(self):
+        """display of vectors"""
         code = '1:3'
         reply, output_msgs = self._execute_code(code)
         
@@ -78,6 +80,7 @@ class IRkernelTests(jkt.KernelTests):
         self.assertIn('text/markdown', output_msgs[0]['content']['data'])
 
     def test_display_vector_only_plaintext(self):
+        """display of plain text vectors"""
         code = without_rich_display.format('1:3')
         reply, output_msgs = self._execute_code(code)
         data = output_msgs[0]['content']['data']
@@ -85,6 +88,7 @@ class IRkernelTests(jkt.KernelTests):
         self.assertEqual(data['text/plain'], '[1] 1 2 3')
 
     def test_irkernel_plots(self):
+        """plotting"""
         code = 'plot(1:3)'
         reply, output_msgs = self._execute_code(code)
         
@@ -102,6 +106,7 @@ class IRkernelTests(jkt.KernelTests):
         self.assertEqual(metadata['image/svg+xml']['isolated'], True)
 
     def test_irkernel_plots_only_PNG(self):
+        """plotting PNG"""
         # the reset needs to happen in another execute because plots are sent after either
         # the next plot is opened or everything is executed, not at the time when plot
         # command is actually happening.
@@ -123,6 +128,7 @@ class IRkernelTests(jkt.KernelTests):
         reply, output_msgs = self._execute_code(code, tests=False)
 
     def test_irkernel_df_default_rich_output(self):
+        """data.frame rich representation"""
         code = 'data.frame(x = 1:3)'
         reply, output_msgs = self._execute_code(code)
         
@@ -131,6 +137,7 @@ class IRkernelTests(jkt.KernelTests):
         self.assertEqual(len(data), 3, data.keys())
 
     def test_irkernel_df_no_rich_output(self):
+        """data.frame plain representation"""
         code = '''
             options(jupyter.rich_display = FALSE)
             data.frame(x = 1:3)
@@ -143,6 +150,7 @@ class IRkernelTests(jkt.KernelTests):
         self.assertEqual(len(data), 1, data.keys())
 
     def test_html_isolated(self):
+        """HTML isolation"""
         code = '''
             repr_html.full_page <- function(obj) sprintf('<html><body>%s</body></html>', obj)
             structure(0, class = 'full_page')
@@ -159,6 +167,7 @@ class IRkernelTests(jkt.KernelTests):
         self.assertEqual(metadata['text/html']['isolated'], True)
 
     def test_in_kernel_set(self):
+        """jupyter.in_kernel option"""
         reply, output_msgs = self._execute_code('getOption("jupyter.in_kernel")')
         data = output_msgs[0]['content']['data']
         self.assertGreaterEqual(len(data), 1, data.keys())
