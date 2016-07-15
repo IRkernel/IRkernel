@@ -17,9 +17,9 @@ find_jupyter <- function() {
 #' different name (and displayname to see a difference in the notebook UI). If the same
 #' name is give, it will overwrite older versions of the kernel spec with that name!
 #'
-#' @param user Install into user directory (~/.jupyter or ~/.ipython) or globally?
-#' @param name The name of the kernel (default "ir")
-#' @param displayname The name which is displayed in the notebook (default: "R")
+#' @param user         Install into user directory (~/.jupyter or ~/.ipython) or globally?
+#' @param name         The name of the kernel (default "ir")
+#' @param displayname  The name which is displayed in the notebook (default: "R")
 #'
 #' @export
 installspec <- function(user = TRUE, name = 'ir', displayname = 'R') {

@@ -370,7 +370,7 @@ comm_manager <- function() comm_manager_env$comm_manager
 
 #' Initialise and run the kernel
 #'
-#' @param connection_file The path to the Jupyter connection file, written by the frontend
+#' @param connection_file  The path to the Jupyter connection file, written by the frontend
 #' 
 #' @export 
 main <- function(connection_file = '') {
