@@ -60,6 +60,17 @@ format_stack <- function(calls) {
     paste0(tb, line_refs)
 }
 
+format_error_message <- function(msg, error, call_stack=NULL) {
+    if (is.null(call_stack)){
+        stack_info <- '<No call stack available>'
+    } else {
+        stack_info <- format_stack(call_stack)
+    }
+    sprintf('%s: %s\nTraceback:\n%s\n',
+            msg,
+            toString(error),
+            paste(stack_info, collapse = '\n'))
+}
 
 Executor <- setRefClass(
     Class = 'Executor',
@@ -83,7 +94,6 @@ send_error_msg = function(msg) {
     if (!is_silent()) return()
     send_response('stream', current_request, 'iopub',
                   list(name = 'stderr', text = msg))
-
 },
 
 display_data = function(data, metadata = NULL) {
@@ -119,9 +129,11 @@ quit = function(save = 'default', status = 0, runLast = TRUE) {
 },
 
 handle_error = function(e) {
-    log_debug('Error output: %s', toString(e))
+    # first send the complete stacktrace to the log
+    log_debug(format_error_message("ERROR", e, sys.calls()))
+
     calls <- head(sys.calls()[-seq_len(nframe + 1L)], -3)
-    
+
     msg <- paste0(toString(e), 'Traceback:\n')
     stack_info <- format_stack(calls)
 
@@ -152,13 +164,13 @@ handle_display_error = function(e){
     # This is used with withCallingHandler and only has two additional
     # calls at the end instead of the 3 for tryCatch... (-2 at the end)
     # we also remove the tryCatch and mime2repr stuff at the head of the callstack (+7)
+    msg <- 'ERROR while rich displaying an object'
     calls <- head(sys.calls()[-seq_len(nframe + 7L)], -2)
-    stack_info <- format_stack(calls)
-    msg <- sprintf('ERROR while rich displaying an object: %s\nTraceback:\n%s\n',
-                   toString(e),
-                   paste(stack_info, collapse = '\n'))
-    log_debug(msg)
-    send_error_msg(msg)
+
+    # first send the complete stacktrace to the log
+    log_debug(format_error_message(msg, e, sys.calls()))
+    # now the "smaller" on to the user
+    send_error_msg(format_error_message(msg, e, calls))
 },
 
 handle_value = function(obj) {
