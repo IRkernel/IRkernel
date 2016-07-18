@@ -2,18 +2,31 @@
 # Per default, only error messages are shown
 # levels: 3 = DEBUG, 2 = INFO/MSG, 1 = ERROR
 
+#' Kernel logging functions
+#'
+#' A set of exported logging utilities that have the capability to be used in upstream projects.
+#' Log level and log file can be set via R package options e.g. \code{options(jupyter.log_level = 2L)}
+#' or from the environment variables JUPYTER_LOG_LEVEL and JUPYTER_LOGFILE.
+#'
+#' @name log_*
+#' @param ...  message to log
+#' @export
 log_debug <- function(...) {
     if (isTRUE(getOption('jupyter.log_level') >= 3L)) {
         log_msg('DEBUG', sprintf(...))
     }
 }
 
+#' @name log_*
+#' @export
 log_info <- function(...) {
     if (isTRUE(getOption('jupyter.log_level') >= 2L)) {
         log_msg('INFO', sprintf(...))
     }
 }
 
+#' @name log_*
+#' @export
 log_error <- function(...) {
     if (isTRUE(getOption('jupyter.log_level') >= 1L)) {
         log_msg('ERROR', sprintf(...))
