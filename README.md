@@ -55,18 +55,23 @@ jupyter qtconsole --kernel=ir
 jupyter console --kernel=ir
 ```
 
-## Run in a Docker container
+## Run a stable release in a Docker container
+
+Refer to the [jupyter/docker-stacks r-notebook](https://github.com/jupyter/docker-stacks/tree/master/r-notebook) repository
 
 If you have a Docker daemon running, e.g. reachable on localhost, start a container with:
 
 ```bash
-git clone https://github.com/IRkernel/IRkernel.git
-cd IRkernel
-docker build -t irkernel .
-cd <path to your notebooks>
-docker run -itp 8888:8888 -v $(pwd):/notebooks/ irkernel
+docker run -d -p 8888:8888 jupyter/r-notebook
 ```
 
 In your browser open the URL <http://localhost:8888/>. All notebooks from your session will be saved in the current directory.
 
 On other platforms without docker, this can be started using `docker-machine` by replacing “localhost” with an IP from `docker-machine ip <MACHINE>`. With the deprecated `boot2docker`, this IP will be `boot2docker ip`.
+
+## Develop and run from source in a Docker container
+
+```bash
+make docker_dev_image #builds dev image and installs IRkernel dependencies from github
+make docker_dev #mounts source, installs, and runs Jupyter notebook
+```
