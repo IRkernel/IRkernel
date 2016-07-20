@@ -5,7 +5,7 @@ Description: The R kernel for the jupyter environment executes R code which the
     network.
 Version: 0.6
 Authors@R: c(person("Thomas", "Kluyver", role = c("aut", "cre"), email = "thomas@kluyver.me.uk"),
-    person("Philipp", "A.", role = "aut", email = "flying-sheep@web.de"),
+    person("Philipp", "Angerer", role = "aut", email = "phil.angerer@gmail.com"),
     person("Jan", "Schulz", role = "aut", email = "jasc@gmx.net"),
     person("Karthik", "Ram", role = "aut", email = "karthik.ram@gmail.com"))
 Depends:
@@ -36,4 +36,5 @@ Collate:
     'help.r'
     'installspec.r'
     'kernel.r'
+    'utils.r'
 RoxygenNote: 5.0.1

@@ -122,6 +122,8 @@ handle_error = function(e) {
     log_debug('Error output: %s', toString(e))
     calls <- head(sys.calls()[-seq_len(nframe + 1L)], -3)
     
+    calls <- skip_repeated(calls)
+    
     msg <- paste0(toString(e), 'Traceback:\n')
     stack_info <- format_stack(calls)
 
