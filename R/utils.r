@@ -1,3 +1,4 @@
+#' @importFrom utils head tail
 skip_repeated <- function(vec) {
     enc <- rle(vec)
     i <- which.max(enc$lengths)
