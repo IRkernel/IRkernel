@@ -275,7 +275,7 @@ execute = function(request) {
         interrupt = function(cond) interrupted <<- TRUE,
         error = .self$handle_error) # evaluate does not catch errors in parsing
     
-    if ((!is.silent()) & (!is.null(last_recorded_plot))) {
+    if (!is.silent() && !is.null(last_recorded_plot)) {
         send_plot(last_recorded_plot)
     }
     
