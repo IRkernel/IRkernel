@@ -2,6 +2,8 @@ ellip_h <- repr:::.char_fallback('\u22EF', '...')
 
 #' @importFrom utils head tail
 skip_repeated <- function(vec) {
+    if (length(vec) == 0L)
+        return(vec)
     enc <- rle(vec)
     i <- which.max(enc$lengths)
     l <- enc$lengths[[i]]
