@@ -4,10 +4,11 @@ Description: The R kernel for the jupyter environment executes R code which the
     frontend (Jupyter Notebook or other frontends) submits to the kernel via the
     network.
 Version: 0.6
-Authors@R: c(person("Thomas", "Kluyver", role = c("aut", "cre"), email = "thomas@kluyver.me.uk"),
-    person("Philipp", "Angerer", role = "aut", email = "phil.angerer@gmail.com"),
-    person("Jan", "Schulz", role = "aut", email = "jasc@gmx.net"),
-    person("Karthik", "Ram", role = "aut", email = "karthik.ram@gmail.com"))
+Authors@R: c(
+    person('Thomas', 'Kluyver', role = c('aut', 'cph'), email = 'thomas@kluyver.me.uk'),
+    person('Philipp', 'Angerer', role = c('aut', 'cph', 'cre'), email = 'phil.angerer@gmail.com'),
+    person('Jan', 'Schulz', role = c('aut', 'cph'), email = 'jasc@gmx.net'),
+    person('Karthik', 'Ram', role = c('aut', 'cph'), email = 'karthik.ram@gmail.com'))
 Depends:
     R (>= 3.0.1)
 Suggests:
