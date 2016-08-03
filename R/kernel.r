@@ -355,13 +355,6 @@ run = function() {
 })
 )
 
-comm_manager_env <- new.env()
-#' Get global Comm_Manager instance
-#'
-#' @return \link{Comm_Manager} instance if a kernel is running, else NULL
-#' @export
-comm_manager <- function() comm_manager_env$comm_manager
-
 #' Initialise and run the kernel
 #'
 #' @param connection_file  The path to the Jupyter connection file, written by the frontend

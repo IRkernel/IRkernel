@@ -45,6 +45,7 @@ init_shadowenv <- function() {
     })
 }
 
+
 init_cran_repo <- function() {
     r <- getOption('repos')
     is_unuseable_mirror <- identical(r, c(CRAN = '@CRAN@'))
