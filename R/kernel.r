@@ -314,7 +314,7 @@ initialize = function(connection_file) {
     executor <<- Executor$new(send_response = .self$send_response,
         abort_queued_messages = .self$abort_queued_messages)
     comm_manager <<- CommManager$new(send_response = .self$send_response)
-    comm_manager_env$comm_manager <- comm_manager
+    runtime_env$comm_manager <- comm_manager
 },
 
 run = function() {
