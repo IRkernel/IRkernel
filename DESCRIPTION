@@ -28,6 +28,7 @@ Imports:
     digest
 Remotes: IRKernel/IRdisplay,
 Collate:
+    'class_unions.r'
     'logging.r'
     'comm_manager.r'
     'environment.r'

@@ -1,7 +1,5 @@
-#' @include logging.r
+#' @include logging.r class_unions.r
 NULL
-
-setClassUnion('functionOrNULL', members = c('function', 'NULL'))
 
 #' The Comm_Manager
 #'

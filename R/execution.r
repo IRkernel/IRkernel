@@ -1,9 +1,5 @@
-#' @include options.r
+#' @include options.r class_unions.r
 NULL
-
-setClassUnion('recordedplotOrNULL', members = c('recordedplot', 'NULL'))
-
-setClassUnion('listOrNULL', members = c('list', 'NULL'))
 
 # Create an empty named list
 #' @importFrom stats setNames
