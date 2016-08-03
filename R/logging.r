@@ -34,8 +34,8 @@ log_error <- function(...) {
 }
 
 log_msg <- function(lvl, msg){
-        log_msg_stderror(lvl, msg)
-        log_msg_logfile(lvl, msg)
+    log_msg_stderror(lvl, msg)
+    log_msg_logfile(lvl, msg)
 }
 
 
