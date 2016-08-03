@@ -38,10 +38,10 @@ init_shadowenv <- function() {
     # we simply have currently no way to view or edit dfs:
     # https://github.com/IRkernel/IRkernel/issues/280
     add_to_user_searchpath('View', function(...) {
-        stop("'View()' not yet supported in the Jupyter R kernel")
+        stop(sQuote('View()'), ' not yet supported in the Jupyter R kernel')
     })
     add_to_user_searchpath('edit', function(...) {
-        stop("'edit()' not yet supported in the Jupyter R kernel")
+        stop(sQuote('edit()'), ' not yet supported in the Jupyter R kernel')
     })
 }
 

@@ -71,7 +71,7 @@ Executor <- setRefClass(
         nframe                = 'integer'),
     methods = list(
 
-is.silent = function() {
+is_silent = function() {
     current_request$content$silent
 },
 
@@ -124,7 +124,7 @@ handle_error = function(e) {
     stack_info <- format_stack(calls)
 
     err <<- list(ename = 'ERROR', evalue = toString(e), traceback = as.list(c(msg, stack_info)))
-    if (!is.silent()) {
+    if (!is_silent()) {
         send_response('error', current_request, 'iopub', c(err, list(
             execution_count = execution_count)))
     }
@@ -223,7 +223,7 @@ execute = function(request) {
         stop_on_error = 1L,
         output_handler = new_output_handler(error = function(e) nframe <<- sys.nframe())))
     
-    oh <- if (is.silent()) {
+    oh <- if (is_silent()) {
         new_output_handler(
             text = identity,
             graphics = identity,
@@ -271,7 +271,7 @@ execute = function(request) {
         interrupt = function(cond) interrupted <<- TRUE,
         error = .self$handle_error) # evaluate does not catch errors in parsing
     
-    if (!is.silent() && !is.null(last_recorded_plot)) {
+    if (!is_silent() && !is.null(last_recorded_plot)) {
         send_plot(last_recorded_plot)
     }
     
@@ -298,7 +298,7 @@ execute = function(request) {
         abort_queued_messages()
     }
 
-    if (!is.silent()) {
+    if (!is_silent()) {
         execution_count <<- execution_count + 1L
     }
 },
@@ -328,6 +328,6 @@ initialize = function(...) {
     callSuper(...)
 },
 finalize = function() {
-    detach("jupyter:irkernel")
+    detach('jupyter:irkernel')
 })
 )
