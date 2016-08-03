@@ -16,3 +16,9 @@ skip_repeated <- function(vec) {
         inverse.rle(enc)
     }
 }
+
+fromRawJSON <- function(r) {
+    s <- rawToChar(r)
+    Encoding(s) <- 'UTF-8'
+    fromJSON(s)
+}

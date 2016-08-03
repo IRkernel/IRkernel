@@ -1,11 +1,5 @@
-#' @include execution.r help.r comm_manager.r logging.r
+#' @include execution.r help.r comm_manager.r logging.r utils.r
 NULL
-
-fromRawJSON <- function(r) {
-    s <- rawToChar(r)
-    Encoding(s) <- 'UTF-8'
-    fromJSON(s)
-}
 
 
 #' The kernel
