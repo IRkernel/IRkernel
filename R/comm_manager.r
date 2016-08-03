@@ -13,27 +13,14 @@ CommManager <- setRefClass(
         parent_request = 'list'
     ),
     methods = list(
-        new_comm = function(target_name, comm_id = NULL) {
-            if(is.null(comm_id)) {
-                comm_id <- UUIDgenerate()
-            }
-            return (Comm$new(id = comm_id, target_name = target_name, comm_manager = .self))
+        new_comm = function(target_name, comm_id = UUIDgenerate()) {
+            Comm$new(id = comm_id, target_name = target_name, comm_manager = .self)
         },
-        register_target = function(target_name, handler_func) {
-            target_to_handler_map[[target_name]] <<- handler_func
-        },
-        unregister_target = function(target_name, handler_func) {
-            target_to_handler_map[[target_name]] <<- NULL
-        },
-        register_comm = function(comm) {
-            commid_to_comm[[comm$id]] <<- comm
-        },
-        unregister_comm = function(comm) {
-            commid_to_comm[[comm$id]] <<- NULL
-        },
-        is_comm_registered = function(comm) {
-            return (!is.null(commid_to_comm[[comm$id]]))
-        },
+        register_target   = function(target_name, handler_func) target_to_handler_map[[target_name]] <<- handler_func,
+        unregister_target = function(target_name, handler_func) target_to_handler_map[[target_name]] <<- NULL,
+        register_comm   = function(comm) commid_to_comm[[comm$id]] <<- comm,
+        unregister_comm = function(comm) commid_to_comm[[comm$id]] <<- NULL,
+        is_comm_registered = function(comm) !is.null(commid_to_comm[[comm$id]]),
         send_open = function(comm_id, target_name, data, metadata = list()) {
             send_response('comm_open', parent_request, 'iopub', list(
                 metadata = metadata,
@@ -63,7 +50,7 @@ CommManager <- setRefClass(
             for (the_comm in comm_list) {
                 all_comms[[the_comm$id]] <- list(target_name = the_comm$target_name)
             }
-            return (all_comms)
+            all_comms
         },
         #response:
         #content = {
@@ -82,7 +69,7 @@ CommManager <- setRefClass(
             #Else target_name not in the request return all commids accross all targets
             reply_msg <- list()
             comms <- list()
-            if('target_name' %in% names(request$content)) {
+            if ('target_name' %in% names(request$content)) {
                 #reply with comms only for the specified target_name
                 target_name_requested <- request$content$target_name
                 filtered_comms <- Filter(function(x) x$target_name == target_name_requested, commid_to_comm)
@@ -102,13 +89,13 @@ CommManager <- setRefClass(
             parent_request <<- request
             target_name <- request$content$target_name
             comm_id <- request$content$comm_id
-
-            if(target_name %in% names(target_to_handler_map)) {
+            
+            if (target_name %in% names(target_to_handler_map)) {
                 # create a comm object
                 comm <- new_comm(target_name, comm_id)
                 register_comm(comm)
                 data <- request$content$data
-
+                
                 #invoke target handler
                 tryCatch({
                     target_to_handler_map[[target_name]](comm, data)
@@ -128,10 +115,10 @@ CommManager <- setRefClass(
         on_comm_msg = function(request) {
             parent_request <<- request
             comm_id <- request$content$comm_id
-
-            if(comm_id %in% names(commid_to_comm)) {
+            
+            if (comm_id %in% names(commid_to_comm)) {
                 comm <- commid_to_comm[[comm_id]]
-
+                
                 data <- request$content$data
                 tryCatch({
                     comm$handle_msg(data)
@@ -142,7 +129,7 @@ CommManager <- setRefClass(
                 log_debug('comm_id not found in comm_msg')
             }
         },
-
+        
         #{
         #  'comm_id' : 'u-u-i-d',
         #  'data' : {}
@@ -150,8 +137,8 @@ CommManager <- setRefClass(
         on_comm_close = function(request) {
             parent_request <<- request
             comm_id <- request$content$comm_id
-
-            if(comm_id %in% names(commid_to_comm)) {
+            
+            if (comm_id %in% names(commid_to_comm)) {
                 comm <- commid_to_comm[[comm_id]]
                 tryCatch({
                     comm$handle_close()
@@ -185,7 +172,7 @@ Comm <- setRefClass(
     ),
     methods = list(
         open = function(msg = list()) {
-            if(!comm_manager$is_comm_registered(.self)) {
+            if (!comm_manager$is_comm_registered(.self)) {
                 comm_manager$register_comm(.self)
                 comm_manager$send_open(id, target_name, msg)
             } else {
@@ -193,14 +180,14 @@ Comm <- setRefClass(
             }
         },
         send = function(msg = list()) {
-            if(comm_manager$is_comm_registered(.self)) {
+            if (comm_manager$is_comm_registered(.self)) {
                 comm_manager$send_msg(id, target_name, msg)
             } else {
                 log_debug('Comm is not opened. Cannot send!')
             }
         },
         close = function(msg = list()) {
-            if(comm_manager$is_comm_registered(.self)) {
+            if (comm_manager$is_comm_registered(.self)) {
                 comm_manager$send_close(id, target_name, msg)
                 comm_manager$unregister_comm(.self)
             } else {
@@ -214,12 +201,12 @@ Comm <- setRefClass(
             close_callback <<- a_close_callback
         },
         handle_msg = function(msg) {
-            if(!is.null(msg_callback)) {
+            if (!is.null(msg_callback)) {
                 msg_callback(msg)
             }
         },
         handle_close = function() {
-            if(!is.null(close_callback)) {
+            if (!is.null(close_callback)) {
                 close_callback()
             }
         }
