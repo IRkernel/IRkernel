@@ -1,11 +1,8 @@
-#' @include execution.r help.r comm_manager.r logging.r utils.r
-NULL
-
-
 #' The kernel
 #' 
 #' Has methods able to connect and talk to a Jupyter server.
 #' 
+#' @include execution.r help.r comm_manager.r logging.r utils.r
 #' @export
 Kernel <- setRefClass(
     'Kernel',

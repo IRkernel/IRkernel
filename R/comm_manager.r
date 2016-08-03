@@ -1,10 +1,8 @@
-#' @include logging.r class_unions.r
-NULL
-
 #' The Comm_Manager
 #'
 #' Has methods able to register comms/targets and process comm messages
 #'
+#' @include logging.r class_unions.r
 #' @export
 Comm_Manager <- setRefClass(
     'Comm_Manager',
