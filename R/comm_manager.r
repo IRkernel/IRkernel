@@ -1,11 +1,11 @@
-#' The Comm_Manager
+#' The CommManager
 #'
 #' Has methods able to register comms/targets and process comm messages
 #'
 #' @include logging.r class_unions.r
 #' @export
-Comm_Manager <- setRefClass(
-    'Comm_Manager',
+CommManager <- setRefClass(
+    'CommManager',
     fields = list(
         send_response = 'function',
         target_to_handler_map = 'list',
@@ -179,7 +179,7 @@ Comm <- setRefClass(
     fields = list(
         id = 'character',
         target_name = 'character',
-        comm_manager = 'Comm_Manager',
+        comm_manager = 'CommManager',
         msg_callback = 'functionOrNULL',
         close_callback = 'functionOrNULL'
     ),

@@ -2,14 +2,14 @@
 % Please edit documentation in R/environment_runtime.r
 \name{comm_manager}
 \alias{comm_manager}
-\title{Get global Comm_Manager instance}
+\title{Get global CommManager instance}
 \usage{
 comm_manager()
 }
 \value{
-\link{Comm_Manager} instance if a kernel is running, else NULL
+\link{CommManager} instance if a kernel is running, else NULL
 }
 \description{
-Get global Comm_Manager instance
+Get global CommManager instance
 }
 

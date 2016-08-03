@@ -2,8 +2,8 @@
 
 comm_manager_env <- new.env()
 
-#' Get global Comm_Manager instance
+#' Get global CommManager instance
 #'
-#' @return \link{Comm_Manager} instance if a kernel is running, else NULL
+#' @return \link{CommManager} instance if a kernel is running, else NULL
 #' @export
 comm_manager <- function() comm_manager_env$comm_manager

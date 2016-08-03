@@ -11,7 +11,7 @@ Kernel <- setRefClass(
         zmqctx          = 'externalptr',
         sockets         = 'list',
         executor        = 'Executor',
-        comm_manager    = 'Comm_Manager'),
+        comm_manager    = 'CommManager'),
     methods = list(
 
 hb_reply = function() {
@@ -313,7 +313,7 @@ initialize = function(connection_file) {
 
     executor <<- Executor$new(send_response = .self$send_response,
         abort_queued_messages = .self$abort_queued_messages)
-    comm_manager <<- Comm_Manager$new(send_response = .self$send_response)
+    comm_manager <<- CommManager$new(send_response = .self$send_response)
     comm_manager_env$comm_manager <- comm_manager
 },
 
