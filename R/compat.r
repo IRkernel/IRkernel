@@ -5,6 +5,7 @@ UNICODE_WARNING <- paste(c(
     'such chars to do comparisons. For more information, please see ',
     'https://github.com/IRkernel/repr/wiki/Problems-with-unicode-on-windows'), collapse = '\n')
 
+#' @importFrom utils capture.output
 warn_unicode_on_windows <- function(code, warn) {
     # Workaround to warn user when code contains potential problematic code
     # https://github.com/IRkernel/repr/issues/28#issuecomment-208810772

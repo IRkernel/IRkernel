@@ -57,6 +57,7 @@ format_stack <- function(calls) {
 }
 
 
+#' @importFrom utils capture.output
 Executor <- setRefClass(
     Class = 'Executor',
     fields = list(
