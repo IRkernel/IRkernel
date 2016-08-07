@@ -1,4 +1,7 @@
 *.ipynb_checkpoints
+__pycache__
+.directory
+.idea
 .Rproj.user
 .RData
 .Rhistory
