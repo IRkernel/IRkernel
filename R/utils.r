@@ -4,7 +4,14 @@ ellip_h <- repr:::.char_fallback('\u22EF', '...')
 skip_repeated <- function(vec) {
     if (length(vec) == 0L)
         return(vec)
-    enc <- rle(vec)
+    
+    if (is.language(vec[[1]])) {  # rle does not work on language items
+        ctb <- as.character(vec)
+        enc <- rle(ctb)
+        enc$values <- match(enc$values, ctb)
+    } else {
+        enc <- rle(vec)
+    }
     i <- which.max(enc$lengths)
     l <- enc$lengths[[i]]
     if (l <= 3) {
