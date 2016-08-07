@@ -4,6 +4,7 @@ Makefile
 .*.ipynb
 ^.*\.Rproj$
 ^\.Rproj\.user$
+.idea/.*$
 [.]pdf$
 example-notebooks/.*$
 ^\.travis\.(sh|yml)$
