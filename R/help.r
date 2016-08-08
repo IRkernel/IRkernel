@@ -36,7 +36,7 @@
 #' @importFrom repr mime2repr repr_option_defaults
 #' 
 #' @docType package
-#' @seealso \link{Kernel-class}, \link{installspec}
+#' @seealso \link{installspec}
 #' @name IRkernel
 #' @aliases IRkernel IRkernel-package IRkernel-options
 NULL

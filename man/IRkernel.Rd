@@ -36,7 +36,7 @@ The following can be set/read via \code{options(opt.name = ...)} / \code{getOpti
 }
 }
 \seealso{
-\link{Kernel-class}, \link{installspec}
+\link{installspec}
 }
 \keyword{datasets}
 
