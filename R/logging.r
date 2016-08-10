@@ -44,7 +44,20 @@ log_msg <- function(lvl, msg) {
 .stderror <- stderr()
 
 log_msg_stderror <- function(lvl, msg) {
-    cat(sprintf('%s: %s\n', lvl, msg) , file = .stderror)
+    cat(sprintf('%s: %s\n', log_color(lvl), msg) , file = .stderror)
+}
+
+#' @importFrom crayon blue
+#' @importFrom crayon green
+#' @importFrom crayon red
+log_color <- function(lvl) {
+    color <- switch(lvl,
+        DEBUG = green,
+        INFO  = blue,
+        ERROR = red,
+        stop('unknown level: ', lvl))
+    
+    color(lvl)
 }
 
 .is_changed_logfile <- local({
