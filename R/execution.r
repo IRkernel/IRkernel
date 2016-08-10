@@ -115,7 +115,7 @@ quit = function(save = 'default', status = 0, runLast = TRUE) {
     payload <<- c(.self$payload, list(list(source = 'ask_exit', keepkernel = FALSE)))
 },
 
-handle_error = function(e) {
+handle_error = function(e) tryCatch({
     log_debug('Error output: %s', toString(e))
     calls <- head(sys.calls()[-seq_len(nframe + 1L)], -3)
     
@@ -129,7 +129,7 @@ handle_error = function(e) {
         send_response('error', current_request, 'iopub', c(err, list(
             execution_count = execution_count)))
     }
-},
+}, error = log_error),
 
 send_plot = function(plotobj) {
     formats <- namedlist()
