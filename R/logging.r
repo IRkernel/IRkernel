@@ -33,7 +33,7 @@ log_error <- function(...) {
     }
 }
 
-log_msg <- function(lvl, msg){
+log_msg <- function(lvl, msg) {
     log_msg_stderror(lvl, msg)
     log_msg_logfile(lvl, msg)
 }
@@ -43,7 +43,7 @@ log_msg <- function(lvl, msg){
 # sink'ed connection...
 .stderror <- stderr()
 
-log_msg_stderror <- function(lvl, msg){
+log_msg_stderror <- function(lvl, msg) {
     cat(sprintf('%s: %s\n', lvl, msg) , file = .stderror)
 }
 

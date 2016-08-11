@@ -147,7 +147,7 @@ send_plot = function(plotobj) {
     publish_mimebundle(formats, metadata)
 },
 
-handle_display_error = function(e){
+handle_display_error = function(e) {
     # This is used with withCallingHandler and only has two additional
     # calls at the end instead of the 3 for tryCatch... (-2 at the end)
     # we also remove the tryCatch and mime2repr stuff at the head of the callstack (+7)
