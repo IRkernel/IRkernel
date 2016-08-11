@@ -15,7 +15,7 @@ For detailed requirements and install instructions see [irkernel.github.io](http
 We will soon submit the IRkernel package to CRAN. Until then, you can install it via the `devtools` package:
 
 ```R
-install.packages(c('repr', 'IRdisplay', 'pbdZMQ', 'devtools'))
+install.packages(c('repr', 'IRdisplay', 'crayon', 'pbdZMQ', 'devtools'))
 devtools::install_github('IRkernel/IRkernel')
 IRkernel::installspec()  # to register the kernel in the current R installation
 ```
