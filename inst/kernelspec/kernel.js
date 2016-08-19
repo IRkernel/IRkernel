@@ -2,6 +2,9 @@ const extra_map = (notebook, cell) => ({
 	['Alt--'](cm) {
 		cm.replaceSelection(' <- ')
 	},
+	['Shift-Ctrl-M'](cm) {
+		cm.replaceSelection(' %>% ')
+	},
 	F1(cm) {
 		const {anchor, head} = cm.findWordAt(cm.getCursor())
 		const word = cm.getRange(anchor, head)
