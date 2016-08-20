@@ -10,7 +10,7 @@ Authors@R: c(
     person('Jan', 'Schulz', role = c('aut', 'cph'), email = 'jasc@gmx.net'),
     person('Karthik', 'Ram', role = c('aut', 'cph'), email = 'karthik.ram@gmail.com'))
 Depends:
-    R (>= 3.0.1)
+    R (>= 3.2.0)
 Suggests:
     testthat,
     roxygen2
