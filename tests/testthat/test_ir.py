@@ -213,6 +213,19 @@ class IRkernelTests(jkt.KernelTests):
         data = output_msgs[0]['content']['data']
         self.assertGreaterEqual(len(data), 1, data.keys())
         self.assertEqual(data['text/plain'], '[1] TRUE', data.keys())
+    
+    def test_warning_message(self):
+        self.flush_channels()
+        reply, output_msgs = self.execute_helper('warning(simpleWarning("wmsg"))')
+        self.assertEqual(output_msgs[0]['msg_type'], 'stream')
+        self.assertEqual(output_msgs[0]['content']['name'], 'stderr')
+        self.assertEqual(output_msgs[0]['content']['text'], 'Warning message:\n“wmsg”')
+        
+        self.flush_channels()
+        reply, output_msgs = self.execute_helper('f <- function() warning("wmsg"); f()')
+        self.assertEqual(output_msgs[0]['msg_type'], 'stream')
+        self.assertEqual(output_msgs[0]['content']['name'], 'stderr')
+        self.assertEqual(output_msgs[0]['content']['text'], 'Warning message in f():\n“wmsg”')
 
 
 if __name__ == '__main__':
