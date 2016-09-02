@@ -89,5 +89,5 @@ test_kernel() (
     R CMD INSTALL "$PKG_TARBALL"
     Rscript -e 'IRkernel::installspec()'
     Rscript -e 'IRkernel::installspec(name = "testir", displayname = "testir")'
-    Rscript -e 'devtools::test()'
+    python3 -W ignore::DeprecationWarning tests/testthat/test_ir.py
 )
