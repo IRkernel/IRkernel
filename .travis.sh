@@ -80,7 +80,7 @@ check_package() (
     LINES=$(grep -v '* .*$' "$CHECK_LOG" | wc -l | sed -e 's/^[[:space:]]*//')
     echo "Lines: $LINES"
     #  4 lines from the "attach" NOTE, 1 lines from the "Status" at the end
-    if [[ "_$LINES" != _5 ]]; then grep -v '* .*$' "$CHECK_LOG"; false; fi
+    if [[ "_$LINES" != _6 ]]; then grep -v '* .*$' "$CHECK_LOG"; false; fi
 )
 
 test_kernel() (
