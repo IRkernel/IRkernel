@@ -56,7 +56,6 @@ script:
   - fold_wrap 'Exporting variables' export_variables
   - fold_wrap 'Building Package' build_package
   - fold_wrap 'Checking Package' check_package
-  - fold_wrap 'Testing Kernel' test_kernel
     
 after_failure:
   - cat "$CHECK_LOG"

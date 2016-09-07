@@ -84,12 +84,3 @@ check_package() (
     #  1 lines from the "Status" at the end
     if [[ "_$LINES" != _9 ]]; then grep -v '* .*$' "$CHECK_LOG"; false; fi
 )
-
-test_kernel() (
-    set -ex
-    
-    R CMD INSTALL "$PKG_TARBALL"
-    Rscript -e 'IRkernel::installspec()'
-    Rscript -e 'IRkernel::installspec(name = "testir", displayname = "testir")'
-    Rscript -e 'devtools::test()'
-)
