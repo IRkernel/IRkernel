@@ -20,7 +20,9 @@ find_jupyter <- function() {
 #' @param user         Install into user directory (~/.jupyter or ~/.ipython) or globally?
 #' @param name         The name of the kernel (default "ir")
 #' @param displayname  The name which is displayed in the notebook (default: "R")
-#'
+#' 
+#' @return Exit code of the \code{jupyter kernelspec install} call.
+#' 
 #' @export
 installspec <- function(user = TRUE, name = 'ir', displayname = 'R') {
     jupyter <- find_jupyter()
@@ -39,10 +41,12 @@ installspec <- function(user = TRUE, name = 'ir', displayname = 'R') {
     spec$argv[[1]] <- file.path(R.home('bin'), 'R')
     spec$display_name <- displayname
     write(toJSON(spec, pretty = TRUE, auto_unbox = TRUE), file = spec_path)
-
+    
     user_flag <- if (user) '--user' else character(0)
     args <- c('kernelspec', 'install', '--replace', '--name', name, user_flag, file.path(tmp_name, 'kernelspec'))
-    system2(jupyter$binary, args, wait = TRUE)
-
+    exit_code <- system2(jupyter$binary, args)
+    
     unlink(tmp_name, recursive = TRUE)
+    
+    invisible(exit_code)
 }

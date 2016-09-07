@@ -13,6 +13,9 @@ installspec(user = TRUE, name = "ir", displayname = "R")
 
 \item{displayname}{The name which is displayed in the notebook (default: "R")}
 }
+\value{
+Exit code of the \code{jupyter kernelspec install} call.
+}
 \description{
 Will use jupyter and its config directory if available, but fall back to ipython if not.
 }
