@@ -29,3 +29,9 @@ fromRawJSON <- function(r) {
     Encoding(s) <- 'UTF-8'
     fromJSON(s)
 }
+
+set_last_value <- function(obj) {
+    unlockBinding(".Last.value", .BaseNamespaceEnv)
+    assign(".Last.value", obj, .BaseNamespaceEnv)
+    lockBinding(".Last.value", .BaseNamespaceEnv)
+}
