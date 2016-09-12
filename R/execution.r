@@ -160,15 +160,18 @@ handle_display_error = function(e) {
     send_error_msg(msg)
 },
 
-handle_value = function(obj) {
+handle_value = function(obj, visible) {
     log_debug('Value output...')
-    mimebundle <- prepare_mimebundle_kernel(obj, .self$handle_display_error)
-    if (length(intersect(class(obj), getOption('jupyter.pager_classes'))) > 0) {
-        log_debug('Showing pager: %s', paste(capture.output(str(mimebundle$data)), collapse = '\n'))
-        page(mimebundle)
-    } else {
-        log_debug('Sending display_data: %s', paste(capture.output(str(mimebundle$data)), collapse = '\n'))
-        send_response('display_data', current_request, 'iopub', mimebundle)
+    set_last_value(obj)
+    if (visible) {
+        mimebundle <- prepare_mimebundle_kernel(obj, .self$handle_display_error)
+        if (length(intersect(class(obj), getOption('jupyter.pager_classes'))) > 0) {
+            log_debug('Showing pager: %s', paste(capture.output(str(mimebundle$data)), collapse = '\n'))
+            page(mimebundle)
+        } else {
+            log_debug('Sending display_data: %s', paste(capture.output(str(mimebundle$data)), collapse = '\n'))
+            send_response('display_data', current_request, 'iopub', mimebundle)
+        }
     }
 },
 
