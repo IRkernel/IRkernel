@@ -18,7 +18,7 @@ class IRkernelTests(jkt.KernelTests):
 
     language_name = 'R'
 
-    def _execute_code(self, code, tests=True):
+    def _execute_code(self, code, tests=True, silent=False, store_history=True):
         self.flush_channels()
 
         reply, output_msgs = self.execute_helper(code)
@@ -217,6 +217,27 @@ class IRkernelTests(jkt.KernelTests):
         self.assertEqual(output_msgs[0]['msg_type'], 'stream')
         self.assertEqual(output_msgs[0]['content']['name'], 'stderr')
         self.assertEqual(output_msgs[0]['content']['text'], 'Warning message in f():\n“wmsg”')
+
+    def test_should_increment_history(self):
+        """properly increments execution history"""
+        code = 'data.frame(x = 1:3)'
+        reply, output_msgs = self._execute_code(code)
+        reply2, output_msgs2 = self._execute_code(code)
+        execution_count_1 = reply['content']['execution_count']
+        execution_count_2 = reply2['content']['execution_count']
+        self.assertEqual(execution_count_1 + 1, execution_count_2)
+
+    def test_should_not_increment_history(self):
+        """Does not increment history if silent is true or store_history is false"""
+        code = 'data.frame(x = 1:3)'
+        reply, output_msgs = self._execute_code(code, store_history=False)
+        reply2, output_msgs2 = self._execute_code(code, store_history=False)
+        reply3, output_msgs3 = self._execute_code(code, tests=False, silent=True)
+        execution_count_1 = reply['content']['execution_count']
+        execution_count_2 = reply2['content']['execution_count']
+        execution_count_3 = reply3['content']['execution_count']
+        self.assertEqual(execution_count_1, execution_count_2)
+        self.assertEqual(execution_count_1, execution_count_3)
 
 
 if __name__ == '__main__':
