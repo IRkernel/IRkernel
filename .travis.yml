@@ -49,7 +49,7 @@ before_script:
   - export PATH="$HOME/miniconda/bin:$PATH"
   - create_conda_environment
   - source activate test-environment
-  - pip install jupyter_kernel_test
+  - pip install jupyter_kernel_test ndjson-testrunner
 
 
 script:
