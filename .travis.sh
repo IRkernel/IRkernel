@@ -81,6 +81,7 @@ check_package() (
     echo "Lines: $LINES"
     #  4 lines from the "attach" NOTE,
     #  4 lines from the ".Last.value" NOTE,
-    #  1 lines from the "Status" at the end
-    if [[ "_$LINES" != _9 ]]; then grep -v '* .*$' "$CHECK_LOG"; false; fi
+    #  1 line  for "Running testthat.R"
+    #  1 line  from the "Status" at the end
+    if [[ "_$LINES" != _10 ]]; then grep -v '* .*$' "$CHECK_LOG"; false; fi
 )
