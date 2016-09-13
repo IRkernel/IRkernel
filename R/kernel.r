@@ -180,10 +180,10 @@ is_complete = function(request) {
     status <- if (message == 'complete') {
         # syntactical complete code
         'complete'
-    } else if (grepl('unexpected end of input', message)) {
+    } else if (grepl(gettext('unexpected end of input', domain = 'R'), message, fixed = TRUE)) {
         # missing closing parenthesis
         'incomplete'
-    } else if (grepl('unexpected INCOMPLETE_STRING', message)) {
+    } else if (grepl(gettextf('unexpected %s', 'INCOMPLETE_STRING', domain = 'R'), message, fixed = TRUE)) {
         # missing closing quotes
         'incomplete'
     } else {
