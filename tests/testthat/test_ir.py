@@ -13,17 +13,8 @@ options(jupyter.rich_display = TRUE)
 #withr::with_options(list(jupyter.rich_display = FALSE), {})
 
 
-class InstallspecTests(jkt.KernelTests):
-    # just a small test, it's the same kernel after all...
-    kernel_name = 'testir'
-
-    language_name = 'R'
-
-    code_hello_world = 'print("hello, world")'
-
-
 class IRkernelTests(jkt.KernelTests):
-    kernel_name = 'ir'
+    kernel_name = 'testir'
 
     language_name = 'R'
 
