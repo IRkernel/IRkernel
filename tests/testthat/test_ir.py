@@ -21,7 +21,7 @@ class IRkernelTests(jkt.KernelTests):
     def _execute_code(self, code, tests=True, silent=False, store_history=True):
         self.flush_channels()
 
-        reply, output_msgs = self.execute_helper(code)
+        reply, output_msgs = self.execute_helper(code, silent=silent, store_history=store_history)
 
         self.assertEqual(reply['content']['status'], 'ok', '{0}: {0}'.format(reply['content'].get('ename'), reply['content'].get('evalue')))
         if tests:
