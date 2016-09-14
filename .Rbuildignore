@@ -9,5 +9,4 @@ Makefile
 example-notebooks/.*$
 ^\.travis\.(sh|yml)$
 Dockerfile
-test_ir.py
 cran-comments.md
