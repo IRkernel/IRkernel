@@ -76,6 +76,10 @@ is_silent = function() {
     current_request$content$silent
 },
 
+should_store_history = function() {
+    current_request$content$store_history
+},
+
 send_error_msg = function(msg) {
     if (!is_silent()) return()
     send_response('stream', current_request, 'iopub',
@@ -289,7 +293,7 @@ execute = function(request) {
         abort_queued_messages()
     }
 
-    if (!is_silent()) {
+    if (!is_silent() && should_store_history()) {
         execution_count <<- execution_count + 1L
     }
 },
