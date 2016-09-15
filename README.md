@@ -72,5 +72,6 @@ On other platforms without docker, this can be started using `docker-machine` by
 
 ```bash
 make docker_dev_image #builds dev image and installs IRkernel dependencies from github
-make docker_dev #mounts source, installs, and runs Jupyter notebook
+make docker_dev #mounts source, installs, and runs Jupyter notebook; docker_dev_image is a prerequisite
+make docker_test #builds the package from source then runs the tests via R CMD check; docker_dev_image is a prerequisite
 ```

@@ -1,4 +1,4 @@
-.PHONY: IRkernel.pdf docs check test docker_dev_image docker_dev
+.PHONY: IRkernel.pdf docs check test docker_dev_image docker_dev docker_test
 
 DEV_IMAGE:=jupyter/r-notebook-dev
 
@@ -23,3 +23,10 @@ docker_dev: docker_dev_image
 	-v `pwd`:/src_irkernel \
 	$(DEV_IMAGE) bash -c 'R CMD INSTALL -l /opt/conda/lib/R/library /src_irkernel && \
 	                        jupyter notebook --no-browser --port 8888 --ip='*''
+
+docker_test: docker_dev_image
+	@echo 'Running IRkernel tests'
+	@docker run -it --rm \
+		-v `pwd`:/src_irkernel \
+		$(DEV_IMAGE) bash -c 'R CMD build /src_irkernel && \
+		R CMD check IRkernel*.tar.gz'
