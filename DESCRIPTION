@@ -27,7 +27,6 @@ Imports:
     jsonlite (>= 0.9.6),
     uuid,
     digest
-Remotes: IRKernel/IRdisplay,
 Collate:
     'class_unions.r'
     'logging.r'
