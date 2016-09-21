@@ -71,9 +71,7 @@ init_null_device <- function() {
     # 2. can handle /dev/null (unlike OSX devices)
     # since there is nothing like that on OSX AFAIK, use pdf there (accepting warnings).
     
-    os <- switch(.Platform$OS.type,
-        windows = 'win',
-        unix = if (identical(Sys.info()[['sysname']], 'Darwin')) 'osx' else 'unix')
+    os <- get_os()
     
     ok_device     <- switch(os, win = png,   osx = pdf,  unix = png)
     null_filename <- switch(os, win = 'NUL', osx = NULL, unix = '/dev/null')

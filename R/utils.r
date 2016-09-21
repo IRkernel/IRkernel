@@ -35,3 +35,7 @@ set_last_value <- function(obj) {
     assign(".Last.value", obj, .BaseNamespaceEnv)
     lockBinding(".Last.value", .BaseNamespaceEnv)
 }
+
+get_os <- function() switch(.Platform$OS.type,
+    windows = 'win',
+    unix = if (identical(Sys.info()[['sysname']], 'Darwin')) 'osx' else 'unix')
