@@ -307,7 +307,8 @@ initialize = function(...) {
             text <- c(text, header, readLines(path))
         }
         if (delete.file) file.remove(files)
-        page(list('text/plain' = paste(text, collapse = '\n')))
+        data <- list('text/plain' = paste(text, collapse = '\n'))
+        page(list(data=data, metadata=namedlist()))
     })
     options(jupyter.base_display_func = .self$display_data)
     # Create the shadow env here and detach it finalize
