@@ -121,6 +121,7 @@ handle_shell = function() {
         history_request     = history(msg),
         complete_request    = complete(msg),
         is_complete_request = is_complete(msg),
+        inspect_request     = inspect(msg),
         shutdown_request    = shutdown(msg),
         print(c('Got unhandled msg_type:', msg$header$msg_type)))
         
@@ -240,6 +241,79 @@ complete = function(request) {
         status = 'ok',
         cursor_start = start_position,
         cursor_end = start_position + nchar(c.info$token)))
+},
+
+inspect = function(request) {
+    # 5.0 protocol:
+    code <- request$content$code
+    cursor_pos <- request$content$cursor_pos
+
+    # Get token under the cursor_pos.
+    # There may be better ways to do that than this.
+    topic <- ""
+    for (i in seq(cursor_pos, nchar(code))) {
+        topic_candidate <- utils:::.guessTokenFromLine(code, i)
+        if (!grepl(topic, topic_candidate)) break
+        topic <- topic_candidate
+    }
+    help_filename <- as.character(eval(parse(text = paste0("?", topic))))
+    if (length(help_filename) == 0L) {
+        # We can't get help document for the names other than functions or packages.
+        # However, there should be some good inspection for object other than the help document.
+        data <- list()
+        found <- FALSE
+    } else if (length(help_filename) == 1L) {
+        data <- list(
+            "text/plain" = paste(capture.output(tools:::Rd2txt(utils:::.getHelpFile(help_filename))), collapse = ""),
+            "text/html" = paste(capture.output(tools:::Rd2HTML(utils:::.getHelpFile(help_filename))), collapse = ""))
+        found <- TRUE
+    } else if (length(help_filename) > 1L) {
+        # Large parts of the codes in this clause are based on
+        # the implementation of `utils:::print.help_files_with_topic()`
+        paths <- unique(dirname(dirname(help_filename)))
+        msg <- gettextf("Help for topic %s is not in any loaded package but can be found in the following packages:", 
+            sQuote(topic))
+
+        data_text <- c(strwrap(msg), "", paste(" ", formatDL(c(gettext("Package"), 
+                basename(paths)), c(gettext("Library"), dirname(paths)), 
+                indent = 22)))
+        data_text <- paste(data_text, collapse = "")
+        if ("function" %in% class(tools:::httpdPort)) {
+            httpdPort <- tools:::httpdPort()
+        } else {
+            httpdPort <- tools:::httpdPort
+        }
+        httpdPort <- httpdPort()
+        if (httpdPort > 0L) {
+            data_html <- paste0("<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n", 
+                "<html><head><title>R: help</title>\n", "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=\"UTF-8\">\n", 
+                "<link rel=\"stylesheet\" type=\"text/css\" href=\"/doc/html/R.css\">\n", 
+                "</head><body>\n\n<hr>\n")
+            data_html <- c(data_html, "<p>", msg, "</p><br>")
+            data_html <- c(data_html, "<table width=\"100%\" summary=\"R Package list\">\n", 
+                "<tr align=\"left\" valign=\"top\">\n", "<td width=\"25%\">Package</td><td>Library</td></tr>\n")
+            pkgs <- basename(paths)
+            links <- paste0("<a href=\"http://127.0.0.1:", httpdPort, 
+                "/library/", pkgs, "/help/", topic, "\">", pkgs, 
+                "</a>")
+            data_html <- c(data_html, paste0("<tr align=\"left\" valign=\"top\">\n", 
+                "<td>", links, "</td><td>", dirname(paths), "</td></tr>\n"))
+            data_html <- c(data_html, "</table>\n</p>\n<hr>\n</body></html>")
+            data_html <- paste(data_html, collapse = "")
+            data <- list(
+                "text/plain" = data_text,
+                "text/html" = data_html)
+        } else {
+            data <- list("text/plain" = data_text)
+        }
+        found <- TRUE
+    }
+    send_response('inspect_reply', request, 'shell', list(
+        status = 'ok',
+        found = found,
+        data = data,
+        metadata = namedlist()
+        ))
 },
 
 history = function(request) {
