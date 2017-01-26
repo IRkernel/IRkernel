@@ -244,69 +244,82 @@ complete = function(request) {
 },
 
 inspect = function(request) {
+    make_section_header_plain <- function (txt) paste0("# ", txt, ":\n")
+    make_section_header_html <- function (txt) paste0("<h1>", txt, ":</h1>\n")
     # 5.0 protocol:
     code <- request$content$code
     cursor_pos <- request$content$cursor_pos
 
     # Get token under the cursor_pos.
     # There may be better ways to do that than this.
-    topic <- ""
+    token <- ""
     for (i in seq(cursor_pos, nchar(code))) {
         topic_candidate <- utils:::.guessTokenFromLine(code, i)
-        if (!grepl(topic, topic_candidate)) break
-        topic <- topic_candidate
+        if (!grepl(token, topic_candidate)) break
+        token <- topic_candidate
     }
-    help_filename <- as.character(eval(parse(text = paste0("?", topic))))
-    if (length(help_filename) == 0L) {
-        # We can't get help document for the names other than functions or packages.
-        # However, there should be some good inspection for object other than the help document.
+
+    if (nchar(token) == 0) {
         data <- list()
         found <- FALSE
-    } else if (length(help_filename) == 1L) {
-        data <- list(
-            "text/plain" = paste(capture.output(tools:::Rd2txt(utils:::.getHelpFile(help_filename))), collapse = ""),
-            "text/html" = paste(capture.output(tools:::Rd2HTML(utils:::.getHelpFile(help_filename))), collapse = ""))
-        found <- TRUE
-    } else if (length(help_filename) > 1L) {
-        # Large parts of the codes in this clause are based on
-        # the implementation of `utils:::print.help_files_with_topic()`
-        paths <- unique(dirname(dirname(help_filename)))
-        msg <- gettextf("Help for topic %s is not in any loaded package but can be found in the following packages:", 
-            sQuote(topic))
+    } else {
+        data <- list()
 
-        data_text <- c(strwrap(msg), "", paste(" ", formatDL(c(gettext("Package"), 
-                basename(paths)), c(gettext("Library"), dirname(paths)), 
-                indent = 22)))
-        data_text <- paste(data_text, collapse = "")
-        if ("function" %in% class(tools:::httpdPort)) {
-            httpdPort <- tools:::httpdPort()
-        } else {
-            httpdPort <- tools:::httpdPort
+        class_data <- tryCatch(
+            eval(parse(text = paste0("class(", token, ")"))),
+            error = function (e) character(0))
+        if (length(class_data) != 0) {
+            section_title <- "Class attribute"
+            body <- paste(class_data, collapse = " ")
+            data[["text/plain"]] <- paste0(
+                make_section_header_plain(section_title),
+                body,
+                "\n\n")
+            data[["text/html"]] <- paste0(
+                make_section_header_html(section_title),
+                body,
+                "\n")
         }
-        httpdPort <- httpdPort()
-        if (httpdPort > 0L) {
-            data_html <- paste0("<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n", 
-                "<html><head><title>R: help</title>\n", "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=\"UTF-8\">\n", 
-                "<link rel=\"stylesheet\" type=\"text/css\" href=\"/doc/html/R.css\">\n", 
-                "</head><body>\n\n<hr>\n")
-            data_html <- c(data_html, "<p>", msg, "</p><br>")
-            data_html <- c(data_html, "<table width=\"100%\" summary=\"R Package list\">\n", 
-                "<tr align=\"left\" valign=\"top\">\n", "<td width=\"25%\">Package</td><td>Library</td></tr>\n")
-            pkgs <- basename(paths)
-            links <- paste0("<a href=\"http://127.0.0.1:", httpdPort, 
-                "/library/", pkgs, "/help/", topic, "\">", pkgs, 
-                "</a>")
-            data_html <- c(data_html, paste0("<tr align=\"left\" valign=\"top\">\n", 
-                "<td>", links, "</td><td>", dirname(paths), "</td></tr>\n"))
-            data_html <- c(data_html, "</table>\n</p>\n<hr>\n</body></html>")
-            data_html <- paste(data_html, collapse = "")
-            data <- list(
-                "text/plain" = data_text,
-                "text/html" = data_html)
-        } else {
-            data <- list("text/plain" = data_text)
+
+        code_to_get_print_mimebundle <- paste0("IRdisplay::prepare_mimebundle(", token, ")")
+        print_data <- tryCatch(
+            eval(parse(text = code_to_get_print_mimebundle))$data,
+            error = function (e) list())
+        if (length(print_data) != 0) {
+            section_title <- "Printed form"
+            data[["text/plain"]] <- paste0(
+                data[["text/plain"]],
+                make_section_header_plain(section_title),
+                print_data[["text/plain"]],
+                "\n\n")
+            data[["text/html"]] <- paste0(
+                data[["text/html"]],
+                make_section_header_html(section_title),
+                print_data[["text/html"]],
+                "\n")
         }
-        found <- TRUE
+
+        code_to_get_help_mimebundle <- paste0("IRdisplay::prepare_mimebundle(?", token, ")")
+        help_data <- tryCatch({
+            help_filename <- as.character(eval(parse(text = paste0("?", token))))
+            if (length(help_filename) > 0) {
+                help_data <- eval(parse(text = code_to_get_help_mimebundle))$data
+            }},
+            error = function (e) list())
+        if (length(help_data) != 0) {
+            section_title <- "Help document"
+            data[["text/plain"]] <- paste0(
+                data[["text/plain"]],
+                make_section_header_plain(section_title),
+                help_data[["text/plain"]],
+                "\n\n")
+            data[["text/html"]] <- paste0(
+                data[["text/html"]],
+                make_section_header_html(section_title),
+                help_data[["text/html"]],
+                "\n")
+        }
+        found <- (length(data) != 0)
     }
     send_response('inspect_reply', request, 'shell', list(
         status = 'ok',
