@@ -250,8 +250,8 @@ inspect = function(request) {
 
 
     section_templates <- list(
-        "text/plain" = "# %1s:\n%2s\n\n",
-        "text/html" = "<h1> %1s:</h1>\n%2s\n\n")
+        'text/plain' = '# %1s:\n%2s\n\n',
+        'text/html' = '<h1> %1s:</h1>\n%2s\n\n')
 
     add_new_section <- function (data, section_name, new_data) {
         for (mime in names(section_templates)) {
@@ -263,7 +263,7 @@ inspect = function(request) {
 
     # Get token under the cursor_pos.
     # There may be better ways to do that than this.
-    token <- ""
+    token <- ''
     for (i in seq(cursor_pos, nchar(code))) {
         topic_candidate <- utils:::.guessTokenFromLine(code, i)
         if (!grepl(token, topic_candidate)) break
@@ -279,22 +279,22 @@ inspect = function(request) {
         class_data <- tryCatch(
             IRdisplay::prepare_mimebundle(class(token)),
             error = function (e) list())
-        data <- add_new_section(data, "Class attribute", class_data)
+        data <- add_new_section(data, 'Class attribute', class_data)
 
-        code_to_get_print_mimebundle <- paste0("IRdisplay::prepare_mimebundle(", token, ")")
+        code_to_get_print_mimebundle <- paste0('IRdisplay::prepare_mimebundle(', token, ')')
         print_data <- tryCatch(
             eval(parse(text = code_to_get_print_mimebundle))$data,
             error = function (e) list())
-        data <- add_new_section(data, "Printed form", print_data)
+        data <- add_new_section(data, 'Printed form', print_data)
 
-        code_to_get_help_mimebundle <- paste0("IRdisplay::prepare_mimebundle(?", token, ")")
+        code_to_get_help_mimebundle <- paste0('IRdisplay::prepare_mimebundle(?', token, ')')
         help_data <- tryCatch({
-            help_filename <- as.character(eval(parse(text = paste0("?", token))))
+            help_filename <- as.character(eval(parse(text = paste0('?', token))))
             if (length(help_filename) > 0) {
                 help_data <- eval(parse(text = code_to_get_help_mimebundle))$data
             }},
             error = function (e) list())
-        data <- add_new_section(data, "Help document", help_data)
+        data <- add_new_section(data, 'Help document', help_data)
         found <- (length(data) != 0)
     }
     send_response('inspect_reply', request, 'shell', list(
