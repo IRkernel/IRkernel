@@ -244,11 +244,22 @@ complete = function(request) {
 },
 
 inspect = function(request) {
-    make_section_header_plain <- function (txt) paste0("# ", txt, ":\n")
-    make_section_header_html <- function (txt) paste0("<h1>", txt, ":</h1>\n")
     # 5.0 protocol:
     code <- request$content$code
     cursor_pos <- request$content$cursor_pos
+
+
+    section_templates <- list(
+        "text/plain" = "# %1s:\n%2s\n\n",
+        "text/html" = "<h1> %1s:</h1>\n%2s\n\n")
+
+    add_new_section <- function (data, section_name, new_data) {
+        for (mime in names(section_templates)) {
+            new_section <- sprintf(section_templates[[mime]], section_name, new_data[[mime]])
+            data[[mime]] <- paste0(data[[mime]], new_section)
+        }
+        return(data)
+    }
 
     # Get token under the cursor_pos.
     # There may be better ways to do that than this.
@@ -266,38 +277,15 @@ inspect = function(request) {
         data <- list()
 
         class_data <- tryCatch(
-            eval(parse(text = paste0("class(", token, ")"))),
-            error = function (e) character(0))
-        if (length(class_data) != 0) {
-            section_title <- "Class attribute"
-            body <- paste(class_data, collapse = " ")
-            data[["text/plain"]] <- paste0(
-                make_section_header_plain(section_title),
-                body,
-                "\n\n")
-            data[["text/html"]] <- paste0(
-                make_section_header_html(section_title),
-                body,
-                "\n")
-        }
+            IRdisplay::prepare_mimebundle(class(token)),
+            error = function (e) list())
+        data <- add_new_section(data, "Class attribute", class_data)
 
         code_to_get_print_mimebundle <- paste0("IRdisplay::prepare_mimebundle(", token, ")")
         print_data <- tryCatch(
             eval(parse(text = code_to_get_print_mimebundle))$data,
             error = function (e) list())
-        if (length(print_data) != 0) {
-            section_title <- "Printed form"
-            data[["text/plain"]] <- paste0(
-                data[["text/plain"]],
-                make_section_header_plain(section_title),
-                print_data[["text/plain"]],
-                "\n\n")
-            data[["text/html"]] <- paste0(
-                data[["text/html"]],
-                make_section_header_html(section_title),
-                print_data[["text/html"]],
-                "\n")
-        }
+        data <- add_new_section(data, "Printed form", print_data)
 
         code_to_get_help_mimebundle <- paste0("IRdisplay::prepare_mimebundle(?", token, ")")
         help_data <- tryCatch({
@@ -306,19 +294,7 @@ inspect = function(request) {
                 help_data <- eval(parse(text = code_to_get_help_mimebundle))$data
             }},
             error = function (e) list())
-        if (length(help_data) != 0) {
-            section_title <- "Help document"
-            data[["text/plain"]] <- paste0(
-                data[["text/plain"]],
-                make_section_header_plain(section_title),
-                help_data[["text/plain"]],
-                "\n\n")
-            data[["text/html"]] <- paste0(
-                data[["text/html"]],
-                make_section_header_html(section_title),
-                help_data[["text/html"]],
-                "\n")
-        }
+        data <- add_new_section(data, "Help document", help_data)
         found <- (length(data) != 0)
     }
     send_response('inspect_reply', request, 'shell', list(
