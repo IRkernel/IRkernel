@@ -248,7 +248,6 @@ inspect = function(request) {
     code <- request$content$code
     cursor_pos <- request$content$cursor_pos
 
-
     section_templates <- list(
         'text/plain' = '# %1s:\n%2s\n\n',
         'text/html' = '<h1> %1s:</h1>\n%2s\n\n')
@@ -265,9 +264,9 @@ inspect = function(request) {
     # There may be better ways to do that than this.
     token <- ''
     for (i in seq(cursor_pos, nchar(code))) {
-        topic_candidate <- utils:::.guessTokenFromLine(code, i)
-        if (!grepl(token, topic_candidate)) break
-        token <- topic_candidate
+        token_candidate <- utils:::.guessTokenFromLine(code, i)
+        if (nchar(token_candidate) == 0) break
+        token <- token_candidate
     }
 
     if (nchar(token) == 0) {
