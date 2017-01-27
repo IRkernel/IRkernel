@@ -273,25 +273,19 @@ inspect = function(request) {
         data <- list()
         found <- FALSE
     } else {
+        obj <- get(token)
         data <- list()
 
-        class_data <- tryCatch(
-            IRdisplay::prepare_mimebundle(class(token)),
-            error = function (e) list())
+        class_data <- IRdisplay::prepare_mimebundle(class(obj))$data
         data <- add_new_section(data, 'Class attribute', class_data)
 
-        code_to_get_print_mimebundle <- paste0('IRdisplay::prepare_mimebundle(', token, ')')
-        print_data <- tryCatch(
-            eval(parse(text = code_to_get_print_mimebundle))$data,
-            error = function (e) list())
+        print_data <- IRdisplay::prepare_mimebundle(obj)$data
         data <- add_new_section(data, 'Printed form', print_data)
 
         code_to_get_help_mimebundle <- paste0('IRdisplay::prepare_mimebundle(?', token, ')')
         help_data <- tryCatch({
-            help_filename <- as.character(eval(parse(text = paste0('?', token))))
-            if (length(help_filename) > 0) {
                 help_data <- eval(parse(text = code_to_get_help_mimebundle))$data
-            }},
+            },
             error = function (e) list())
         data <- add_new_section(data, 'Help document', help_data)
         found <- (length(data) != 0)
