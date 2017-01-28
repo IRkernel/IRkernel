@@ -298,6 +298,11 @@ class IRkernelTests(jkt.KernelTests):
             'f',
             preprocess='f <- function (x) x + x',
             postprocess='rm("f")')
+        # Object which masks other object in workspace
+        test_token_is_ok(
+            'c',
+            preprocess='c <- function (x) x + x',
+            postprocess='rm("c")')
 
 
 if __name__ == '__main__':
