@@ -248,14 +248,27 @@ inspect = function(request) {
     code <- request$content$code
     cursor_pos <- request$content$cursor_pos
 
-    section_templates <- list(
-        'text/plain' = '# %1s:\n%2s\n\n',
-        'text/html' = '<h1> %1s:</h1>\n%2s\n\n')
+    # Define functions to add a section to content.
+    add_new_section_plain_text <- function (content, section_name, new_content) {
+        if (is.null(new_content)) return(content)
+        title <- paste0('# ', section_name, ':\n')
+        return(paste0(content, title, new_content, '\n', sep = '\n'))
+    }
+
+    add_new_section_html <- function (content, section_name, new_content) {
+        if (is.null(new_content)) return(content)
+        title <- paste0('<h1>', section_name, ':</h1>\n')
+        return(paste0(content, title, new_content, '\n', sep = '\n'))
+    }
+
+    new_section_adders <- list(
+        'text/plain' = add_new_section_plain_text,
+        'text/html' = add_new_section_html)
 
     add_new_section <- function (data, section_name, new_data) {
-        for (mime in names(section_templates)) {
-            new_section <- sprintf(section_templates[[mime]], section_name, new_data[[mime]])
-            data[[mime]] <- paste0(data[[mime]], new_section)
+        for (mime in names(new_section_adders)) {
+            data[[mime]] <- new_section_adders[[mime]](
+                data[[mime]], section_name, new_data[[mime]])
         }
         return(data)
     }
@@ -269,27 +282,28 @@ inspect = function(request) {
         token <- token_candidate
     }
 
-    if (nchar(token) == 0) {
-        data <- list()
-        found <- FALSE
-    } else {
-        obj <- get(token)
-        data <- list()
+    data <- namedlist()
+    if (nchar(token) != 0) {
+        tryCatch(
+            {
+                obj <- eval(parse(text = token))
 
-        class_data <- IRdisplay::prepare_mimebundle(class(obj))$data
-        data <- add_new_section(data, 'Class attribute', class_data)
+                class_data <- IRdisplay::prepare_mimebundle(class(obj))$data
+                data <- add_new_section(data, 'Class attribute', class_data)
 
-        print_data <- IRdisplay::prepare_mimebundle(obj)$data
-        data <- add_new_section(data, 'Printed form', print_data)
-
-        code_to_get_help_mimebundle <- paste0('IRdisplay::prepare_mimebundle(?', token, ')')
-        help_data <- tryCatch({
-                help_data <- eval(parse(text = code_to_get_help_mimebundle))$data
+                print_data <- IRdisplay::prepare_mimebundle(obj)$data
+                data <- add_new_section(data, 'Printed form', print_data)
             },
-            error = function (e) list())
-        data <- add_new_section(data, 'Help document', help_data)
-        found <- (length(data) != 0)
+            error = function (e) NULL)
+        tryCatch(
+            {
+                help_obj <- eval(parse(text = paste0('?', token)))
+                help_data <- IRdisplay::prepare_mimebundle(help_obj)$data
+                data <- add_new_section(data, 'Help document', help_data)
+            },
+            error = function (e) NULL)
     }
+    found <- (length(data) != 0)
     send_response('inspect_reply', request, 'shell', list(
         status = 'ok',
         found = found,
