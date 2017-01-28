@@ -259,9 +259,7 @@ class IRkernelTests(jkt.KernelTests):
             fix the tests beow and check the contents.
             """
             if preprocess:
-                msg_id = self.kc.execute(preprocess, silent=True)
-                reply = self.kc.get_shell_msg(timeout=TIMEOUT)
-                validate_message(reply, 'execute_reply', msg_id)
+                self._execute_code(preprocess, tests=False)
 
             msg_id = self.kc.inspect(token)
             reply = self.kc.get_shell_msg(timeout=TIMEOUT)
@@ -272,9 +270,7 @@ class IRkernelTests(jkt.KernelTests):
             self.assertGreaterEqual(len(reply['content']['data']), 1)
 
             if postprocess:
-                msg_id = self.kc.execute(preprocess, silent=True)
-                reply = self.kc.get_shell_msg(timeout=TIMEOUT)
-                validate_message(reply, 'execute_reply', msg_id)
+                self._execute_code(postprocess, tests=False)
 
         # Built-in constants
         test_token_is_ok('1')
