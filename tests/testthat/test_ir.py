@@ -288,17 +288,20 @@ class IRkernelTests(jkt.KernelTests):
         test_token_is_ok(
             'x',
             preprocess='x <- 1',
-            postprocess='rm("x")')
+            postprocess='rm("x")'
+        )
         # User-defined function
         test_token_is_ok(
             'f',
             preprocess='f <- function (x) x + x',
-            postprocess='rm("f")')
+            postprocess='rm("f")'
+        )
         # Object which masks other object in workspace
         test_token_is_ok(
             'c',
             preprocess='c <- function (x) x + x',
-            postprocess='rm("c")')
+            postprocess='rm("c")'
+        )
 
 
 if __name__ == '__main__':

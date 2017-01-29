@@ -248,33 +248,24 @@ inspect = function(request) {
     code <- request$content$code
     cursor_pos <- request$content$cursor_pos
 
-    # Define functions to add a section to content.
-    add_new_section_plain_text <- function (content, section_name, new_content) {
-        if (is.null(new_content)) return(content)
-        title <- paste0('# ', section_name, ':\n')
-        return(paste0(content, title, new_content, '\n', sep = '\n'))
-    }
-
-    add_new_section_html <- function (content, section_name, new_content) {
-        if (is.null(new_content)) return(content)
-        title <- paste0('<h1>', section_name, ':</h1>\n')
-        return(paste0(content, title, new_content, '\n', sep = '\n'))
-    }
-
-    new_section_adders <- list(
-        'text/plain' = add_new_section_plain_text,
-        'text/html' = add_new_section_html)
-
+    title_templates <- list(
+        'text/plain' = '# %s:\n',
+        'text/html' = '<h1>%s:</h1>\n')
+    # Function to add a section to content.
     add_new_section <- function (data, section_name, new_data) {
         for (mime in names(new_section_adders)) {
-            data[[mime]] <- new_section_adders[[mime]](
-                data[[mime]], section_name, new_data[[mime]])
+            new_content <- new_data[[mime]]
+            if (is.null(new_content)) next
+            title <- sprintf(title_templates, section_name)
+            # use paste0 since sprintf cannot deal with format strings > 8192 bytes
+            data[[mime]] <- paste0(content, title, new_content, '\n', sep = '\n')
         }
         return(data)
     }
 
-    # Get token under the cursor_pos.
-    # There may be better ways to do that than this.
+    # Get token under the `cursor_pos`.
+    # Since `.guessTokenFromLine()` does not check the characters after `cursor_pos`
+    # check them by a loop.
     token <- ''
     for (i in seq(cursor_pos, nchar(code))) {
         token_candidate <- utils:::.guessTokenFromLine(code, i)
@@ -286,6 +277,9 @@ inspect = function(request) {
     if (nchar(token) != 0) {
         tryCatch(
             {
+                # In many cases `get(token)` works, but it does not
+                # in the cases such as `token` is a numeric constants or reserved words.
+                # Therefore `eval()` is used here.
                 obj <- eval(parse(text = token))
 
                 class_data <- IRdisplay::prepare_mimebundle(class(obj))$data
@@ -297,6 +291,8 @@ inspect = function(request) {
             error = function (e) NULL)
         tryCatch(
             {
+                # `help(token)` is  not used here because it does not works
+                # in the cases `token` is in `pkg::topic`or `pkg:::topic` form.
                 help_obj <- eval(parse(text = paste0('?', token)))
                 help_data <- IRdisplay::prepare_mimebundle(help_obj)$data
                 data <- add_new_section(data, 'Help document', help_data)
