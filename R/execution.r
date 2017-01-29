@@ -313,7 +313,7 @@ initialize = function(...) {
     options(jupyter.base_display_func = .self$display_data)
     # Create the shadow env here and detach it finalize
     # so it's available for the whole lifetime of the kernel.
-    attach(NULL, name = 'jupyter:irkernel')
+    .BaseNamespaceEnv$attach(NULL, name = 'jupyter:irkernel')
 
     # Add stuff to the user environment and configure a few options
     # in the current session

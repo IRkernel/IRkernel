@@ -31,7 +31,8 @@ fromRawJSON <- function(r) {
 }
 
 set_last_value <- function(obj) {
-    unlockBinding(".Last.value", .BaseNamespaceEnv)
+    # access via namespace so R CMD check does not complain
+    .BaseNamespaceEnv$unlockBinding(".Last.value", .BaseNamespaceEnv)
     assign(".Last.value", obj, .BaseNamespaceEnv)
     lockBinding(".Last.value", .BaseNamespaceEnv)
 }

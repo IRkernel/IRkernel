@@ -72,16 +72,13 @@ check_package() (
     
     R CMD check "$PKG_TARBALL" --as-cran
     ! grep -q 'WARNING' "$CHECK_LOG"
-    # .. because ': ' was resulting in an replacement by travis and an error
-    grep -q 'Status..1 NOTE' "$CHECK_LOG"
-    # Code problems are only one note, so make sure that we catch new ones...
-    # count the lines with real note sin it... remove leading whitespace because
-    # wc -l on OSX has some there...
+    ! grep -q 'NOTE' "$CHECK_LOG"
+    # Code problems are only one note, so make sure that we catch new ones.
+    # Count the lines with real notes in it.
+    # Remove leading whitespace because wc -l on OSX has some there.
     LINES=$(grep -v '* .*$' "$CHECK_LOG" | wc -l | sed -e 's/^[[:space:]]*//')
     echo "Lines: $LINES"
-    #  4 lines from the "attach" NOTE,
-    #  4 lines from the ".Last.value" NOTE,
     #  1 line  for "Running testthat.R"
     #  1 line  from the "Status" at the end
-    if [[ "_$LINES" != _10 ]]; then grep -v '* .*$' "$CHECK_LOG"; false; fi
+    if [[ "_$LINES" != _2 ]]; then grep -v '* .*$' "$CHECK_LOG"; false; fi
 )

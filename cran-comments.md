@@ -11,19 +11,7 @@ other frontends) submits to the kernel via the network.
 
 ## R CMD check results
 
-There are no ERRORS and no WARNINGs and 1 NOTEs.
-
-Note:
-
-* Found the following calls to attach():
-  File 'IRkernel/R/execution.r':
-    attach(NULL, name = "jupyter:irkernel")
-  See section 'Good practice' in '?attach'.
-
-  We use this additional environment to add functions so that regular "stuff"
-  like `quit()` works in the IRkernel environment (in this case to shutdown the
-  kernel). We added the "good practice" call to `detach` in `finalize` so that
-  this environment is available as long as the R kernel is running.
+0 errors | 0 warnings | 0 notes
 
 ## Downstream dependencies
 
