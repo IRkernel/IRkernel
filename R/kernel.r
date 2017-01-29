@@ -278,7 +278,7 @@ inspect = function(request) {
         tryCatch(
             {
                 # In many cases `get(token)` works, but it does not
-                # in the cases such as `token` is a numeric constants or reserved words.
+                # in the cases such as `token` is a numeric constant or reserved word.
                 # Therefore `eval()` is used here.
                 obj <- eval(parse(text = token))
 
