@@ -166,7 +166,7 @@ class IRkernelTests(jkt.KernelTests):
         
         # we currently send three formats: text/plain, html, and latex
         data = output_msgs[0]['content']['data']
-        self.assertEqual(len(data), 3, data.keys())
+        self.assertEqual(len(data), 4, data.keys())
 
     def test_irkernel_df_no_rich_output(self):
         """data.frame plain representation"""
