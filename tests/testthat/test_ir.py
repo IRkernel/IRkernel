@@ -2,6 +2,7 @@ import unittest
 import jupyter_kernel_test as jkt
 
 from jupyter_client.manager import start_new_kernel
+from jupyter_kernel_test.messagespec import validate_message
 
 
 without_rich_display = '''\
@@ -11,6 +12,8 @@ options(jupyter.rich_display = TRUE)
 '''
 #this will not work!
 #withr::with_options(list(jupyter.rich_display = FALSE), {})
+
+TIMEOUT = 15
 
 
 class IRkernelTests(jkt.KernelTests):
@@ -238,6 +241,67 @@ class IRkernelTests(jkt.KernelTests):
         execution_count_3 = reply3['content']['execution_count']
         self.assertEqual(execution_count_1, execution_count_2)
         self.assertEqual(execution_count_1, execution_count_3)
+
+    def test_irkernel_inspects(self):
+        """Test if object inspection works."""
+        self.flush_channels()
+
+        def test_token_is_ok(token, preprocess=None, postprocess=None):
+            """Check if inspect_request for the `token` returns a reply.
+
+            Run code in `preprocess` before requesting if it's given,
+            and `proprocess` after requesting.
+
+            Currently just test if the kernel replys without an error
+            and not care about its content.
+            Because the contents of inspections are still so arguable.
+            When the requirements for the contents are decided,
+            fix the tests beow and check the contents.
+            """
+            if preprocess:
+                self._execute_code(preprocess, tests=False)
+
+            msg_id = self.kc.inspect(token)
+            reply = self.kc.get_shell_msg(timeout=TIMEOUT)
+            validate_message(reply, 'inspect_reply', msg_id)
+
+            self.assertEqual(reply['content']['status'], 'ok')
+            self.assertTrue(reply['content']['found'])
+            self.assertGreaterEqual(len(reply['content']['data']), 1)
+
+            if postprocess:
+                self._execute_code(postprocess, tests=False)
+
+        # Numeric constant
+        test_token_is_ok('1')
+        # Reserved word
+        test_token_is_ok('NULL')
+        # Dataset with a help document
+        test_token_is_ok('iris')
+        # Function with a help document
+        test_token_is_ok('c')
+        # Function name with namespace
+        test_token_is_ok('base::c')
+        # Function not exported from namespace
+        test_token_is_ok('tools:::.Rd2pdf')
+        # User-defined variable
+        test_token_is_ok(
+            'x',
+            preprocess='x <- 1',
+            postprocess='rm("x")'
+        )
+        # User-defined function
+        test_token_is_ok(
+            'f',
+            preprocess='f <- function (x) x + x',
+            postprocess='rm("f")'
+        )
+        # Object which masks other object in workspace
+        test_token_is_ok(
+            'c',
+            preprocess='c <- function (x) x + x',
+            postprocess='rm("c")'
+        )
 
 
 if __name__ == '__main__':
