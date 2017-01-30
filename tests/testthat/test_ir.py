@@ -272,11 +272,11 @@ class IRkernelTests(jkt.KernelTests):
             if postprocess:
                 self._execute_code(postprocess, tests=False)
 
-        # Built-in constants
+        # Numeric constant
         test_token_is_ok('1')
-        # Built-in constants
+        # Reserved word
         test_token_is_ok('NULL')
-        # Datasets with a help document
+        # Dataset with a help document
         test_token_is_ok('iris')
         # Function with a help document
         test_token_is_ok('c')
