@@ -252,13 +252,13 @@ inspect = function(request) {
         'text/plain' = '# %s:\n',
         'text/html' = '<h1>%s:</h1>\n')
     # Function to add a section to content.
-    add_new_section <- function (data, section_name, new_data) {
-        for (mime in names(new_section_adders)) {
+    add_new_section <- function(data, section_name, new_data) {
+        for (mime in names(title_templates)) {
             new_content <- new_data[[mime]]
             if (is.null(new_content)) next
-            title <- sprintf(title_templates, section_name)
+            title <- sprintf(title_templates[[mime]], section_name)
             # use paste0 since sprintf cannot deal with format strings > 8192 bytes
-            data[[mime]] <- paste0(content, title, new_content, '\n', sep = '\n')
+            data[[mime]] <- paste0(data[[mime]], title, new_content, '\n', sep = '\n')
         }
         return(data)
     }
@@ -278,7 +278,7 @@ inspect = function(request) {
         tryCatch(
             {
                 # In many cases `get(token)` works, but it does not
-                # in the cases such as `token` is a numeric constant or reserved word.
+                # in the cases such as `token` is a numeric constant or a reserved word.
                 # Therefore `eval()` is used here.
                 obj <- eval(parse(text = token))
 
@@ -288,7 +288,7 @@ inspect = function(request) {
                 print_data <- IRdisplay::prepare_mimebundle(obj)$data
                 data <- add_new_section(data, 'Printed form', print_data)
             },
-            error = function (e) NULL)
+            error = identity)
         tryCatch(
             {
                 # `help(token)` is  not used here because it does not works
@@ -297,15 +297,14 @@ inspect = function(request) {
                 help_data <- IRdisplay::prepare_mimebundle(help_obj)$data
                 data <- add_new_section(data, 'Help document', help_data)
             },
-            error = function (e) NULL)
+            error = identity)
     }
-    found <- (length(data) != 0)
+    found <- length(data) != 0
     send_response('inspect_reply', request, 'shell', list(
         status = 'ok',
         found = found,
         data = data,
-        metadata = namedlist()
-        ))
+        metadata = namedlist()))
 },
 
 history = function(request) {
