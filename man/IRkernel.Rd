@@ -3,9 +3,9 @@
 \docType{data}
 \name{IRkernel}
 \alias{IRkernel}
-\alias{IRkernel-options}
-\alias{IRkernel-package}
 \alias{jupyter_option_defaults}
+\alias{IRkernel-package}
+\alias{IRkernel-options}
 \title{An R kernel for Jupyter.}
 \format{An object of class \code{list} of length 6.}
 \usage{
@@ -35,8 +35,8 @@ The following can be set/read via \code{options(opt.name = ...)} / \code{getOpti
   }
 }
 }
+
 \seealso{
 \link{installspec}
 }
 \keyword{datasets}
-

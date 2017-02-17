@@ -24,4 +24,3 @@ This can be called multiple times for different R interpreter, but you have to g
 different name (and displayname to see a difference in the notebook UI). If the same
 name is give, it will overwrite older versions of the kernel spec with that name!
 }
-

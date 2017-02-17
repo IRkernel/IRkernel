@@ -2,8 +2,8 @@
 % Please edit documentation in R/comm_manager.r
 \docType{class}
 \name{CommManager-class}
-\alias{CommManager}
 \alias{CommManager-class}
+\alias{CommManager}
 \title{The CommManager}
 \description{
 Has methods able to register comms/targets and process comm messages

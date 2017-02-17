@@ -12,4 +12,3 @@ comm_manager()
 \description{
 Get global CommManager instance
 }
-

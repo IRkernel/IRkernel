@@ -12,4 +12,3 @@ main(connection_file = "")
 \description{
 Initialise and run the kernel
 }
-

@@ -42,4 +42,4 @@ Collate:
     'utils.r'
     'kernel.r'
     'main.r'
-RoxygenNote: 5.0.1
+RoxygenNote: 6.0.1.9000

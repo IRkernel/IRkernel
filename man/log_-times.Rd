@@ -3,8 +3,8 @@
 \name{log_*}
 \alias{log_*}
 \alias{log_debug}
-\alias{log_error}
 \alias{log_info}
+\alias{log_error}
 \title{Kernel logging functions}
 \usage{
 log_debug(...)
@@ -21,4 +21,3 @@ A set of exported logging utilities that have the capability to be used in upstr
 Log level and log file can be set via R package options e.g. \code{options(jupyter.log_level = 2L)}
 or from the environment variables JUPYTER_LOG_LEVEL and JUPYTER_LOGFILE.
 }
-

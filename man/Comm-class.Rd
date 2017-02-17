@@ -2,8 +2,8 @@
 % Please edit documentation in R/comm_manager.r
 \docType{class}
 \name{Comm-class}
-\alias{Comm}
 \alias{Comm-class}
+\alias{Comm}
 \title{The Comm}
 \description{
 Has methods able to register and handle message callbacks
