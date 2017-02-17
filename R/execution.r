@@ -77,7 +77,7 @@ is_silent = function() {
 },
 
 should_store_history = function() {
-    current_request$content$store_history
+    with(current_request$content, exists('store_history') && store_history)
 },
 
 send_error_msg = function(msg) {
