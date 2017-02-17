@@ -8,7 +8,7 @@ For detailed requirements and install instructions see [irkernel.github.io](http
 ## Requirements
 
 * [Jupyter](http://jupyter.org).
-* A current [R installation](http://www.r-project.org).
+* A current [R installation](https://www.R-project.org).
 
 ## Installation
 

@@ -11,7 +11,19 @@ other frontends) submits to the kernel via the network.
 
 ## R CMD check results
 
-0 errors | 0 warnings | 0 notes
+```r
+Found the following (possibly) invalid URLs:
+  URL: http://localhost:8888/
+    From: README.md
+    Status: Error
+    Message: libcurl Fehlercode 7
+    \tFailed to connect to localhost port 8888: Verbindungsaufbau abgelehnt
+
+Status: 1 NOTE
+```
+
+This arises from the fact that a common usage of this package involves starting a
+server on localhost. As expected this URL is only reachable after starting it.
 
 ## Downstream dependencies
 
