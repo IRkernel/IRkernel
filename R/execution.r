@@ -77,7 +77,8 @@ is_silent = function() {
 },
 
 should_store_history = function() {
-    current_request$content$store_history
+    sh <- current_request$content$store_history
+    !is.null(sh) && sh
 },
 
 send_error_msg = function(msg) {
