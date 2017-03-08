@@ -22,12 +22,25 @@ function enable_extra_keys(notebook, cell) {
 	cell.code_mirror.setOption('extraKeys', new_keymap)
 }
 
-define(['base/js/namespace'], ({notebook}) => ({
+function render_math(pager, html) {
+    if (!html) return
+    const $container = pager.pager_element.find('#pager-container')
+    $container.find('p[style="text-align: center;"]').map((i, e) =>
+        e.outerHTML = `\\[${e.querySelector('i').innerHTML}\\]`)
+    $container.find('i').map((i, e) =>
+        e.outerHTML = `\\(${e.innerHTML}\\)`)
+    MathJax.Hub.Queue(['Typeset', MathJax.Hub, $container[0]])
+}
+
+define(['base/js/namespace'], ({notebook, pager}) => ({
 	onload() {
 		for (let cell of notebook.get_cells())
 			enable_extra_keys(notebook, cell)
 		
 		notebook.events.on('edit_mode.Cell', (event, {cell}) =>
 			enable_extra_keys(notebook, cell))
+		
+		pager.events.on('open_with_text.Pager', (event, {data: {'text/html': html}}) =>
+		    render_math(pager, html))
 	},
 }))
