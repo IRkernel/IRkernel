@@ -4,7 +4,7 @@
 #' different name (and displayname to see a difference in the notebook UI). If the same
 #' name is give, it will overwrite older versions of the kernel spec with that name!
 #'
-#' @param user         Install into user directory (\code{\href{https://specifications.freedesktop.org/basedir-spec/latest/ar01s03.html}{$XDG_DATA_HOME}/jupyter/kernels}) or globally?
+#' @param user         Install into user directory (\href{https://specifications.freedesktop.org/basedir-spec/latest/ar01s03.html}{\code{$XDG_DATA_HOME}}\code{/jupyter/kernels}) or globally?
 #' @param name         The name of the kernel (default "ir")
 #' @param displayname  The name which is displayed in the notebook (default: "R")
 #' 

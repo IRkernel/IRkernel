@@ -7,7 +7,7 @@
 installspec(user = TRUE, name = "ir", displayname = "R")
 }
 \arguments{
-\item{user}{Install into user directory (\code{\href{https://specifications.freedesktop.org/basedir-spec/latest/ar01s03.html}{$XDG_DATA_HOME}/jupyter/kernels}) or globally?}
+\item{user}{Install into user directory (\href{https://specifications.freedesktop.org/basedir-spec/latest/ar01s03.html}{\code{$XDG_DATA_HOME}}\code{/jupyter/kernels}) or globally?}
 
 \item{name}{The name of the kernel (default "ir")}
 
