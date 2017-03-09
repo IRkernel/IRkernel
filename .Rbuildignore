@@ -8,5 +8,6 @@ Makefile
 [.]pdf$
 example-notebooks/.*$
 ^\.travis\.(sh|yml)$
+^tests/testthat/jkt/[^j][^u][^p].*$
 Dockerfile
 cran-comments.md
