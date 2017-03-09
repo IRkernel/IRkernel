@@ -65,7 +65,7 @@ If you have a Docker daemon running, e.g. reachable on localhost, start a contai
 docker run -d -p 8888:8888 jupyter/r-notebook
 ```
 
-In your browser open the URL <http://localhost:8888/>. All notebooks from your session will be saved in the current directory.
+Open localhost:8888 in your browser. All notebooks from your session will be saved in the current directory.
 
 On other platforms without docker, this can be started using `docker-machine` by replacing “localhost” with an IP from `docker-machine ip <MACHINE>`. With the deprecated `boot2docker`, this IP will be `boot2docker ip`.
 
