@@ -1,3 +1,9 @@
+import sys
+from pathlib import Path
+
+HERE = Path(__file__).parent
+sys.path.insert(0, str(HERE / 'jkt'))
+
 import unittest
 import jupyter_kernel_test as jkt
 

@@ -1,0 +1,3 @@
+[submodule "tests/testthat/jkt"]
+	path = tests/testthat/jkt
+	url = https://github.com/jupyter/jupyter_kernel_test.git
