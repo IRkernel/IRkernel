@@ -1,8 +1,10 @@
+const cmd_key = /Mac/.test(navigator.platform) ? 'Cmd' : 'Ctrl'
+
 const extra_map = (notebook, cell) => ({
 	['Alt--'](cm) {
 		cm.replaceSelection(' <- ')
 	},
-	['Shift-Ctrl-M'](cm) {
+	[`Shift-${cmd_key}-M`](cm) {
 		cm.replaceSelection(' %>% ')
 	},
 	F1(cm) {
