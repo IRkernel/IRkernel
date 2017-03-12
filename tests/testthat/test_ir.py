@@ -3,6 +3,7 @@ from pathlib import Path
 
 HERE = Path(__file__).parent
 sys.path.insert(0, str(HERE / 'jkt'))
+sys.path.insert(0, str(HERE / 'njr'))
 
 import unittest
 import jupyter_kernel_test as jkt

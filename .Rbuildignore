@@ -9,5 +9,6 @@ Makefile
 example-notebooks/.*$
 ^\.travis\.(sh|yml)$
 ^tests/testthat/jkt/[^j][^u][^p].*$
+^tests/testthat/njr/[^n][^d][^j].*$
 Dockerfile
 cran-comments.md
