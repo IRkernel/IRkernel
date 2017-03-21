@@ -102,7 +102,7 @@ send_response = function(msg_type, parent_msg, socket_name, content) {
 
 handle_shell = function() {
     "React to a shell message coming in"
-    
+
     parts <- zmq.recv.multipart(sockets$shell, unserialize = FALSE)
     msg <- wire_to_msg(parts)
     
@@ -123,7 +123,7 @@ handle_shell = function() {
         is_complete_request = is_complete(msg),
         inspect_request     = inspect(msg),
         shutdown_request    = shutdown(msg),
-        print(c('Got unhandled msg_type:', msg$header$msg_type)))
+        log_debug(c('Got unhandled msg_type:', msg$header$msg_type)))
         
     send_response('status', msg, 'iopub', list(
         execution_state = 'idle'))
@@ -164,6 +164,27 @@ abort_queued_messages = function() {
     }
     log_debug('abort loop: end')
 
+},
+
+handle_stdin = function() {
+    "React to a stdin message coming in"
+
+    # wait for 'input_reply' response message
+    while (TRUE) {
+        log_debug('stdin loop: beginning')
+        zmq.poll(c(sockets$stdin),          # only stdin channel
+                 c(.pbd_env$ZMQ.PO$POLLIN)) # type
+
+        if (bitwAnd(zmq.poll.get.revents(1), .pbd_env$ZMQ.PO$POLLIN)) {
+            log_debug('stdin loop: found msg')
+            parts <- zmq.recv.multipart(sockets$stdin, unserialize = FALSE)
+            msg <- wire_to_msg(parts)
+            return(msg$content$value)
+        } else {
+            # else shouldn't be possible
+            log_debug('stdin loop: zmq.poll returned but no message found?')
+        }
+    }
 },
 
 is_complete = function(request) {
@@ -336,7 +357,7 @@ handle_control = function() {
         log_debug('Control: shutdown...')
         shutdown(msg)
     } else {
-        print(paste('Unhandled control message, msg_type:', msg$header$msg_type))
+        log_debug(paste('Unhandled control message, msg_type:', msg$header$msg_type))
     }
 },
 
@@ -372,7 +393,8 @@ initialize = function(connection_file) {
     zmq.bind(sockets$shell,   url_with_port('shell_port'))
 
     executor <<- Executor$new(send_response = .self$send_response,
-        abort_queued_messages = .self$abort_queued_messages)
+                              handle_stdin = .self$handle_stdin,
+                              abort_queued_messages = .self$abort_queued_messages)
     comm_manager <<- CommManager$new(send_response = .self$send_response)
     runtime_env$comm_manager <- comm_manager
 },
@@ -386,7 +408,7 @@ run = function() {
             rep(.pbd_env$ZMQ.PO$POLLIN, 3))
         log_debug('main loop: after poll')
 
-        # It's important that these messages are handler one  by one in each
+        # It's important that these messages are handled one  by one in each
         # look. The problem is that during the handler, a new zmq.poll could be
         # done (and is done in case of errors in a execution request) and this
         # invalidates the zmq.poll.get.revents call leading to "funny" results

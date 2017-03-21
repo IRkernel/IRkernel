@@ -56,12 +56,12 @@ format_stack <- function(calls) {
     paste0(tb, line_refs)
 }
 
-
 #' @importFrom utils capture.output
 Executor <- setRefClass(
     Class = 'Executor',
     fields = list(
         send_response         = 'function',
+        handle_stdin          = 'function',
         abort_queued_messages = 'function',
         execution_count       = 'integer',
         payload               = 'list',
@@ -118,6 +118,28 @@ quit = function(save = 'default', status = 0, runLast = TRUE) {
     }
     if (save) NULL  # TODO: actually save history
     payload <<- c(.self$payload, list(list(source = 'ask_exit', keepkernel = FALSE)))
+},
+
+# noninteractive
+readline = function(prompt='') {
+    log_debug("entering custom readline")
+    send_response('input_request', current_request, 'stdin',
+        list(prompt = prompt, password = FALSE))
+    # wait for 'input_reply' response message
+    input = handle_stdin()
+    log_debug("exiting custom readline")
+    return(input)
+},
+
+# noninteractive 5.0 protocol:
+readpass = function(prompt='') {
+    log_debug("entering custom readpass")
+    send_response('input_request', current_request, 'stdin',
+        list(prompt = prompt, password = TRUE))
+    # wait for 'input_reply' response message
+    input = handle_stdin()
+    log_debug("exiting custom readpass")
+    return(input)
 },
 
 handle_error = function(e) tryCatch({
@@ -216,13 +238,19 @@ execute = function(request) {
     send_response('execute_input', request, 'iopub', list(
         code = request$content$code,
         execution_count = execution_count))
-        
+
     # Make the current request available to other functions
     current_request <<- request
     # reset ...
     payload <<- list()
     err <<- list()
     
+    # shade base::readline
+    add_to_user_searchpath('readline', .self$readline)
+    
+    # shade 'readpass' if it appears in other packages
+    add_to_user_searchpath('readpass', .self$readpass)
+
     # shade base::quit
     add_to_user_searchpath('quit', .self$quit)
     add_to_user_searchpath('q', .self$quit)
@@ -257,7 +285,7 @@ execute = function(request) {
     log_debug('Executing code: %s', request$content$code)
     
     warn_unicode_on_windows(request$content$code, .self$send_error_msg)
-    
+
     tryCatch(
         evaluate(
             request$content$code,
@@ -266,7 +294,7 @@ execute = function(request) {
             stop_on_error = 1L),
         interrupt = function(cond) interrupted <<- TRUE,
         error = .self$handle_error) # evaluate does not catch errors in parsing
-    
+
     if (!is_silent() && !is.null(last_recorded_plot)) {
         send_plot(last_recorded_plot)
     }
