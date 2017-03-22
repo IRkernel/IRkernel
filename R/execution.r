@@ -56,6 +56,7 @@ format_stack <- function(calls) {
     paste0(tb, line_refs)
 }
 
+
 #' @importFrom utils capture.output
 Executor <- setRefClass(
     Class = 'Executor',
@@ -235,7 +236,7 @@ execute = function(request) {
     send_response('execute_input', request, 'iopub', list(
         code = request$content$code,
         execution_count = execution_count))
-    
+        
     # Make the current request available to other functions
     current_request <<- request
     # reset ...
