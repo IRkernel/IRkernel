@@ -179,10 +179,11 @@ handle_stdin = function() {
             log_debug('stdin loop: found msg')
             parts <- zmq.recv.multipart(sockets$stdin, unserialize = FALSE)
             msg <- wire_to_msg(parts)
-            return(msg$content$value)
+            msg$content$value
         } else {
             # else shouldn't be possible
-            log_debug('stdin loop: zmq.poll returned but no message found?')
+            log_error('stdin loop: zmq.poll returned but no message found?')
+            NULL
         }
     }
 },
@@ -392,9 +393,10 @@ initialize = function(connection_file) {
     zmq.bind(sockets$stdin,   url_with_port('stdin_port'))
     zmq.bind(sockets$shell,   url_with_port('shell_port'))
 
-    executor <<- Executor$new(send_response = .self$send_response,
-                              handle_stdin = .self$handle_stdin,
+    executor <<- Executor$new(send_response         = .self$send_response,
+                              handle_stdin          = .self$handle_stdin,
                               abort_queued_messages = .self$abort_queued_messages)
+    
     comm_manager <<- CommManager$new(send_response = .self$send_response)
     runtime_env$comm_manager <- comm_manager
 },

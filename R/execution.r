@@ -121,25 +121,22 @@ quit = function(save = 'default', status = 0, runLast = TRUE) {
 },
 
 # noninteractive
-readline = function(prompt='') {
-    log_debug("entering custom readline")
+readline = function(prompt = '') {
+    log_debug('entering custom readline')
     send_response('input_request', current_request, 'stdin',
         list(prompt = prompt, password = FALSE))
     # wait for 'input_reply' response message
-    input = handle_stdin()
-    log_debug("exiting custom readline")
-    return(input)
+    input <- handle_stdin()
 },
 
 # noninteractive 5.0 protocol:
-readpass = function(prompt='') {
-    log_debug("entering custom readpass")
+readpass = function(prompt = '') {
+    log_debug('entering custom readpass')
     send_response('input_request', current_request, 'stdin',
         list(prompt = prompt, password = TRUE))
     # wait for 'input_reply' response message
+    log_debug('exiting custom readpass')
     input = handle_stdin()
-    log_debug("exiting custom readpass")
-    return(input)
 },
 
 handle_error = function(e) tryCatch({
