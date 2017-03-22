@@ -235,7 +235,7 @@ execute = function(request) {
     send_response('execute_input', request, 'iopub', list(
         code = request$content$code,
         execution_count = execution_count))
-
+    
     # Make the current request available to other functions
     current_request <<- request
     # reset ...
@@ -282,7 +282,7 @@ execute = function(request) {
     log_debug('Executing code: %s', request$content$code)
     
     warn_unicode_on_windows(request$content$code, .self$send_error_msg)
-
+    
     tryCatch(
         evaluate(
             request$content$code,
@@ -291,7 +291,7 @@ execute = function(request) {
             stop_on_error = 1L),
         interrupt = function(cond) interrupted <<- TRUE,
         error = .self$handle_error) # evaluate does not catch errors in parsing
-
+    
     if (!is_silent() && !is.null(last_recorded_plot)) {
         send_plot(last_recorded_plot)
     }

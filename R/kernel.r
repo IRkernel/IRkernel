@@ -102,7 +102,7 @@ send_response = function(msg_type, parent_msg, socket_name, content) {
 
 handle_shell = function() {
     "React to a shell message coming in"
-
+    
     parts <- zmq.recv.multipart(sockets$shell, unserialize = FALSE)
     msg <- wire_to_msg(parts)
     
