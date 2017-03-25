@@ -131,13 +131,13 @@ readline = function(prompt = '') {
 },
 
 # noninteractive 5.0 protocol:
-readpass = function(prompt = '') {
-    log_debug('entering custom readpass')
+get_pass = function(prompt = '') {
+    log_debug('entering custom get_pass')
     send_response('input_request', current_request, 'stdin',
         list(prompt = prompt, password = TRUE))
     # wait for 'input_reply' response message
-    log_debug('exiting custom readpass')
-    input = handle_stdin()
+    log_debug('exiting custom get_pass')
+    input <- handle_stdin()
 },
 
 handle_error = function(e) tryCatch({
@@ -246,8 +246,8 @@ execute = function(request) {
     # shade base::readline
     add_to_user_searchpath('readline', .self$readline)
     
-    # shade 'readpass' if it appears in other packages
-    add_to_user_searchpath('readpass', .self$readpass)
+    # shade getPass::getPass
+    add_to_user_searchpath('getPass', .self$get_pass)
     
     # shade base::quit
     add_to_user_searchpath('quit', .self$quit)
