@@ -248,7 +248,7 @@ execute = function(request) {
     err <<- list()
     
     add_to_user_searchpath('interactive', .self$interactive)
-
+    
     # shade base::readline
     add_to_user_searchpath('readline', .self$readline)
     
