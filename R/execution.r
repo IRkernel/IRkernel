@@ -140,6 +140,10 @@ get_pass = function(prompt = '') {
     input <- handle_stdin()
 },
 
+interactive = function() {
+    TRUE
+},
+
 handle_error = function(e) tryCatch({
     log_debug('Error output: %s', toString(e))
     calls <- head(sys.calls()[-seq_len(nframe + 1L)], -3)
@@ -243,6 +247,8 @@ execute = function(request) {
     payload <<- list()
     err <<- list()
     
+    add_to_user_searchpath('interactive', .self$interactive)
+
     # shade base::readline
     add_to_user_searchpath('readline', .self$readline)
     
