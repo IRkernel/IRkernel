@@ -107,7 +107,6 @@ page = function(mimebundle) {
 
 # .Last doesn’t seem to work, so replicating behavior
 quit = function(save = 'default', status = 0, runLast = TRUE) {
-    log_debug('entering custom quit')
     save <- switch(save,
         default = , yes = TRUE,
         no = FALSE,
