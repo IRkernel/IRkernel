@@ -6,6 +6,11 @@ add_to_user_searchpath <- function(name, FN) {
     assign(name, FN, 'jupyter:irkernel')
 }
 
+add_to_base_searchpath <- function(name, FN) {
+    unlockBinding(name, baseenv())
+    assign(name, FN, baseenv())
+}
+
 get_shadowenv <- function() {
     as.environment('jupyter:irkernel')
 }
@@ -42,6 +47,9 @@ init_shadowenv <- function() {
     })
     add_to_user_searchpath('edit', function(...) {
         stop(sQuote('edit()'), ' not yet supported in the Jupyter R kernel')
+    })
+    add_to_base_searchpath('interactive', function(...) {
+        TRUE
     })
 }
 

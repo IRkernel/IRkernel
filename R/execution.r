@@ -107,6 +107,7 @@ page = function(mimebundle) {
 
 # .Last doesn’t seem to work, so replicating behavior
 quit = function(save = 'default', status = 0, runLast = TRUE) {
+    log_debug('entering custom quit')
     save <- switch(save,
         default = , yes = TRUE,
         no = FALSE,
@@ -138,10 +139,6 @@ get_pass = function(prompt = '') {
     # wait for 'input_reply' response message
     log_debug('exiting custom get_pass')
     input <- handle_stdin()
-},
-
-interactive = function() {
-    TRUE
 },
 
 handle_error = function(e) tryCatch({
@@ -247,17 +244,15 @@ execute = function(request) {
     payload <<- list()
     err <<- list()
     
-    add_to_user_searchpath('interactive', .self$interactive)
-    
     # shade base::readline
-    add_to_user_searchpath('readline', .self$readline)
+    add_to_base_searchpath('readline', .self$readline)
     
     # shade getPass::getPass
     add_to_user_searchpath('getPass', .self$get_pass)
     
     # shade base::quit
-    add_to_user_searchpath('quit', .self$quit)
-    add_to_user_searchpath('q', .self$quit)
+    add_to_base_searchpath('quit', .self$quit)
+    add_to_base_searchpath('q', .self$quit)
 
     # find out stack depth in notebook cell
     # TODO: maybe replace with a single call on first execute and rest reuse the value?
