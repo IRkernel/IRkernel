@@ -48,9 +48,6 @@ init_shadowenv <- function() {
     add_to_user_searchpath('edit', function(...) {
         stop(sQuote('edit()'), ' not yet supported in the Jupyter R kernel')
     })
-    add_to_base_searchpath('interactive', function(...) {
-        TRUE
-    })
 }
 
 
