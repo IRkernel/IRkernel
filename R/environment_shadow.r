@@ -6,7 +6,7 @@ add_to_user_searchpath <- function(name, FN) {
     assign(name, FN, 'jupyter:irkernel')
 }
 
-add_to_base_searchpath <- function(name, FN) {
+replace_in_base_namespace <- function(name, FN) {
     unlockBinding(name, baseenv())
     assign(name, FN, baseenv())
 }
