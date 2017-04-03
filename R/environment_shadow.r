@@ -6,6 +6,11 @@ add_to_user_searchpath <- function(name, FN) {
     assign(name, FN, 'jupyter:irkernel')
 }
 
+replace_in_base_namespace <- function(name, FN) {
+    .BaseNamespaceEnv$unlockBinding(name, baseenv())
+    assign(name, FN, baseenv())
+}
+
 get_shadowenv <- function() {
     as.environment('jupyter:irkernel')
 }
