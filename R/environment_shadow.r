@@ -7,7 +7,7 @@ add_to_user_searchpath <- function(name, FN) {
 }
 
 replace_in_base_namespace <- function(name, FN) {
-    unlockBinding(name, baseenv())
+    .BaseNamespaceEnv$unlockBinding(name, baseenv())
     assign(name, FN, baseenv())
 }
 
