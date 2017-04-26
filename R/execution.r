@@ -87,7 +87,7 @@ should_store_history = function() {
 
 should_stop_on_error = function() {
     current_request$content$stop_on_error
-}
+},
 
 send_error_msg = function(msg) {
     if (is_silent()) return()
