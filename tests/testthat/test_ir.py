@@ -27,10 +27,10 @@ class IRkernelTests(jkt.KernelTests):
 
     language_name = 'R'
 
-    def _execute_code(self, code, tests=True, silent=False, store_history=True):
+    def _execute_code(self, code, tests=True, silent=False, store_history=True, stop_on_error=False):
         self.flush_channels()
 
-        reply, output_msgs = self.execute_helper(code, silent=silent, store_history=store_history)
+        reply, output_msgs = self.execute_helper(code, silent=silent, store_history=store_history, stop_on_error=stop_on_error)
 
         self.assertEqual(reply['content']['status'], 'ok', '{0}: {0}'.format(reply['content'].get('ename'), reply['content'].get('evalue')))
         if tests:
@@ -247,6 +247,34 @@ class IRkernelTests(jkt.KernelTests):
         execution_count_3 = reply3['content']['execution_count']
         self.assertEqual(execution_count_1, execution_count_2)
         self.assertEqual(execution_count_1, execution_count_3)
+
+    def test_should_stop_on_error(self):
+        """Stops remaining queued execution on error"""
+        bad_code = 'Sys.sleep(5); bad code'
+        good_code = 'data.frame(x = 1:3)'
+        reply1, output_msgs1 = self._execute_code(bad_code, stop_on_error=True)
+        reply2, output_msgs2 = self._execute_code(good_code)
+        reply3, output_msgs3 = self._execute_code(good_code)
+        execution_status_1 = reply1['content']['status']
+        execution_status_2 = reply2['content']['status']
+        execution_status_3 = reply3['content']['status']
+        self.assertEqual(execution_status_1, 'error')
+        self.assertEqual(execution_status_2, 'abort')
+        self.assertEqual(execution_status_3, 'abort')
+
+    def test_should_not_stop_on_error(self):
+        """Stops remaining queued execution on error"""
+        bad_code = 'Sys.sleep(5); bad code'
+        good_code = 'data.frame(x = 1:3)'
+        reply1, output_msgs1 = self._execute_code(bad_code)
+        reply2, output_msgs2 = self._execute_code(good_code)
+        reply3, output_msgs3 = self._execute_code(good_code)
+        execution_status_1 = reply1['content']['status']
+        execution_status_2 = reply2['content']['status']
+        execution_status_3 = reply3['content']['status']
+        self.assertEqual(execution_status_1, 'error')
+        self.assertEqual(execution_status_2, 'ok')
+        self.assertEqual(execution_status_3, 'ok')
 
     def test_irkernel_inspects(self):
         """Test if object inspection works."""
