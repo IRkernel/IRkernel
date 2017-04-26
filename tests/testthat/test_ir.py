@@ -250,7 +250,8 @@ class IRkernelTests(jkt.KernelTests):
 
     def test_should_stop_on_error(self):
         """Stops remaining queued execution on error"""
-        bad_code = 'Sys.sleep(5); bad code'
+        # Sleep for a bit in the bad code, to ensure following messages actually get queued up
+        bad_code = 'Sys.sleep(2); bad code'
         good_code = 'data.frame(x = 1:3)'
         reply1, output_msgs1 = self._execute_code(bad_code, stop_on_error=True)
         reply2, output_msgs2 = self._execute_code(good_code)
@@ -263,8 +264,9 @@ class IRkernelTests(jkt.KernelTests):
         self.assertEqual(execution_status_3, 'abort')
 
     def test_should_not_stop_on_error(self):
-        """Stops remaining queued execution on error"""
-        bad_code = 'Sys.sleep(5); bad code'
+        """Continues remaining queued execution on error"""
+        # Sleep for a bit in the bad code, to ensure following messages actually get queued up
+        bad_code = 'Sys.sleep(2); bad code'
         good_code = 'data.frame(x = 1:3)'
         reply1, output_msgs1 = self._execute_code(bad_code)
         reply2, output_msgs2 = self._execute_code(good_code)
