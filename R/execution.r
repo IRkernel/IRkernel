@@ -325,7 +325,7 @@ execute = function(request) {
     
     send_response('execute_reply', request, 'shell', reply_content)
 
-    if ((interrupted || !is.null(err$ename)) && should_stop_on_error()) {
+    if (interrupted || (!is.null(err$ename) && should_stop_on_error())) {
         # errors or interrupts should interrupt all currently queued messages,
         # not only the currently running one...
         abort_queued_messages()
