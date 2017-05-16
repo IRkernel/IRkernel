@@ -7,6 +7,7 @@
 #' @param user         Install into user directory (\href{https://specifications.freedesktop.org/basedir-spec/latest/ar01s03.html}{\code{$XDG_DATA_HOME}}\code{/jupyter/kernels}) or globally?
 #' @param name         The name of the kernel (default "ir")
 #' @param displayname  The name which is displayed in the notebook (default: "R")
+#' @param rprofile_file Path to kernel-specific Rprofile (defaults to system-level settings)
 #' 
 #' @return Exit code of the \code{jupyter kernelspec install} call.
 #' 
