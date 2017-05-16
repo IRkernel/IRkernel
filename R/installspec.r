@@ -11,7 +11,7 @@
 #' @return Exit code of the \code{jupyter kernelspec install} call.
 #' 
 #' @export
-installspec <- function(user = TRUE, name = 'ir', displayname = 'R') {
+installspec <- function(user = TRUE, name = 'ir', displayname = 'R', rprofile_file = NULL) {
     exit_code <- system2('jupyter', c('kernelspec', '--version'), FALSE, FALSE)
     if (exit_code != 0)
         stop('jupyter-client has to be installed but ', dQuote('jupyter kernelspec --version'), ' exited with code ', exit_code, '.\n')
@@ -25,6 +25,9 @@ installspec <- function(user = TRUE, name = 'ir', displayname = 'R') {
     spec <- fromJSON(spec_path)
     spec$argv[[1]] <- file.path(R.home('bin'), 'R')
     spec$display_name <- displayname
+    if (!is.null(rprofile_file)) {
+        spec$env <- list(R_PROFILE_USER = rprofile_file)
+    }
     write(toJSON(spec, pretty = TRUE, auto_unbox = TRUE), file = spec_path)
     
     user_flag <- if (user) '--user' else character(0)
