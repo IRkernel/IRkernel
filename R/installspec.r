@@ -7,11 +7,12 @@
 #' @param user         Install into user directory (\href{https://specifications.freedesktop.org/basedir-spec/latest/ar01s03.html}{\code{$XDG_DATA_HOME}}\code{/jupyter/kernels}) or globally?
 #' @param name         The name of the kernel (default "ir")
 #' @param displayname  The name which is displayed in the notebook (default: "R")
+#' @param rprofile     (optional) Path to kernel-specific Rprofile (defaults to system-level settings)
 #' 
 #' @return Exit code of the \code{jupyter kernelspec install} call.
 #' 
 #' @export
-installspec <- function(user = TRUE, name = 'ir', displayname = 'R') {
+installspec <- function(user = TRUE, name = 'ir', displayname = 'R', rprofile = NULL) {
     exit_code <- system2('jupyter', c('kernelspec', '--version'), FALSE, FALSE)
     if (exit_code != 0)
         stop('jupyter-client has to be installed but ', dQuote('jupyter kernelspec --version'), ' exited with code ', exit_code, '.\n')
@@ -25,6 +26,9 @@ installspec <- function(user = TRUE, name = 'ir', displayname = 'R') {
     spec <- fromJSON(spec_path)
     spec$argv[[1]] <- file.path(R.home('bin'), 'R')
     spec$display_name <- displayname
+    if (!is.null(rprofile)) {
+        spec$env <- list(R_PROFILE_USER = rprofile)
+    }
     write(toJSON(spec, pretty = TRUE, auto_unbox = TRUE), file = spec_path)
     
     user_flag <- if (user) '--user' else character(0)

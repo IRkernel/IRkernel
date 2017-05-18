@@ -3,7 +3,9 @@
 \name{log_*}
 \alias{log_*}
 \alias{log_debug}
+\alias{log_*}
 \alias{log_info}
+\alias{log_*}
 \alias{log_error}
 \title{Kernel logging functions}
 \usage{
