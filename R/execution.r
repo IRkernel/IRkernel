@@ -4,6 +4,9 @@ NULL
 # Create an empty named list
 #' @importFrom stats setNames
 namedlist <- function() setNames(list(), character(0))
+# Converts something to a string no matter what
+#' @importFrom utils str
+resilient_to_str <- function(v) tryCatch(toString(v), error = function(e) capture.output(str(v)))
 
 plot_builds_upon <- function(prev, current) {
     if (is.null(prev)) {
@@ -140,21 +143,27 @@ get_pass = function(prompt = '') {
     input <- handle_stdin()
 },
 
-handle_error = function(e) tryCatch({
-    log_debug('Error output: %s', toString(e))
-    calls <- head(sys.calls()[-seq_len(nframe + 1L)], -3)
-    
-    calls <- skip_repeated(calls)
-    
-    msg <- paste0(toString(e), 'Traceback:\n')
-    stack_info <- format_stack(calls)
+handle_error = function(e) {
+    estr <- resilient_to_str(e)
+    tryCatch({
+        log_debug('Error output: %s', estr)
+        calls <- head(sys.calls()[-seq_len(nframe + 1L)], -3)
 
-    err <<- list(ename = 'ERROR', evalue = toString(e), traceback = as.list(c(msg, stack_info)))
-    if (!is_silent()) {
-        send_response('error', current_request, 'iopub', c(err, list(
-            execution_count = execution_count)))
-    }
-}, error = log_error),
+        calls <- skip_repeated(calls)
+
+        msg <- paste0(estr, 'Traceback:\n')
+        stack_info <- format_stack(calls)
+
+        err <<- list(ename = 'ERROR', evalue = estr, traceback = as.list(c(msg, stack_info)))
+        if (!is_silent()) {
+            send_response('error', current_request, 'iopub', c(err, list(
+                execution_count = execution_count)))
+        }
+    }, error = function(e2) {
+        log_error('Error in handle_error! %s', resilient_to_str(e2))
+        log_error('Caused when handling %s', estr)
+    })
+},
 
 send_plot = function(plotobj) {
     formats <- namedlist()
