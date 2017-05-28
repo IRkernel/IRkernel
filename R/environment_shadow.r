@@ -2,8 +2,15 @@
 # This is needed to build in our own needs, like properly shutting down the kernel
 # when `quit()` is called.
 
-add_to_user_searchpath <- function(name, FN) {
-    assign(name, FN, 'jupyter:irkernel')
+add_to_user_searchpath <- function(name, FN, pkg = NULL) {
+    if (is.null(pkg)) {
+        assign(name, FN, 'jupyter:irkernel')
+    } else {
+        env <- getNamespace(pkg)
+        unlockBinding(name, env)
+        assign(name, FN, envir = env, inherits = TRUE)
+        lockBinding(name, env)
+    }
 }
 
 replace_in_base_namespace <- function(name, FN) {
