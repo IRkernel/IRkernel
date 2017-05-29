@@ -7,7 +7,7 @@ add_to_user_searchpath <- function(name, FN, pkg = NULL) {
         assign(name, FN, 'jupyter:irkernel')
     } else {
         env <- getNamespace(pkg)
-        unlockBinding(name, env)
+        .BaseNamespaceEnv$unlockBinding(name, env)
         assign(name, FN, envir = env, inherits = TRUE)
         lockBinding(name, env)
     }
