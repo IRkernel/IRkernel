@@ -256,7 +256,7 @@ execute = function(request) {
     replace_in_base_namespace('readline', .self$readline)
     
     # shade getPass::getPass
-    add_to_user_searchpath('getPass', .self$get_pass)
+    add_to_user_searchpath('getPass', .self$get_pass, 'getPass')
     
     # shade base::quit
     replace_in_base_namespace('quit', .self$quit)
