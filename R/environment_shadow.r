@@ -3,14 +3,15 @@
 # when `quit()` is called.
 
 add_to_user_searchpath <- function(name, FN, pkg = NULL) {
-    tryCatch({
+    pkg_avail <- !is.null(pkg) && requireNamespace(pkg, quietly = TRUE)
+    if (pkg_avail) {
         env <- getNamespace(pkg)
         .BaseNamespaceEnv$unlockBinding(name, env)
         assign(name, FN, envir = env, inherits = TRUE)
         .BaseNamespaceEnv$lockBinding(name, env)
-    }, error = function(e) {
+    } else {
         assign(name, FN, 'jupyter:irkernel')
-    })
+    }
 }
 
 replace_in_base_namespace <- function(name, FN) {
