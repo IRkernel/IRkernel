@@ -306,20 +306,18 @@ execute = function(request) {
         send_plot(last_recorded_plot)
     }
     
-    if (interrupted) {
-        reply_content <- list(
-            status = 'abort')
-    } else if (!is.null(err$ename)) {
-        reply_content <- c(err, list(
-            status = 'error',
-            execution_count = execution_count))
-    } else {
-        reply_content <- list(
-            status = 'ok',
-            execution_count = execution_count,
-            payload = payload,
-            user_expressions = namedlist())
-    }
+    status <-
+        if (interrupted) 'abort'
+        else if (!is.null(err$ename)) 'error'
+        else 'ok'
+    
+    reply_content <- c(
+        list(
+            status = status,
+            execution_count = execution_count),
+        switch(status,
+            ok = list(payload = payload, user_expressions = namedlist()),
+            error = err))
     
     send_response('execute_reply', request, 'shell', reply_content)
 
