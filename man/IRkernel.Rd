@@ -4,10 +4,8 @@
 \name{IRkernel}
 \alias{IRkernel}
 \alias{jupyter_option_defaults}
-\alias{IRkernel}
 \alias{IRkernel-package}
 \alias{IRkernel-options}
-\alias{IRkernel-package}
 \title{An R kernel for Jupyter.}
 \format{An object of class \code{list} of length 6.}
 \usage{

@@ -24,7 +24,8 @@ get_shadowenv <- function() {
 }
 
 # Adds functions which do not need any access to the executer into the users searchpath
-#' @importFrom utils getFromNamespace
+#' @importFrom utils getFromNamespace flush.console
+#' @importFrom evaluate inject_funs flush_console
 init_shadowenv <- function() {
     # add the accessors to the shadow env itself, so they are actually accessable
     # from everywhere...
@@ -56,6 +57,11 @@ init_shadowenv <- function() {
     add_to_user_searchpath('edit', function(...) {
         stop(sQuote('edit()'), ' not yet supported in the Jupyter R kernel')
     })
+    
+    # stream output in loops:
+    # https://github.com/IRkernel/IRkernel/issues/3
+    replace_in_base_namespace('flush', function(con) { flush(con); flush_console() })
+    add_to_user_searchpath('flush.console', function() { flush.console(); flush_console() })  # TODO: replace in utils::
 }
 
 
