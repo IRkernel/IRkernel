@@ -60,7 +60,7 @@ init_shadowenv <- function() {
     
     # stream output in loops:
     # https://github.com/IRkernel/IRkernel/issues/3
-    replace_in_base_namespace('flush', function(con) { flush(con); flush_console() })
+    replace_in_base_namespace('flush.connection', function(con) { .Internal(flush(con)); flush_console() })
     add_to_user_searchpath('flush.console', function() { flush.console(); flush_console() })  # TODO: replace in utils::
 }
 
