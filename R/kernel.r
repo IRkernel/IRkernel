@@ -296,29 +296,28 @@ inspect = function(request) {
 
     data <- namedlist()
     if (nchar(token) != 0) {
-        tryCatch(
-            {
-                # In many cases `get(token)` works, but it does not
-                # in the cases such as `token` is a numeric constant or a reserved word.
-                # Therefore `eval()` is used here.
-                obj <- eval(parse(text = token))
-
-                class_data <- IRdisplay::prepare_mimebundle(class(obj))$data
-                data <- add_new_section(data, 'Class attribute', class_data)
-
-                print_data <- IRdisplay::prepare_mimebundle(obj)$data
-                data <- add_new_section(data, 'Printed form', print_data)
-            },
-            error = identity)
-        tryCatch(
-            {
-                # `help(token)` is  not used here because it does not works
-                # in the cases `token` is in `pkg::topic`or `pkg:::topic` form.
-                help_obj <- eval(parse(text = paste0('?', token)))
-                help_data <- IRdisplay::prepare_mimebundle(help_obj)$data
-                data <- add_new_section(data, 'Help document', help_data)
-            },
-            error = identity)
+        # In many cases `get(token)` works, but it does not
+        # in the cases such as `token` is a numeric constant or a reserved word.
+        # Therefore `eval()` is used here.
+        obj <- tryCatch(eval(parse(text = token), envir = .GlobalEnv), error = function(e) NULL)
+        class_data <- if (!is.null(obj)) IRdisplay::prepare_mimebundle(class(obj))$data
+        print_data <- if (!is.null(obj)) IRdisplay::prepare_mimebundle(obj)$data
+        
+        # `help(token)` is  not used here because it does not works
+        # in the cases `token` is in `pkg::topic`or `pkg:::topic` form.
+        help_data <- tryCatch({
+            help_obj <- eval(parse(text = paste0('?', token)))
+            IRdisplay::prepare_mimebundle(help_obj)$data
+        }, error = function(e) NULL)
+        
+        # only show help if we have a function
+        if ('function' %in% class(obj) && !is.null(help_data)) {
+            data <- help_data
+        } else {# any of those that are NULL are automatically skipped
+            data <- add_new_section(data, 'Class attribute', class_data)
+            data <- add_new_section(data, 'Printed form', print_data)
+            data <- add_new_section(data, 'Help document', help_data)
+        }
     }
     found <- length(data) != 0
     send_response('inspect_reply', request, 'shell', list(
