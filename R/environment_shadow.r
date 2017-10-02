@@ -14,10 +14,13 @@ add_to_user_searchpath <- function(name, FN, pkg = NULL) {
     }
 }
 
-replace_in_base_namespace <- function(name, FN) {
-    .BaseNamespaceEnv$unlockBinding(name, baseenv())
-    assign(name, FN, baseenv())
+replace_in_namespace <- function(name, FN, env) {
+    env <- as.environment(env)
+    .BaseNamespaceEnv$unlockBinding(name, env)
+    assign(name, FN, env)
 }
+
+replace_in_base_namespace <- function(name, FN) replace_in_namespace(name, FN, baseenv())
 
 get_shadowenv <- function() {
     as.environment('jupyter:irkernel')
@@ -61,7 +64,7 @@ init_shadowenv <- function() {
     # stream output in loops:
     # https://github.com/IRkernel/IRkernel/issues/3
     replace_in_base_namespace('flush.connection', function(con) { .Internal(flush(con)); flush_console() })
-    add_to_user_searchpath('flush.console', function() { flush.console(); flush_console() })  # TODO: replace in utils::
+    replace_in_namespace('flush.console', function() { .Call(utils:::C_flushconsole); flush_console() }, getNamespace('utils'))
 }
 
 
