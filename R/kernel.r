@@ -404,10 +404,17 @@ run = function() {
     options(jupyter.in_kernel = TRUE)
     while (TRUE) {
         log_debug('main loop: beginning')
-        zmq.poll(
-            c(sockets$hb, sockets$shell, sockets$control),
-            rep(.pbd_env$ZMQ.PO$POLLIN, 3))
-        log_debug('main loop: after poll')
+        r <- tryCatch(
+            zmq.poll(
+                c(sockets$hb, sockets$shell, sockets$control),
+                rep(.pbd_env$ZMQ.PO$POLLIN, 3),
+                MC = ZMQ.MC(check.eintr = TRUE)),
+            interrupt = function(e) list(0L, 'SIGINT'))
+        log_debug('main loop: after poll. ZMQ code: %s; Errno: %s', r[[1L]], r[[2L]])
+        if (identical(r[[2L]], 'SIGINT')) {
+            log_info('main loop: keyboard interrupt caught')
+            next
+        }
 
         # It's important that these messages are handled one by one in each
         # look. The problem is that during the handler, a new zmq.poll could be
