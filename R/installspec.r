@@ -8,11 +8,12 @@
 #' @param name         The name of the kernel (default "ir")
 #' @param displayname  The name which is displayed in the notebook (default: "R")
 #' @param rprofile     (optional) Path to kernel-specific Rprofile (defaults to system-level settings)
+#' @param prefix       (optional) Path to alternate directory to install kernelspec into, overrides 'user' (default: NULL)
 #' 
 #' @return Exit code of the \code{jupyter kernelspec install} call.
 #' 
 #' @export
-installspec <- function(user = TRUE, name = 'ir', displayname = 'R', rprofile = NULL) {
+installspec <- function(user = TRUE, name = 'ir', displayname = 'R', rprofile = NULL, prefix = NULL) {
     exit_code <- system2('jupyter', c('kernelspec', '--version'), FALSE, FALSE)
     if (exit_code != 0)
         stop('jupyter-client has to be installed but ', dQuote('jupyter kernelspec --version'), ' exited with code ', exit_code, '.\n')
@@ -32,7 +33,8 @@ installspec <- function(user = TRUE, name = 'ir', displayname = 'R', rprofile = 
     write(toJSON(spec, pretty = TRUE, auto_unbox = TRUE), file = spec_path)
     
     user_flag <- if (user) '--user' else character(0)
-    args <- c('kernelspec', 'install', '--replace', '--name', name, user_flag, file.path(tmp_name, 'kernelspec'))
+    location <- if (is.null(prefix)) user_flag else c('--prefix', prefix)
+    args <- c('kernelspec', 'install', '--replace', '--name', name, location, file.path(tmp_name, 'kernelspec'))
     exit_code <- system2('jupyter', args)
     
     unlink(tmp_name, recursive = TRUE)
