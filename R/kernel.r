@@ -385,6 +385,11 @@ initialize = function(connection_file) {
         stdin   = zmq.socket(zmqctx, .pbd_env$ZMQ.ST$ROUTER),
         shell   = zmq.socket(zmqctx, .pbd_env$ZMQ.ST$ROUTER))
     
+    # Enable handover: https://github.com/IRkernel/IRkernel/issues/508
+    for (router in sockets[c('control', 'stdin', 'shell')]) {
+        zmq.setsockopt(router, .pbd_env$ZMQ.SO$ROUTER_HANDOVER, 1L)
+    }
+    
     zmq.bind(sockets$hb,      url_with_port('hb_port'))
     zmq.bind(sockets$iopub,   url_with_port('iopub_port'))
     zmq.bind(sockets$control, url_with_port('control_port'))
