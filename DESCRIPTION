@@ -30,7 +30,7 @@ Imports:
     jsonlite (>= 0.9.6),
     uuid,
     digest
-Collate:
+Collate: 
     'class_unions.r'
     'logging.r'
     'comm_manager.r'
@@ -45,4 +45,5 @@ Collate:
     'utils.r'
     'kernel.r'
     'main.r'
+    'onload.r'
 RoxygenNote: 6.0.1.9000

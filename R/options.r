@@ -22,7 +22,8 @@ from_env <- list(
 # converts e.g. jupyter.log_level to JUPYTER_LOG_LEVEL
 opt_to_env <- function(nms) gsub('.', '_', toupper(nms), fixed = TRUE)
 
-.onLoad <- function(libname = NULL, pkgname = NULL) {
+# called in .onLoad
+init_options <- function() {
     for (opt_name in names(jupyter_option_defaults)) {
         # skip option if it is already set, e.g. in the Rprofile
         if (is.null(getOption(opt_name))) {

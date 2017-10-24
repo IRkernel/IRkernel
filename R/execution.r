@@ -253,14 +253,14 @@ execute = function(request) {
     err <<- list()
     
     # shade base::readline
-    replace_in_base_namespace('readline', .self$readline)
+    replace_in_package('base', 'readline', .self$readline)
     
     # shade getPass::getPass
     add_to_user_searchpath('getPass', .self$get_pass, 'getPass')
     
     # shade base::quit
-    replace_in_base_namespace('quit', .self$quit)
-    replace_in_base_namespace('q', .self$quit)
+    replace_in_package('base', 'quit', .self$quit)
+    replace_in_package('base', 'q', .self$quit)
 
     # find out stack depth in notebook cell
     # TODO: maybe replace with a single call on first execute and rest reuse the value?

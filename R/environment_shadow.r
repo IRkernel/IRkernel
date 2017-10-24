@@ -14,21 +14,33 @@ add_to_user_searchpath <- function(name, FN, pkg = NULL) {
     }
 }
 
-replace_in_namespace <- function(name, FN, env) {
-    env <- as.environment(env)
+replace_in_package <- function(pkg, name, FN) {
+    env <- as.environment(paste0('package:', pkg))
+    ns <- getNamespace(pkg)
+    #environment(FN) <- env
     .BaseNamespaceEnv$unlockBinding(name, env)
     assign(name, FN, env)
+    .BaseNamespaceEnv$lockBinding(name, env)
+    .BaseNamespaceEnv$unlockBinding(name, ns)
+    assign(name, FN, ns)
+    .BaseNamespaceEnv$lockBinding(name, ns)
 }
-
-replace_in_base_namespace <- function(name, FN) replace_in_namespace(name, FN, baseenv())
 
 get_shadowenv <- function() {
     as.environment('jupyter:irkernel')
 }
 
+# save functions that are later replaced (called in .onLoad)
+backup_env <- new.env()
+
+init_backup_env <- function() {
+    backup_env$base_flush_connection <- base::flush.connection
+    backup_env$utils_flush_console <- utils::flush.console
+}
+
 # Adds functions which do not need any access to the executer into the users searchpath
-#' @importFrom utils getFromNamespace flush.console
-#' @importFrom evaluate inject_funs flush_console
+#' @importFrom utils getFromNamespace
+#' @importFrom evaluate flush_console
 init_shadowenv <- function() {
     # add the accessors to the shadow env itself, so they are actually accessable
     # from everywhere...
@@ -63,8 +75,14 @@ init_shadowenv <- function() {
     
     # stream output in loops:
     # https://github.com/IRkernel/IRkernel/issues/3
-    replace_in_base_namespace('flush.connection', function(con) { .Internal(flush(con)); flush_console() })
-    replace_in_namespace('flush.console', function() { .Call(utils:::C_flushconsole); flush_console() }, getNamespace('utils'))
+    replace_in_package('base', 'flush.connection', function(con) {
+        backup_env$base_flush_connection(con)
+        flush_console()
+    })
+    replace_in_package('utils', 'flush.console', function() {
+        backup_env$utils_flush_console()
+        flush_console()
+    })
 }
 
 
