@@ -86,7 +86,7 @@ should_store_history = function() {
 },
 
 send_error_msg = function(msg) {
-    if (!is_silent()) return()
+    if (is_silent()) return()
     send_response('stream', current_request, 'iopub',
                   list(name = 'stderr', text = msg))
 
