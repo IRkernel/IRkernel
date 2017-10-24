@@ -4,17 +4,19 @@
 \alias{installspec}
 \title{Install the kernelspec to tell Jupyter about IRkernel.}
 \usage{
-installspec(user = TRUE, name = "ir", displayname = "R",
-  rprofile = NULL)
+installspec(user = NULL, name = "ir", displayname = "R",
+  rprofile = NULL, prefix = NULL)
 }
 \arguments{
-\item{user}{Install into user directory (\href{https://specifications.freedesktop.org/basedir-spec/latest/ar01s03.html}{\code{$XDG_DATA_HOME}}\code{/jupyter/kernels}) or globally?}
+\item{user}{Install into user directory (\href{https://specifications.freedesktop.org/basedir-spec/latest/ar01s03.html}{\code{$XDG_DATA_HOME}}\code{/jupyter/kernels}) or globally? (default: NULL but treated as TRUE if "prefix" is not specified)}
 
 \item{name}{The name of the kernel (default "ir")}
 
 \item{displayname}{The name which is displayed in the notebook (default: "R")}
 
 \item{rprofile}{(optional) Path to kernel-specific Rprofile (defaults to system-level settings)}
+
+\item{prefix}{(optional) Path to alternate directory to install kernelspec into (default: NULL)}
 }
 \value{
 Exit code of the \code{jupyter kernelspec install} call.
