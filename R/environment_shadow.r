@@ -5,10 +5,7 @@
 add_to_user_searchpath <- function(name, FN, pkg = NULL) {
     pkg_avail <- !is.null(pkg) && requireNamespace(pkg, quietly = TRUE)
     if (pkg_avail) {
-        env <- getNamespace(pkg)
-        .BaseNamespaceEnv$unlockBinding(name, env)
-        assign(name, FN, envir = env, inherits = TRUE)
-        .BaseNamespaceEnv$lockBinding(name, env)
+        replace_in_package(pkg, name, FN)
     } else {
         assign(name, FN, 'jupyter:irkernel')
     }
