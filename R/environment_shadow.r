@@ -12,15 +12,16 @@ add_to_user_searchpath <- function(name, FN, pkg = NULL) {
 }
 
 replace_in_package <- function(pkg, name, FN) {
-    env <- as.environment(paste0('package:', pkg))
-    ns <- getNamespace(pkg)
-    #environment(FN) <- env
+    env_name <- paste0('package:', pkg)
+    if (env_name %in% search())
+        replace_in_env(name, FN, as.environment(env_name))
+    replace_in_env(name, FN, getNamespace(pkg))
+}
+
+replace_in_env <- function(name, FN, env) {
     .BaseNamespaceEnv$unlockBinding(name, env)
     assign(name, FN, env)
     .BaseNamespaceEnv$lockBinding(name, env)
-    .BaseNamespaceEnv$unlockBinding(name, ns)
-    assign(name, FN, ns)
-    .BaseNamespaceEnv$lockBinding(name, ns)
 }
 
 get_shadowenv <- function() {
