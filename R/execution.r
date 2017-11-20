@@ -97,7 +97,6 @@ display_data = function(data, metadata = NULL) {
         metadata <- namedlist()
     }
     send_response('display_data', current_request, 'iopub', list(
-        source = 'R display func',
         data = data,
         metadata = metadata))
     
