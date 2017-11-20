@@ -14,12 +14,6 @@ matrix:
     - r: release
       env: DEPS=github
       os: linux
-    - r: release
-      env: DEPS=cran
-      os: osx
-    - r: release
-      env: DEPS=github
-      os: osx
     - r: devel
       env: DEPS=cran
       os: linux
@@ -30,6 +24,12 @@ matrix:
       env: DEPS=cran
       os: linux
   allow_failures:
+    - r: release
+      env: DEPS=cran
+      os: osx
+    - r: release
+      env: DEPS=github
+      os: osx
     - r: devel
       env: DEPS=cran
       os: osx
