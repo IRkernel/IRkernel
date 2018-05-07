@@ -30,6 +30,8 @@ get_shadowenv <- function() {
 
 # save functions that are later replaced (called in .onLoad)
 backup_env <- new.env()
+# Circumvent windows build bug, see issue #530
+backup_env$utils_flush_console <- function(...) {}
 
 init_backup_env <- function() {
     backup_env$base_flush_connection <- base::flush.connection
