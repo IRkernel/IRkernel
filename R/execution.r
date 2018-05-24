@@ -155,7 +155,7 @@ handle_error = function(e) {
 
         err <<- list(ename = 'ERROR', evalue = estr, traceback = as.list(c(msg, stack_info)))
         if (!is_silent()) {
-            send_response('error', current_request, 'iopub', c(err))
+            send_response('error', current_request, 'iopub', err)
         }
     }, error = function(e2) {
         log_error('Error in handle_error! %s', resilient_to_str(e2))
