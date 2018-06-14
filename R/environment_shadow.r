@@ -36,6 +36,7 @@ backup_env$utils_flush_console <- function(...) {}
 init_backup_env <- function() {
     backup_env$base_flush_connection <- base::flush.connection
     backup_env$utils_flush_console <- utils::flush.console
+    backup_env$base_quit <- base::quit
 }
 
 # Adds functions which do not need any access to the executer into the users searchpath

@@ -363,7 +363,8 @@ handle_control = function() {
 shutdown = function(request) {
     send_response('shutdown_reply', request, 'control', list(
         restart = request$content$restart))
-    quit('no')
+    # Always call the base quit() during shutdown since execution shadows it.
+    backup_env$base_quit('no')  # bound during startup in .onLoad
 },
 
 initialize = function(connection_file) {
@@ -407,6 +408,7 @@ initialize = function(connection_file) {
 
 run = function() {
     options(jupyter.in_kernel = TRUE)
+
     while (TRUE) {
         log_debug('main loop: beginning')
         r <- tryCatch(
