@@ -25,9 +25,13 @@ result_to_test <- function(result) {
 }
 
 spec_add_status <- installspec(name = 'testir', displayname = 'testir')
-test_that('test kernel installed', expect_equal(spec_add_status, 0))
+test_that('test kernel installed', {
+    skip_on_cran()
+    expect_equal(spec_add_status, 0)
+})
 
 test_that('kernel tests pass', {
+    skip_on_cran()
     expect_true(file.exists('test_ir.py'), 'test_ir.py exists')
     
     Sys.setenv(PYTHONPATH = 'njr')
@@ -40,4 +44,7 @@ test_that('kernel tests pass', {
 })
 
 spec_rm_status <- system2('jupyter', c('kernelspec', 'remove', '-f', 'testir'))
-test_that('test kernel removed', expect_equal(spec_rm_status, 0))
+test_that('test kernel removed', {
+    skip_on_cran()
+    expect_equal(spec_rm_status, 0)
+})
