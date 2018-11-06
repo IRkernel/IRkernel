@@ -24,10 +24,10 @@ result_to_test <- function(result) {
     test_that(get_desc(result), emit_result(msg))
 }
 
-spec_add_status <- installspec(name = 'testir', displayname = 'testir')
+spec_add_status <- tryCatch(installspec(name = 'testir', displayname = 'testir'), error = function(e) 666L)
 test_that('test kernel installed', {
     skip_on_cran()
-    expect_equal(spec_add_status, 0)
+    expect_equal(spec_add_status, 0L)
 })
 
 test_that('kernel tests pass', {
