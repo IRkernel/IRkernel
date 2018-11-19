@@ -15,7 +15,7 @@ For detailed requirements and install instructions see [irkernel.github.io](http
 This package is available on CRAN:
 
 ```R
-install.packages('IRkernel/IRkernel')
+install.packages('IRkernel')
 IRkernel::installspec()  # to register the kernel in the current R installation
 ```
 
