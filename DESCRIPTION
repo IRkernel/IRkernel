@@ -6,7 +6,7 @@ Description:
 Version: 0.8.14.9000
 Authors@R: c(
     person('Thomas', 'Kluyver', role = c('aut', 'cph'), email = 'thomas@kluyver.me.uk'),
-    person('Philipp', 'Angerer', role = c('aut', 'cph', 'cre'), email = 'phil.angerer@gmail.com'),
+    person('Philipp', 'Angerer', role = c('aut', 'cph', 'cre'), email = 'phil.angerer@gmail.com', comment = c(ORCID = "0000-0002-0369-2888")),
     person('Jan', 'Schulz', role = c('aut', 'cph'), email = 'jasc@gmx.net'),
     person('Karthik', 'Ram', role = c('aut', 'cph'), email = 'karthik.ram@gmail.com'))
 Depends:
