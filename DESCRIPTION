@@ -46,4 +46,4 @@ Collate:
     'kernel.r'
     'main.r'
     'onload.r'
-RoxygenNote: 6.1.0
+RoxygenNote: 6.1.1

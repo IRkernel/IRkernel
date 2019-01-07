@@ -195,15 +195,17 @@ handle_display_error = function(e) {
 handle_value = function(obj, visible) {
     log_debug('Value output...')
     set_last_value(obj)
-    if (visible) {
-        mimebundle <- prepare_mimebundle_kernel(obj, .self$handle_display_error)
-        if (length(intersect(class(obj), getOption('jupyter.pager_classes'))) > 0) {
-            log_debug('Showing pager: %s', paste(capture.output(str(mimebundle$data)), collapse = '\n'))
-            page(mimebundle)
-        } else {
-            log_debug('Sending display_data: %s', paste(capture.output(str(mimebundle$data)), collapse = '\n'))
-            send_response('display_data', current_request, 'iopub', mimebundle)
-        }
+    if (!visible) return()
+    
+    mimebundle <- prepare_mimebundle_kernel(obj, .self$handle_display_error)
+    if (is.null(mimebundle$data)) return()
+    
+    if (length(intersect(class(obj), getOption('jupyter.pager_classes'))) > 0) {
+        log_debug('Showing pager: %s', paste(capture.output(str(mimebundle$data)), collapse = '\n'))
+        page(mimebundle)
+    } else {
+        log_debug('Sending display_data: %s', paste(capture.output(str(mimebundle$data)), collapse = '\n'))
+        send_response('display_data', current_request, 'iopub', mimebundle)
     }
 },
 
@@ -243,7 +245,7 @@ execute = function(request) {
     send_response('execute_input', request, 'iopub', list(
         code = request$content$code,
         execution_count = execution_count))
-        
+    
     # Make the current request available to other functions
     current_request <<- request
     # reset ...
