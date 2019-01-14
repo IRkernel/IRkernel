@@ -174,7 +174,8 @@ send_plot = function(plotobj) {
                 attr(plotobj, '.irkernel_width'),
                 attr(plotobj, '.irkernel_height'),
                 res = attr(plotobj, '.irkernel_res')
-        )}, error = handle_error)
+            )
+        }, error = handle_error)
         # Isolating SVGs (putting them in an iframe) avoids strange
         # interactions with CSS on the page.
         if (identical(mime, 'image/svg+xml')) {
