@@ -230,8 +230,8 @@ handle_graphics = function(plotobj) {
     }
     # need to be set here to capture the size and have it available when the plot is sent
     attr(plotobj, '.irkernel_res')    <- getOption('repr.plot.res',    repr_option_defaults$repr.plot.res)
-    attr(plotobj, '.irkernel_height') <- getOption('repr.plot.height', repr_option_defaults$repr.plot.height)
     attr(plotobj, '.irkernel_width')  <- getOption('repr.plot.width',  repr_option_defaults$repr.plot.width)
+    attr(plotobj, '.irkernel_height') <- getOption('repr.plot.height', repr_option_defaults$repr.plot.height)
     last_recorded_plot <<- plotobj
 },
 
