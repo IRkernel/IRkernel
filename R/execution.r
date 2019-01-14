@@ -4,6 +4,7 @@ NULL
 # Create an empty named list
 #' @importFrom stats setNames
 namedlist <- function() setNames(list(), character(0))
+
 # Converts something to a string no matter what
 #' @importFrom utils str
 resilient_to_str <- function(v) tryCatch(toString(v), error = function(e) capture.output(str(v)))
@@ -168,8 +169,12 @@ send_plot = function(plotobj) {
     metadata <- namedlist()
     for (mime in getOption('jupyter.plot_mimetypes')) {
         tryCatch({
-            formats[[mime]] <- mime2repr[[mime]](plotobj, attr(plotobj, '.irkernel_width'), attr(plotobj, '.irkernel_height'))
-        }, error = handle_error)
+            formats[[mime]] <- mime2repr[[mime]](
+                plotobj,
+                attr(plotobj, '.irkernel_width'),
+                attr(plotobj, '.irkernel_height'),
+                res = attr(plotobj, '.irkernel_res')
+        )}, error = handle_error)
         # Isolating SVGs (putting them in an iframe) avoids strange
         # interactions with CSS on the page.
         if (identical(mime, 'image/svg+xml')) {
@@ -223,12 +228,15 @@ handle_graphics = function(plotobj) {
         send_plot(last_recorded_plot)
     }
     # need to be set here to capture the size and have it available when the plot is sent
-    factor <- getOption('repr.plot.res', repr_option_defaults$repr.plot.res) / repr_option_defaults$repr.plot.res
-    height <- getOption('repr.plot.height',  repr_option_defaults$repr.plot.height) / factor
-    width <- getOption('repr.plot.width',  repr_option_defaults$repr.plot.width) / factor
+    height <- getOption('repr.plot.height',  repr_option_defaults$repr.plot.height)
+    width <- getOption('repr.plot.width',  repr_option_defaults$repr.plot.width)
+    res <- getOption('repr.plot.res', repr_option_defaults$repr.plot.res)
     
-    attr(plotobj, '.irkernel_height') <- height
-    attr(plotobj, '.irkernel_width')  <- width
+    factor <- res / repr_option_defaults$repr.plot.res
+    
+    attr(plotobj, '.irkernel_res')  <- res
+    attr(plotobj, '.irkernel_height') <- height/factor
+    attr(plotobj, '.irkernel_width')  <- width/factor
     last_recorded_plot <<- plotobj
 },
 
