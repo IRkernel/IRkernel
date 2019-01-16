@@ -1,5 +1,9 @@
 Before submitting an issue please be sure to answer these questions with **yes**:
 
+- [ ] Did you follow the [official installation instructions](https://irkernel.github.io/installation/)?
+
+    If you have an installation problem and used e.g. Anaconda, please report your issue to them instead.
+
 - [ ] Did you reproduce the error with the newest versions? If the following code installs packages, you didn’t yet!
 
     ```r
