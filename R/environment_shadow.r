@@ -102,6 +102,8 @@ init_cran_repo <- function() {
 
 init_session <- function() {
     init_cran_repo()
+    # We support color even if isatty(stdout()) is FALSE
+    options(crayon.enabled = TRUE)
 }
 
 
