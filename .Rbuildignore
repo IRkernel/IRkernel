@@ -1,4 +1,5 @@
 .gitignore
+.github
 Makefile
 .ipynb_checkpoints
 .*.ipynb
