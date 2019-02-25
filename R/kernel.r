@@ -245,15 +245,20 @@ complete = function(request) {
     utils:::.assignEnd(cursor_pos)
     utils:::.guessTokenFromLine()
     utils:::.completeToken()
-        
+    
     # .guessTokenFromLine, like most other functions here usually sets variables in .CompletionEnv.
     # When specifying update = FALSE, it instead returns a list(token = ..., start = ...)
     c.info <- c(
         list(comps = utils:::.retrieveCompletions()),
         utils:::.guessTokenFromLine(update = FALSE))
+    # TODO: c.info$start
     
     # good coding style for completions
     comps <- gsub('=$', ' = ', c.info$comps)
+    
+    # TODO: only do this if we are not in a string or so
+    suggestions <- substring(c.info$comps, nchar(c.info$token) + c.info$start + 1L)
+    comps <- paste0(c.info$token, ifelse(make.names(suggestions) == suggestions, suggestions, sprintf('`%s`', suggestions)))
     
     start_position <- chars_before_line + c.info$start
     send_response('complete_reply', request, 'shell', list(
