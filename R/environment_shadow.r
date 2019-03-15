@@ -34,6 +34,14 @@ backup_env <- new.env()
 backup_env$utils_flush_console <- function(...) {}
 
 init_backup_env <- function() {
+    if (!identical(environment(utils::flush.console), environment(utils::read.delim))) {
+        tb <- .traceback(2)
+        warning(
+            'init_backup_env called a second time after init_shadowenv:\n',
+            paste(capture.output(traceback(tb)), collapse = '\n')
+        )
+        return()
+    }
     backup_env$base_flush_connection <- base::flush.connection
     backup_env$utils_flush_console <- utils::flush.console
     backup_env$base_quit <- base::quit
