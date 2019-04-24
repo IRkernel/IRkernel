@@ -1,3 +1,7 @@
+# Test manually via
+# IR_KERNEL_NAME=ir python3 -m test_ir -k some_test
+
+import os
 import sys
 from pathlib import Path
 
@@ -23,7 +27,7 @@ TIMEOUT = 15
 
 
 class IRkernelTests(jkt.KernelTests):
-    kernel_name = 'testir'
+    kernel_name = os.environ.get('IR_KERNEL_NAME', 'testir')
 
     language_name = 'R'
 
@@ -45,6 +49,18 @@ class IRkernelTests(jkt.KernelTests):
         {
             'text': 'zi',
             'matches': {'zip'},
+        },
+        {
+            'text': 'base::transform(',
+            'matches': {'`_data` = ', '...'},
+        },
+        {
+            'text': 'foo(R_system',
+            'matches': {'R_system_version'},
+        },
+        {
+            'text': 'grDevice',
+            'matches': {'grDevices::'},
         },
     ]
 
@@ -216,13 +232,13 @@ class IRkernelTests(jkt.KernelTests):
     
     def test_warning_message(self):
         self.flush_channels()
-        reply, output_msgs = self.execute_helper('warning(simpleWarning("wmsg"))')
+        reply, output_msgs = self.execute_helper('options(warn=1); warning(simpleWarning("wmsg"))')
         self.assertEqual(output_msgs[0]['msg_type'], 'stream')
         self.assertEqual(output_msgs[0]['content']['name'], 'stderr')
         self.assertEqual(output_msgs[0]['content']['text'], 'Warning message:\n“wmsg”')
         
         self.flush_channels()
-        reply, output_msgs = self.execute_helper('f <- function() warning("wmsg"); f()')
+        reply, output_msgs = self.execute_helper('options(warn=1); f <- function() warning("wmsg"); f()')
         self.assertEqual(output_msgs[0]['msg_type'], 'stream')
         self.assertEqual(output_msgs[0]['content']['name'], 'stderr')
         self.assertEqual(output_msgs[0]['content']['text'], 'Warning message in f():\n“wmsg”')

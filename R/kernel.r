@@ -229,52 +229,13 @@ complete = function(request) {
     code <- request$content$code
     cursor_pos <- request$content$cursor_pos
     
-    # Find which line we're on and position within that line
-    lines <- strsplit(code, '\n', fixed = TRUE)[[1]]
-    chars_before_line <- 0L
-    for (line in lines) {
-        new_cursor_pos <- cursor_pos - nchar(line) - 1L # -1 for the newline
-        if (new_cursor_pos < 0L) {
-            break
-        }
-        cursor_pos <- new_cursor_pos
-        chars_before_line <- chars_before_line + nchar(line) + 1L
-    }
-    
-    utils:::.assignLinebuffer(line)
-    utils:::.assignEnd(cursor_pos)
-    utils:::.guessTokenFromLine()
-    utils:::.completeToken()
-    
-    # .guessTokenFromLine, like most other functions here usually sets variables in .CompletionEnv.
-    # When specifying update = FALSE, it instead returns a list(token = ..., start = ...)
-    c.info <- c(
-        list(comps = utils:::.retrieveCompletions()),
-        utils:::.guessTokenFromLine(update = FALSE))
-    # TODO: c.info$start
-    
-    # good coding style for completions
-    comps <- gsub('=$', ' = ', c.info$comps)
-    
-    # TODO: only do this if we are not in a string or so
-    suggestions <- substring(c.info$comps, nchar(c.info$token) + c.info$start + 1L)
-    comps <- paste0(c.info$token, ifelse(
-        make.names(suggestions) == suggestions,
-        suggestions,
-        ifelse(
-            nchar(suggestions) > 0,
-            sprintf('`%s`', suggestions),
-            ''
-        )
-    ))
-    
-    start_position <- chars_before_line + c.info$start
+    comps <- completions(code, cursor_pos)
     send_response('complete_reply', request, 'shell', list(
-        matches = as.list(comps),  # make single strings not explode into letters
+        matches = as.list(comps$comps),  # make single strings not explode into letters
         metadata = namedlist(),
         status = 'ok',
-        cursor_start = start_position,
-        cursor_end = start_position + nchar(c.info$token)))
+        cursor_start = comps$start,
+        cursor_end = comps$end))
 },
 
 inspect = function(request) {

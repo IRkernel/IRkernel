@@ -35,6 +35,7 @@ Collate:
     'logging.r'
     'comm_manager.r'
     'compat.r'
+    'completion.r'
     'environment_runtime.r'
     'environment_shadow.r'
     'options.r'
