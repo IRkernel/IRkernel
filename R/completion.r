@@ -23,7 +23,7 @@ completions <- function(code, cursor_pos = nchar(code)) {
     
     # https://cran.r-project.org/doc/manuals/r-release/R-lang.html#Identifiers
     # TODO: only do this if we are not in a string or so
-    comps <- gsub('^([\\w\\d._]+\\$)?([_.].*?|.*?[^\\w\\d._].*?|.*?[.]\\d)(=)?(?<!::)$', '\\1`\\2`\\3', comps, perl = TRUE)
+    comps <- gsub('^([\\w\\d._]+(?:\\$|::))?(?!.*::)([_.].*?|.*?[^\\w\\d._].*?|.*?[.]\\d)(=)?(?<!::)$', '\\1`\\2`\\3', comps, perl = TRUE)
     
     # good coding style for completions
     comps <- gsub('`[.][.][.]`=$', '...', comps)
