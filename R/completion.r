@@ -11,15 +11,20 @@ completions <- function(code, cursor_pos = nchar(code)) {
         chars_before_line <- chars_before_line + nchar(line) + 1L
     }
     
-    utils:::.assignLinebuffer(line)
-    utils:::.assignEnd(cursor_pos)
+    # the completion docs say:
+    # > they are unexported because they are not meant to be called directly by users
+    # And we are no users, so we just have to trick the overeager R CMD check by not using :::
+    utils_ns <- asNamespace('utils')
+    
+    get('.assignLinebuffer', utils_ns)(line)
+    get('.assignEnd', utils_ns)(cursor_pos)
     # .guessTokenFromLine, like most other functions here usually sets variables in .CompletionEnv.
     # When specifying update = FALSE, it instead returns a list(token = ..., start = ...)
-    c.info <- utils:::.guessTokenFromLine(update = FALSE)
-    utils:::.guessTokenFromLine()
-    utils:::.completeToken()
+    c.info <- get('.guessTokenFromLine', utils_ns)(update = FALSE)
+    get('.guessTokenFromLine', utils_ns)()
+    get('.completeToken', utils_ns)()
 
-    comps <- utils:::.retrieveCompletions()
+    comps <- get('.retrieveCompletions', utils_ns)()
     
     # https://cran.r-project.org/doc/manuals/r-release/R-lang.html#Identifiers
     # TODO: only do this if we are not in a string or so

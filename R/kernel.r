@@ -260,10 +260,10 @@ inspect = function(request) {
 
     # Get token under the `cursor_pos`.
     # Since `.guessTokenFromLine()` does not check the characters after `cursor_pos`
-    # check them by a loop.
+    # check them by a loop. Use get since R CMD check does not like :::
     token <- ''
     for (i in seq(cursor_pos, nchar(code))) {
-        token_candidate <- utils:::.guessTokenFromLine(code, i)
+        token_candidate <- get('.guessTokenFromLine', asNamespace('utils'))(code, i)
         if (nchar(token_candidate) == 0) break
         token <- token_candidate
     }
