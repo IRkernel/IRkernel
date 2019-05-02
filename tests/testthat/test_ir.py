@@ -46,12 +46,14 @@ class IRkernelTests(jkt.KernelTests):
     code_hello_world = 'print("hello, world")'
 
     completion_samples = [
-        {'text': 'zi',               'matches': {'zip'}},
-        {'text': 'base::transform(', 'matches': {'`_data` = ', '...'}},
-        {'text': 'foo(R_system',     'matches': {'R_system_version'}},
-        {'text': 'grDevice',         'matches': {'grDevices::'}},
-        {'text': 'base::abbrev',     'matches': {'base::abbreviate'}},
-        {'text': 'base::.rowNamesD', 'matches': {'base::`.rowNamesDF<-`'}},
+        {'text': 'zi',                     'matches': {'zip'}},
+        {'text': 'seq_len(',               'matches': {'length.out = '}},
+        {'text': 'base::transform(',       'matches': {'`_data` = ', '...'}},
+        {'text': 'foo(R_system',           'matches': {'R_system_version'}},
+        {'text': 'grDevice',               'matches': {'grDevices::'}},
+        {'text': 'base::abbrev',           'matches': {'base::abbreviate'}},
+        {'text': 'base::.rowNamesD',       'matches': {'base::`.rowNamesDF<-`'}},
+        {'text': 'repr::format2repr$mark', 'matches': {'repr::format2repr$markdown'}},
     ]
 
     complete_code_samples = ['1', 'print("hello, world")', 'f <- function(x) {\n  x*2\n}']

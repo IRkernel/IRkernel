@@ -1,4 +1,4 @@
-completions <- function(code, cursor_pos = nchar(code)) {
+completions <- function(code, cursor_pos = nchar(code), fixup = TRUE) {
     # Find which line we're on and position within that line
     lines <- strsplit(code, '\n', fixed = TRUE)[[1]]
     chars_before_line <- 0L
@@ -26,18 +26,33 @@ completions <- function(code, cursor_pos = nchar(code)) {
 
     comps <- get('.retrieveCompletions', utils_ns)()
     
-    # https://cran.r-project.org/doc/manuals/r-release/R-lang.html#Identifiers
-    # TODO: only do this if we are not in a string or so
-    comps <- gsub('^([\\w\\d._]+(?:\\$|::))?(?!.*::)([_.].*?|.*?[^\\w\\d._].*?|.*?[.]\\d)(=)?(?<!::)$', '\\1`\\2`\\3', comps, perl = TRUE)
-    
-    # good coding style for completions
-    comps <- gsub('`[.][.][.]`=$', '...', comps)
-    comps <- gsub('=$', ' = ', comps)
+    if (fixup) comps <- fixup_comps(comps)
     
     start_position <- chars_before_line + c.info$start
     list(
         comps = comps,
         start = start_position,
-        end = start_position
+        end = start_position + nchar(c.info$token)
     )
+}
+
+fixup_comps <- function(comps) {
+    # TODO: only do this if we are not in a string or so
+    re_trail <- '=|::'
+    re_lead <- '[\\w\\d._]+(?:\\$|::)'  # TODO: allow foo$`_bar`$baz<tab>
+    
+    # split off leading and trailing parts
+    trailing <- gsub(sprintf('^.*?(%s)?$', re_trail), '\\1', comps, perl = TRUE)
+    comps <- gsub(sprintf('(%s)$', re_trail), '', comps, perl = TRUE)
+    leading <- gsub(sprintf('^((%s)*).*?$', re_lead), '\\1', comps, perl = TRUE)
+    comps <- gsub(sprintf('^(%s)+', re_lead), '', comps, perl = TRUE)
+    
+    # wrap non-identifiers with ``
+    # https://cran.r-project.org/doc/manuals/r-release/R-lang.html#Identifiers
+    comps <- gsub('^([_.].*?|.*?[^\\w\\d._].*?|.*?[.]\\d)$', '`\\1`', comps, perl = TRUE)
+    
+    # good coding style for completions
+    trailing <- gsub('=', ' = ', trailing)
+    comps <- paste0(leading, comps, trailing)
+    gsub('^`[.][.][.]` = $', '...', comps)
 }
