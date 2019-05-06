@@ -53,6 +53,7 @@ class IRkernelTests(jkt.KernelTests):
         {'text': 'grDevice',               'matches': {'grDevices::'}},
         {'text': 'base::abbrev',           'matches': {'base::abbreviate'}},
         {'text': 'base::.rowNamesD',       'matches': {'base::`.rowNamesDF<-`'}},
+        {'text': 'repr:::repr_png.def',    'matches': {'repr:::repr_png.default'}},
         {'text': 'repr::format2repr$mark', 'matches': {'repr::format2repr$markdown'}},
     ]
 

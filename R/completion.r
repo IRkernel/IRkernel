@@ -39,7 +39,7 @@ completions <- function(code, cursor_pos = nchar(code), fixup = TRUE) {
 fixup_comps <- function(comps) {
     # TODO: only do this if we are not in a string or so
     re_trail <- '=|::'
-    re_lead <- '[\\w\\d._]+(?:\\$|::)'  # TODO: allow foo$`_bar`$baz<tab>
+    re_lead <- '[\\w\\d._]+(?:\\$|:::?)'  # TODO: allow foo$`_bar`$baz<tab>
     
     # split off leading and trailing parts
     trailing <- gsub(sprintf('^.*?(%s)?$', re_trail), '\\1', comps, perl = TRUE)
