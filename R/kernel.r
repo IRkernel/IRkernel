@@ -94,6 +94,9 @@ send_response = function(msg_type, parent_msg, socket_name, content) {
     "Send a response"
     
     msg <- new_reply(msg_type, parent_msg)
+    if (grepl('_reply$', msg_type) && is.null(content$status)) {
+        content$status <- 'ok'
+    }
     msg$content <- content
     socket <- sockets[[socket_name]]
     zmq.send.multipart(socket, msg_to_wire(msg), serialize = FALSE)
@@ -233,7 +236,6 @@ complete = function(request) {
     send_response('complete_reply', request, 'shell', list(
         matches = as.list(comps$comps),  # make single strings not explode into letters
         metadata = namedlist(),
-        status = 'ok',
         cursor_start = comps$start,
         cursor_end = comps$end))
 },
@@ -295,7 +297,6 @@ inspect = function(request) {
     }
     found <- length(data) != 0
     send_response('inspect_reply', request, 'shell', list(
-        status = 'ok',
         found = found,
         data = data,
         metadata = namedlist()))
