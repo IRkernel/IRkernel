@@ -343,6 +343,7 @@ shutdown = function(request) {
 },
 
 initialize = function(connection_file) {
+    if (is.character(connection_file)) connection_file <- file(connection_file)
     connection_info <<- fromJSON(connection_file)
     stopifnot(connection_info$transport %in% c('tcp', 'ipc'))
     
