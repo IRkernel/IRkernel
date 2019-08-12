@@ -18,7 +18,13 @@
 #'   }
 #'   \item{\code{jupyter.plot_mimetypes}}{
 #'      The plot formats emitted to the frontend when a plot is displayed.
-#'      (default: image/png, application/pdf, and image/svg+xml)
+#'      (default: image/png and application/pdf)
+#'   }
+#'   \item{\code{jupyter.plot_scale}}{
+#'      The ratio (notebook PPI / \code{repr.plot.res}).
+#'      E.g.: With the defaults \code{repr.plot.res}=120 px/in (PPI) and \code{jupyter.plot_scale}=2, 
+#'      a 1in\eqn{\times}1in image will be displayed as a 0.5in\eqn{\times}0.5in, 240 PPI image.
+#'      (default: 2, fit for retina displays)
 #'   }
 #' }
 #'

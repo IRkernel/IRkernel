@@ -167,13 +167,20 @@ send_plot = function(plotobj) {
     formats <- namedlist()
     metadata <- namedlist()
     for (mime in getOption('jupyter.plot_mimetypes')) {
+        w <- attr(plotobj, '.irkernel_width')
+        h <- attr(plotobj, '.irkernel_height')
+        ppi <- attr(plotobj, '.irkernel_ppi')
         tryCatch({
-            formats[[mime]] <- mime2repr[[mime]](plotobj, attr(plotobj, '.irkernel_width'), attr(plotobj, '.irkernel_height'))
+            formats[[mime]] <- mime2repr[[mime]](plotobj, w, h)
         }, error = handle_error)
+        metadata[[mime]] <- list(
+            width  = w * ppi,
+            height = h * ppi
+        )
         # Isolating SVGs (putting them in an iframe) avoids strange
         # interactions with CSS on the page.
         if (identical(mime, 'image/svg+xml')) {
-            metadata[[mime]] <- list(isolated = TRUE)
+            metadata[[mime]]$isolated <- TRUE
         }
     }
     publish_mimebundle(formats, metadata)
@@ -225,6 +232,9 @@ handle_graphics = function(plotobj) {
     # need to be set here to capture the size and have it available when the plot is sent
     attr(plotobj, '.irkernel_width')  <- getOption('repr.plot.width',  repr_option_defaults$repr.plot.width)
     attr(plotobj, '.irkernel_height') <- getOption('repr.plot.height', repr_option_defaults$repr.plot.height)
+    attr(plotobj, '.irkernel_ppi')    <-
+        getOption('repr.plot.res', repr_option_defaults$repr.plot.res) /
+        getOption('jupyter.plot_scale', jupyter_option_defaults$jupyter.plot_scale)
     last_recorded_plot <<- plotobj
 },
 
