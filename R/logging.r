@@ -8,8 +8,11 @@
 #' Log level and log file can be set via R package options e.g. \code{options(jupyter.log_level = 2L)}
 #' or from the environment variables JUPYTER_LOG_LEVEL and JUPYTER_LOGFILE.
 #'
-#' @name log_*
 #' @param ...  message to log
+#' @name log
+NULL
+
+#' @rdname log
 #' @export
 log_debug <- function(...) {
     if (isTRUE(getOption('jupyter.log_level') >= 3L)) {
@@ -17,7 +20,7 @@ log_debug <- function(...) {
     }
 }
 
-#' @name log_*
+#' @rdname log
 #' @export
 log_info <- function(...) {
     if (isTRUE(getOption('jupyter.log_level') >= 2L)) {
@@ -25,7 +28,7 @@ log_info <- function(...) {
     }
 }
 
-#' @name log_*
+#' @rdname log
 #' @export
 log_error <- function(...) {
     if (isTRUE(getOption('jupyter.log_level') >= 1L)) {

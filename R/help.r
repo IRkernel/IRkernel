@@ -37,6 +37,6 @@
 #' 
 #' @docType package
 #' @seealso \link{installspec}
-#' @name IRkernel
+#' @name IRkernel-package
 #' @aliases IRkernel IRkernel-package IRkernel-options
 NULL

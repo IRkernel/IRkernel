@@ -1,7 +1,7 @@
 #' @usage
 #' jupyter_option_defaults
 #' 
-#' @name IRkernel
+#' @rdname IRkernel-package
 #' @export
 jupyter_option_defaults <- list(
     jupyter.rich_display = TRUE, # moved from IRdisplay
