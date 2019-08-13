@@ -240,13 +240,13 @@ handle_graphics = function(plotobj) {
 
 handle_message = function(o) {
     log_debug('Message output: %s', o)
-    stream(paste(conditionMessage(o), collapse = ''), 'stderr')
+    stream(paste(c(conditionMessage(o), '\n'), collapse = ''), 'stderr')
 },
 
 handle_warning = function(o) {
     call <- conditionCall(o)
     call <- if (is.null(call)) '' else sprintf(' in %s', deparse(call)[[1]])
-    msg <- sprintf('Warning message%s:\n%s', call, dQuote(conditionMessage(o)))
+    msg <- sprintf('Warning message%s:\n%s\n', call, dQuote(conditionMessage(o)))
     log_debug('Warning output: %s', msg)
     stream(msg, 'stderr')
 },
