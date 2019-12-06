@@ -4,8 +4,13 @@
 \alias{installspec}
 \title{Install the kernelspec to tell Jupyter about IRkernel.}
 \usage{
-installspec(user = NULL, name = "ir", displayname = "R",
-  rprofile = NULL, prefix = NULL)
+installspec(
+  user = NULL,
+  name = "ir",
+  displayname = "R",
+  rprofile = NULL,
+  prefix = NULL
+)
 }
 \arguments{
 \item{user}{Install into user directory (\href{https://specifications.freedesktop.org/basedir-spec/latest/ar01s03.html}{\code{$XDG_DATA_HOME}}\code{/jupyter/kernels}) or globally? (default: NULL but treated as TRUE if "prefix" is not specified)}
