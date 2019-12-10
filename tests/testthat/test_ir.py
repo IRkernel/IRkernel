@@ -110,9 +110,11 @@ class IRkernelTests(jkt.KernelTests):
         self.assertEqual(data['text/plain'], 'plot without title')
         self.assertIn('image/png', data)
         
-        # we isolate only svg plots, which are not included in the default types
+        # we send image dimensions
         metadata = output_msgs[0]['content']['metadata']
-        self.assertEqual(len(metadata), 0, metadata.keys())
+        self.assertEqual(len(metadata), 1, metadata.keys())
+        self.assertIn('image/png', metadata)
+        self.assertEqual(metadata['image/png'], dict(width=420, height=420), metadata['image/png'])
 
     def test_irkernel_plots_only_PNG(self):
         """plotting PNG"""
@@ -134,7 +136,9 @@ class IRkernelTests(jkt.KernelTests):
 
         # nothing in metadata
         metadata = output_msgs[0]['content']['metadata']
-        self.assertEqual(len(metadata), 0, metadata.keys())
+        self.assertEqual(len(metadata), 1, metadata.keys())
+        self.assertIn('image/png', metadata)
+        self.assertEqual(metadata['image/png'], dict(width=420, height=420), metadata['image/png'])
 
         # And reset
         code = 'options(old_options)'
@@ -156,8 +160,8 @@ class IRkernelTests(jkt.KernelTests):
         # svg output is currently isolated
         metadata = output_msgs[0]['content']['metadata']
         self.assertEqual(len(metadata), 1, metadata.keys())
-        self.assertEqual(len(metadata['image/svg+xml']), 1)
-        self.assertEqual(metadata['image/svg+xml']['isolated'], True)
+        self.assertEqual(len(metadata['image/svg+xml']), 3)
+        self.assertEqual(metadata['image/svg+xml'], dict(width=420, height=420, isolated=True), metadata['image/svg+xml'])
 
         # And reset
         code = 'options(old_options)'
@@ -231,13 +235,13 @@ class IRkernelTests(jkt.KernelTests):
         reply, output_msgs = self.execute_helper('options(warn=1); warning(simpleWarning("wmsg"))')
         self.assertEqual(output_msgs[0]['msg_type'], 'stream')
         self.assertEqual(output_msgs[0]['content']['name'], 'stderr')
-        self.assertEqual(output_msgs[0]['content']['text'], 'Warning message:\n“wmsg”')
+        self.assertEqual(output_msgs[0]['content']['text'].strip(), 'Warning message:\n“wmsg”')
         
         self.flush_channels()
         reply, output_msgs = self.execute_helper('options(warn=1); f <- function() warning("wmsg"); f()')
         self.assertEqual(output_msgs[0]['msg_type'], 'stream')
         self.assertEqual(output_msgs[0]['content']['name'], 'stderr')
-        self.assertEqual(output_msgs[0]['content']['text'], 'Warning message in f():\n“wmsg”')
+        self.assertEqual(output_msgs[0]['content']['text'].strip(), 'Warning message in f():\n“wmsg”')
 
     def test_should_increment_history(self):
         """properly increments execution history"""

@@ -173,10 +173,12 @@ send_plot = function(plotobj) {
         tryCatch({
             formats[[mime]] <- mime2repr[[mime]](plotobj, w, h)
         }, error = handle_error)
-        metadata[[mime]] <- list(
-            width  = w * ppi,
-            height = h * ppi
-        )
+        if (!identical(mime, 'text/plain')) {
+            metadata[[mime]] <- list(
+                width  = w * ppi,
+                height = h * ppi
+            )
+        }
         # Isolating SVGs (putting them in an iframe) avoids strange
         # interactions with CSS on the page.
         if (identical(mime, 'image/svg+xml')) {
