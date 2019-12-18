@@ -24,11 +24,11 @@ completions <- function(code, cursor_pos = nchar(code), fixup = TRUE) {
     get('.guessTokenFromLine', utils_ns)()
     get('.completeToken', utils_ns)()
 
-    comps <- get('.retrieveCompletions', utils_ns)()
-    
-    if (fixup) comps <- fixup_comps(comps)
-    
     start_position <- chars_before_line + c.info$start
+    in_string <- substr(code, start_position, start_position) %in% c("'", '"')
+
+    comps <- get('.retrieveCompletions', utils_ns)()
+    if (fixup && !in_string) comps <- fixup_comps(comps)
     list(
         comps = comps,
         start = start_position,

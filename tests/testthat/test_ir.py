@@ -58,6 +58,8 @@ class IRkernelTests(jkt.KernelTests):
         {'text': 'base::.rowNamesD',       'matches': {'base::`.rowNamesDF<-`'}},
         {'text': 'repr:::repr_png.def',    'matches': {'repr:::repr_png.default'}},
         {'text': 'repr::format2repr$mark', 'matches': {'repr::format2repr$markdown'}},
+        {'text': 'load("test_i',           'matches': {'test_ir.py'}},
+        {'text': 'load("../test',          'matches': {'../testthat.R', '../testthat/'}},
     ]
 
     complete_code_samples = ['1', 'print("hello, world")', 'f <- function(x) {\n  x*2\n}']
