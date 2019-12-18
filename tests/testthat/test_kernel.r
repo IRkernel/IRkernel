@@ -34,7 +34,7 @@ test_that('kernel tests pass', {
     skip_on_cran()
     expect_true(file.exists('test_ir.py'), 'test_ir.py exists')
     
-    Sys.setenv(PYTHONPATH = 'njr')
+    Sys.setenv(PYTHONPATH = 'njr', PYTHONUNBUFFERED = '1')
     con <- pipe('python3 -W ignore::DeprecationWarning -m ndjson_testrunner test_ir', 'rt')
     on.exit(expect_equal(close(con), 0L))
     
