@@ -9,19 +9,20 @@
 #' @param displayname  The name which is displayed in the notebook (default: "R")
 #' @param rprofile     (optional) Path to kernel-specific Rprofile (defaults to system-level settings)
 #' @param prefix       (optional) Path to alternate directory to install kernelspec into (default: NULL)
+#' @param sys_prefix   (optional) Install kernelspec using the "--sys-prefix" option of the currently detected jupyter (default: NULL)
 #' 
 #' @return Exit code of the \code{jupyter kernelspec install} call.
 #' 
 #' @export
-installspec <- function(user = NULL, name = 'ir', displayname = 'R', rprofile = NULL, prefix = NULL) {
+installspec <- function(user = NULL, name = 'ir', displayname = 'R', rprofile = NULL, prefix = NULL, sys_prefix = NULL) {
     exit_code <- system2('jupyter', c('kernelspec', '--version'), FALSE, FALSE)
     if (exit_code != 0)
         stop('jupyter-client has to be installed but ', dQuote('jupyter kernelspec --version'), ' exited with code ', exit_code, '.\n')
 
     # default to 'user' install if neither 'user' or 'prefix' is specified
-    if (is.null(user)) user <- is.null(prefix)
-    if (user && !is.null(prefix))
-        stop('"user" and "prefix" are mutually exclusive')
+    if (is.null(user)) user <- (is.null(prefix) && is.null(sys_prefix))
+    if (sum(user, !is.null(prefix), !is.null(sys_prefix)) > 1)
+        stop('"user", "prefix", "sys_prefix" are mutually exclusive')
     
     # make a kernelspec with the current interpreter's absolute path
     srcdir <- system.file('kernelspec', package = 'IRkernel')
@@ -39,7 +40,8 @@ installspec <- function(user = NULL, name = 'ir', displayname = 'R', rprofile = 
     
     user_flag <- if (user) '--user' else character(0)
     prefix_flag <- if (!is.null(prefix)) c('--prefix', prefix) else character(0) 
-    args <- c('kernelspec', 'install', '--replace', '--name', name, user_flag, prefix_flag, file.path(tmp_name, 'kernelspec'))
+    sys_prefix_flag <- if (!is.null(sys_prefix)) c('--sys-prefix', prefix) else character(0) 
+    args <- c('kernelspec', 'install', '--replace', '--name', name, user_flag, prefix_flag, sys_prefix_flag, file.path(tmp_name, 'kernelspec'))
     exit_code <- system2('jupyter', args)
     
     unlink(tmp_name, recursive = TRUE)

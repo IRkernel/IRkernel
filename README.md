@@ -34,6 +34,10 @@ IRkernel::installspec(name = 'ir33', displayname = 'R 3.3')
 IRkernel::installspec(name = 'ir32', displayname = 'R 3.2')
 ```
 
+By default, it installs the kernel per-user.  To install system-wide,
+use `user = FALSE`.  To install in the `sys.prefix` of the currently
+detected `jupyter` command line utility, use `sys_prefix = TRUE`.
+
 Now both R versions are available as an R kernel in the notebook.
 
 ### If you encounter problems during installation
@@ -76,3 +80,14 @@ make docker_dev_image #builds dev image and installs IRkernel dependencies from 
 make docker_dev #mounts source, installs, and runs Jupyter notebook; docker_dev_image is a prerequisite
 make docker_test #builds the package from source then runs the tests via R CMD check; docker_dev_image is a prerequisite
 ```
+
+## How does it know where to install?
+
+The IRKernel does not have any Python dependencies whatsoever, and
+does not know anything about any other Jupyter/Python installations
+you may have.  It only requires the `jupyter` command to be available
+on `$PATH`.  To install the kernel, it prepares a kernelspec directory
+(containing `kernel.json` and so on), and passes it to the command
+line `jupyter kernelspec install [options] prepared_kernel_dir/`,
+where options such as `--name`, `--user`, `--prefix`, and
+`--sys-prefix` are given based on the options.

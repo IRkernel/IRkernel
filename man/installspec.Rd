@@ -9,7 +9,8 @@ installspec(
   name = "ir",
   displayname = "R",
   rprofile = NULL,
-  prefix = NULL
+  prefix = NULL,
+  sys_prefix = NULL
 )
 }
 \arguments{
@@ -22,6 +23,8 @@ installspec(
 \item{rprofile}{(optional) Path to kernel-specific Rprofile (defaults to system-level settings)}
 
 \item{prefix}{(optional) Path to alternate directory to install kernelspec into (default: NULL)}
+
+\item{sys_prefix}{(optional) Install kernelspec using the "--sys-prefix" option of the currently detected jupyter (default: NULL)}
 }
 \value{
 Exit code of the \code{jupyter kernelspec install} call.
