@@ -164,6 +164,7 @@ handle_error = function(e) {
 },
 
 send_plot = function(plotobj) {
+    log_debug('Sending plot...')
     formats <- namedlist()
     metadata <- namedlist()
     for (mime in getOption('jupyter.plot_mimetypes')) {
@@ -228,7 +229,6 @@ stream = function(output, streamname) {
 handle_graphics = function(plotobj) {
     log_debug('Graphics output...')
     if (!plot_builds_upon(last_recorded_plot, plotobj)) {
-        log_debug('Sending plot...')
         send_plot(last_recorded_plot)
     }
     # need to be set here to capture the size and have it available when the plot is sent
@@ -311,7 +311,10 @@ execute = function(request) {
             envir = .GlobalEnv,
             output_handler = oh,
             stop_on_error = 1L),
-        interrupt = function(cond) interrupted <<- TRUE,
+        interrupt = function(cond) {
+            log_debug('Interrupt during execution')
+            interrupted <<- TRUE
+        },
         error = .self$handle_error) # evaluate does not catch errors in parsing
     
     if (!is_silent() && !is.null(last_recorded_plot)) {
@@ -322,6 +325,8 @@ execute = function(request) {
         if (interrupted) 'abort'
         else if (!is.null(err$ename)) 'error'
         else 'ok'
+
+    log_debug('Code execution reasult: %s', status)
     
     reply_content <- c(
         list(
