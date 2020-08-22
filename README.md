@@ -19,6 +19,7 @@ This package is available on CRAN:
 ```R
 install.packages('IRkernel')
 IRkernel::installspec()  # to register the kernel in the current R installation
+jupyter labextension install @techrah/text-shortcuts  # for RStudio’s shortcuts
 ```
 
 Per default `IRkernel::installspec()` will install a kernel with the name “ir” and a
