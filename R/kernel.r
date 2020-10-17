@@ -81,8 +81,8 @@ new_reply = function(msg_type, parent_msg) {
         msg_id   = UUIDgenerate(),
         session  = parent_msg$header$session,
         username = parent_msg$header$username,
-        # ISO 8601
-        date = strftime(as.POSIXlt(Sys.time(), 'UTC'), '%Y-%m-%dT%H:%M:%S%z'),
+        # ISO 8601, 6 is the maximum number decimal digits supported by R
+        date = strftime(as.POSIXlt(Sys.time(), 'UTC'), '%Y-%m-%dT%H:%M:%OS6Z'),
         msg_type = msg_type,
         version  = PROTOCOL_VER)
     
