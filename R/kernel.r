@@ -1,4 +1,6 @@
 #' @include execution.r help.r comm_manager.r logging.r utils.r
+PROTOCOL_VER = '5.3'
+
 Kernel <- setRefClass(
     'Kernel',
     fields = list(
@@ -77,10 +79,12 @@ new_reply = function(msg_type, parent_msg) {
     
     header <- list(
         msg_id   = UUIDgenerate(),
-        username = parent_msg$header$username,
         session  = parent_msg$header$session,
+        username = parent_msg$header$username,
+        # ISO 8601
+        date = strftime(as.POSIXlt(Sys.time(), 'UTC'), '%Y-%m-%dT%H:%M:%S%z'),
         msg_type = msg_type,
-        version  = '5.0')
+        version  = PROTOCOL_VER)
     
     list(
         header        = header,
@@ -309,7 +313,7 @@ history = function(request) {
 kernel_info = function(request) {
     rversion <- paste0(version$major, '.', version$minor)
     send_response('kernel_info_reply', request, 'shell', list(
-        protocol_version       = '5.0',
+        protocol_version       = PROTOCOL_VER,
         implementation         = 'IRkernel',
         implementation_version = as.character(packageVersion('IRkernel')),
         language_info = list(
