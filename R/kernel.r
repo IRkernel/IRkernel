@@ -104,7 +104,7 @@ send_response = function(msg_type, parent_msg, socket_name, content) {
     msg$content <- content
     socket <- sockets[[socket_name]]
     zmq.send.multipart(socket, msg_to_wire(msg), serialize = FALSE)
-    log_debug('Sending msg %s', msg$header$msg_type)
+    log_debug('Sending msg %s.%s', socket_name, msg$header$msg_type)
 },
 
 handle_shell = function() {
