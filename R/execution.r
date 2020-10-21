@@ -326,7 +326,7 @@ execute = function(request) {
         else if (!is.null(err$ename)) 'error'
         else 'ok'
 
-    log_debug('Code execution reasult: %s', status)
+    log_debug('Code execution result: %s', status)
     
     reply_content <- c(
         list(
