@@ -73,11 +73,13 @@ init_shadowenv <- function() {
         Sys.sleep(0.5)
     })
 
-    # we simply have currently no way to view or edit dfs:
-    # https://github.com/IRkernel/IRkernel/issues/280
-    add_to_user_searchpath('View', function(...) {
-        stop(sQuote('View()'), ' not yet supported in the Jupyter R kernel')
+    add_to_user_searchpath('View', function(x, title) {
+        if (!missing(title)) IRdisplay::display_text(title)
+        IRdisplay::display(x)
+        invisible(x)  # the manpage says it returns NULL, but this is useful for piping
     })
+    # we simply have currently no way to edit dfs:
+    # https://github.com/IRkernel/IRkernel/issues/280
     add_to_user_searchpath('edit', function(...) {
         stop(sQuote('edit()'), ' not yet supported in the Jupyter R kernel')
     })
