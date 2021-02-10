@@ -51,7 +51,7 @@ create_conda_environment() (
     conda update -q conda
     # Useful for debugging any issues with conda
     conda info -a
-    conda create -q -n test-environment python=3.5 jupyter nose
+    conda create -q -n test-environment python=3.8 jupyter nose
     
     ls ~/miniconda/bin
 )
