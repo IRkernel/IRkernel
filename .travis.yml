@@ -1,3 +1,4 @@
+dist: bionic
 language: r
 sudo: false
 cache: packages
@@ -64,3 +65,4 @@ script:
 after_failure:
 - cat "$CHECK_LOG"
 - cat "$INSTALL_LOG"
+- Rscript -e 'devtools::install();devtools::test()'
