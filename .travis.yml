@@ -2,61 +2,65 @@ language: r
 sudo: false
 cache: packages
 
+branches:
+  only:
+  - master
+
 # travis handles 5 builds in parallel,
 # so restrict the build matrix to multiples of that.
 # Also put the most important builds (-> release on both os)
 # into the first batch
 matrix:
   include:
-    - r: release
-      env: DEPS=cran
-      os: linux
-    - r: release
-      env: DEPS=github
-      os: linux
-    - r: devel
-      env: DEPS=cran
-      os: linux
-    - r: devel
-      env: DEPS=github
-      os: linux
-    - r: oldrel
-      env: DEPS=cran
-      os: linux
+  - r: release
+    env: DEPS=cran
+    os: linux
+  - r: release
+    env: DEPS=github
+    os: linux
+  - r: devel
+    env: DEPS=cran
+    os: linux
+  - r: devel
+    env: DEPS=github
+    os: linux
+  - r: oldrel
+    env: DEPS=cran
+    os: linux
   allow_failures:
-    - r: release
-      env: DEPS=cran
-      os: osx
-    - r: release
-      env: DEPS=github
-      os: osx
-    - r: devel
-      env: DEPS=cran
-      os: osx
-    - r: devel
-      env: DEPS=github
-      os: osx
-    - r: oldrel
-      env: DEPS=cran
-      os: osx
+  - r: release
+    env: DEPS=cran
+    os: osx
+  - r: release
+    env: DEPS=github
+    os: osx
+  - r: devel
+    env: DEPS=cran
+    os: osx
+  - r: devel
+    env: DEPS=github
+    os: osx
+  - r: oldrel
+    env: DEPS=cran
+    os: osx
 
 r_packages:
-  - devtools
+- devtools
 
 before_script:
-  - source .travis.sh
-  - install_r_packages
-  - export PATH="$HOME/miniconda/bin:$PATH"
-  - create_conda_environment
-  - source activate test-environment
-  - pip install jupyter_kernel_test ndjson-testrunner
+- source .travis.sh
+- install_r_packages
+- export PATH="$HOME/miniconda/bin:$PATH"
+- create_conda_environment
+- source activate test-environment
+- pip install jupyter_kernel_test ndjson-testrunner
 
 
 script:
-  - fold_wrap 'Exporting variables' export_variables
-  - fold_wrap 'Building Package' build_package
-  - fold_wrap 'Checking Package' check_package
+- fold_wrap 'Exporting variables' export_variables
+- fold_wrap 'Building Package' build_package
+- fold_wrap 'Checking Package' check_package
     
 after_failure:
-  - cat "$CHECK_LOG"
-  - cat "$INSTALL_LOG"
+- cat "$CHECK_LOG"
+- cat "$INSTALL_LOG"
