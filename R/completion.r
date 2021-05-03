@@ -49,7 +49,7 @@ fixup_comps <- function(comps) {
     
     # wrap non-identifiers with ``
     # https://cran.r-project.org/doc/manuals/r-release/R-lang.html#Identifiers
-    comps <- gsub('^([_.].*?|.*?[^\\w\\d._].*?|.*?[.]\\d)$', '`\\1`', comps, perl = TRUE)
+    comps <- gsub('^(_.*?|[.]{2,}.*?|.*?[^\\w\\d._].*?|.*?[.]\\d)$', '`\\1`', comps, perl = TRUE)
     
     # good coding style for completions
     trailing <- gsub('=', ' = ', trailing)
