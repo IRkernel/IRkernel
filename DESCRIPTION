@@ -3,7 +3,7 @@ Title: Native R Kernel for the 'Jupyter Notebook'
 Description:
     The R kernel for the 'Jupyter' environment executes R code which the front-end
     ('Jupyter Notebook' or other front-ends) submits to the kernel via the network.
-Version: 1.2
+Version: 1.2.0.9000
 Authors@R: c(
     person('Thomas', 'Kluyver', role = c('aut', 'cph'), email = 'thomas@kluyver.me.uk'),
     person('Philipp', 'Angerer', role = c('aut', 'cph', 'cre'), email = 'phil.angerer@gmail.com', comment = c(ORCID = "0000-0002-0369-2888")),
