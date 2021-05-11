@@ -20,7 +20,6 @@ SystemRequirements:
     jupyter,
     jupyter_kernel_test (Python package for testing)
 License: MIT + file LICENSE
-LazyData: true
 Encoding: UTF-8
 Imports:
     repr (>= 0.4.99),
