@@ -103,6 +103,10 @@ display_data = function(data, metadata = NULL) {
     invisible(TRUE)
 },
 
+clear_output = function(wait = TRUE) {
+    send_response('clear_output', current_request, 'iopub', list(wait = wait))
+},
+
 page = function(mimebundle) {
     payload <<- c(payload, list(c(source = 'page', mimebundle)))
 },
@@ -352,16 +356,19 @@ execute = function(request) {
 initialize = function(...) {
     execution_count <<- 1L
     err <<- list()
-    options(pager = function(files, header, title, delete.file) {
-        text <- title
-        for (path in files) {
-            text <- c(text, header, readLines(path))
-        }
-        if (delete.file) file.remove(files)
-        data <- list('text/plain' = paste(text, collapse = '\n'))
-        page(list(data=data, metadata=namedlist()))
-    })
-    options(jupyter.base_display_func = .self$display_data)
+    options(
+        pager = function(files, header, title, delete.file) {
+            text <- title
+            for (path in files) {
+                text <- c(text, header, readLines(path))
+            }
+            if (delete.file) file.remove(files)
+            data <- list('text/plain' = paste(text, collapse = '\n'))
+            page(list(data=data, metadata=namedlist()))
+        },
+        jupyter.base_display_func = .self$display_data,
+        jupyter.clear_output_func = .self$clear_output
+    )
     # Create the shadow env here and detach it finalize
     # so it's available for the whole lifetime of the kernel.
     .BaseNamespaceEnv$attach(NULL, name = 'jupyter:irkernel')
