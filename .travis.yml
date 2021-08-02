@@ -1,6 +1,5 @@
-dist: bionic
+dist: focal
 language: r
-sudo: false
 cache: packages
 
 branches:
