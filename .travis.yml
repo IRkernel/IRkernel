@@ -10,7 +10,7 @@ branches:
 # so restrict the build matrix to multiples of that.
 # Also put the most important builds (-> release on both os)
 # into the first batch
-matrix:
+jobs:
   include:
   - r: release
     env: DEPS=cran
