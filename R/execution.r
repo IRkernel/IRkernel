@@ -85,6 +85,10 @@ should_store_history = function() {
     !is.null(sh) && sh
 },
 
+should_stop_on_error = function() {
+    current_request$content$stop_on_error
+},
+
 send_error_msg = function(msg) {
     if (is_silent()) return()
     send_response('stream', current_request, 'iopub',
@@ -342,7 +346,7 @@ execute = function(request) {
     
     send_response('execute_reply', request, 'shell', reply_content)
 
-    if (interrupted || !is.null(err$ename)) {
+    if (interrupted || (!is.null(err$ename) && should_stop_on_error())) {
         # errors or interrupts should interrupt all currently queued messages,
         # not only the currently running one...
         abort_queued_messages()
