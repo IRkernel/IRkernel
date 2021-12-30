@@ -31,6 +31,8 @@ jobs:
         with:
           extra-packages: any::rcmdcheck
           needs: check
+      - if: runner.os == 'macOS'
+        run: brew install --cask xquartz
       # Python & Jupyter
       - uses: actions/setup-python@v2
         with:
