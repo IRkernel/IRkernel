@@ -20,7 +20,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-        submodules: yes
+        with:
+          submodules: yes
       # R
       - name: Set up R ${{ matrix.r-version }}
         uses: r-lib/actions/setup-r@v2
