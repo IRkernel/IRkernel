@@ -12,7 +12,7 @@ import unittest
 import jupyter_kernel_test as jkt
 
 from jupyter_client.manager import start_new_kernel
-from jupyter_kernel_test.messagespec import validate_message
+from jupyter_kernel_test import validate_message
 
 
 without_rich_display = '''\
