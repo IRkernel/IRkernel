@@ -35,6 +35,6 @@ jobs:
       - uses: actions/setup-python@v2
         with:
           python-version: '3.x'
-      - run: pip install jupyter jupyter-client
+      - run: pip install jupyter jupyter-client ndjson-testrunner jupyter-kernel-test
       # Checks
       - uses: r-lib/actions/check-r-package@v2
