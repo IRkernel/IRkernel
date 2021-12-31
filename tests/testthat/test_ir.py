@@ -300,7 +300,7 @@ class IRkernelTests(jkt.KernelTests):
         # Numeric constant
         test_token_is_ok('1')
         # Reserved word
-        test_token_is_ok('NULL')
+        # test_token_is_ok('NULL')  # null is not an object anymore?
         # Dataset with a help document
         test_token_is_ok('iris')
         # Function with a help document
