@@ -9,12 +9,15 @@
 #' @param displayname  The name which is displayed in the notebook (default: "R")
 #' @param rprofile     (optional) Path to kernel-specific Rprofile (defaults to system-level settings)
 #' @param prefix       (optional) Path to alternate directory to install kernelspec into (default: NULL)
-#' @param sys_prefix   (optional) Install kernelspec using the "--sys-prefix" option of the currently detected jupyter (default: NULL)
+#' @param sys_prefix   (optional) Install kernelspec using the \code{--sys-prefix} option of the currently detected jupyter (default: NULL)
+#' @param verbose      (optional) If \code{FALSE}, silence output of \code{install}
 #' 
 #' @return Exit code of the \code{jupyter kernelspec install} call.
 #' 
 #' @export
-installspec <- function(user = NULL, name = 'ir', displayname = 'R', rprofile = NULL, prefix = NULL, sys_prefix = NULL) {
+installspec <- function(
+    user = NULL, name = 'ir', displayname = 'R', rprofile = NULL, prefix = NULL, sys_prefix = NULL, verbose = getOption('verbose')
+) {
     exit_code <- system2('jupyter', c('kernelspec', '--version'), FALSE, FALSE)
     if (exit_code != 0)
         stop('jupyter-client has to be installed but ', dQuote('jupyter kernelspec --version'), ' exited with code ', exit_code, '.\n')
@@ -40,8 +43,9 @@ installspec <- function(user = NULL, name = 'ir', displayname = 'R', rprofile = 
     
     user_flag <- if (user) '--user' else character(0)
     prefix_flag <- if (!is.null(prefix)) c('--prefix', prefix) else character(0) 
-    sys_prefix_flag <- if (!is.null(sys_prefix)) c('--sys-prefix', prefix) else character(0) 
-    args <- c('kernelspec', 'install', '--replace', '--name', name, user_flag, prefix_flag, sys_prefix_flag, file.path(tmp_name, 'kernelspec'))
+    sys_prefix_flag <- if (!is.null(sys_prefix)) c('--sys-prefix', prefix) else character(0)
+    quiet_flag <- if (!verbose) '--log-level=WARN' else character(0)
+    args <- c('kernelspec', 'install', '--replace', '--name', name, user_flag, prefix_flag, sys_prefix_flag, quiet_flag, file.path(tmp_name, 'kernelspec'))
     exit_code <- system2('jupyter', args)
     
     unlink(tmp_name, recursive = TRUE)

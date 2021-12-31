@@ -10,7 +10,8 @@ installspec(
   displayname = "R",
   rprofile = NULL,
   prefix = NULL,
-  sys_prefix = NULL
+  sys_prefix = NULL,
+  verbose = getOption("verbose")
 )
 }
 \arguments{
@@ -24,7 +25,9 @@ installspec(
 
 \item{prefix}{(optional) Path to alternate directory to install kernelspec into (default: NULL)}
 
-\item{sys_prefix}{(optional) Install kernelspec using the "--sys-prefix" option of the currently detected jupyter (default: NULL)}
+\item{sys_prefix}{(optional) Install kernelspec using the \code{--sys-prefix} option of the currently detected jupyter (default: NULL)}
+
+\item{verbose}{(optional) If \code{FALSE}, silence output of \code{install}}
 }
 \value{
 Exit code of the \code{jupyter kernelspec install} call.
