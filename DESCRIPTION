@@ -48,4 +48,4 @@ Collate:
     'kernel.r'
     'main.r'
     'onload.r'
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2
