@@ -1,7 +1,7 @@
-# Native R kernel for Jupyter [![b-Travis]][Travis] [![b-CRAN]][CRAN]
+# Native R kernel for Jupyter [![b-CI]][CI] [![b-CRAN]][CRAN]
 
-[b-Travis]: https://travis-ci.com/IRkernel/IRkernel.svg?branch=master "Build status"
-[Travis]: https://travis-ci.com/IRkernel/IRkernel
+[b-CI]: https://github.com/IRkernel/IRkernel/actions/workflows/r.yml/badge.svg "Build status"
+[CI]: https://github.com/IRkernel/IRkernel/actions/workflows/r.yml
 [b-CRAN]: https://www.r-pkg.org/badges/version/IRkernel "Comprehensive R Archive Network"
 [CRAN]: https://cran.r-project.org/package=IRkernel
 

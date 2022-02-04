@@ -13,3 +13,4 @@ example-notebooks/.*$
 ^tests/testthat/njr/[^n][^d][^j].*$
 Dockerfile
 cran-comments.md
+^LICENSE\.md$
