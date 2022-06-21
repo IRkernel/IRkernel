@@ -13,7 +13,7 @@ completions <- function(code, cursor_pos = nchar(code), fixup = TRUE) {
 
     # guard from errors when completion is invoked in empty cells 
     if (is.null(line)) {
-        return(list())
+        line <- ''
     }
     
     
