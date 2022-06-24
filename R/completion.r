@@ -10,6 +10,12 @@ completions <- function(code, cursor_pos = nchar(code), fixup = TRUE) {
         cursor_pos <- new_cursor_pos
         chars_before_line <- chars_before_line + nchar(line) + 1L
     }
+
+    # guard from errors when completion is invoked in empty cells 
+    if (is.null(line)) {
+        line <- ''
+    }
+    
     
     # the completion docs say:
     # > they are unexported because they are not meant to be called directly by users
