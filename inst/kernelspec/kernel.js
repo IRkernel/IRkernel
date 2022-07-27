@@ -14,9 +14,9 @@ const edit_actions = [
 		name: 'R Pipe',
 		shortcut: `Shift-${cmd_key}-M`,
 		icon: 'fa-angle-right',
-		help: 'R: Inserts the magrittr pipe operator (%>%)',
+		help: 'R: Inserts the magrittr pipe operator (|>)',
 		handler(cm) {
-			cm.replaceSelection(' %>% ')
+			cm.replaceSelection(' |> ')
 		},
 	},
 	{
