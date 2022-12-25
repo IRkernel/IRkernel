@@ -157,10 +157,10 @@ abort_queued_messages = function() {
         log_debug('abort loop: before poll')
         ret <- zmq.poll(
             c(sockets$shell), # only shell channel
-            c(.pbd_env$ZMQ.PO$POLLIN), # type
+            c(ZMQ.PO()$POLLIN), # type
             0) # zero timeout, only what's already there
         log_debug('abort loop: after poll')
-        if (bitwAnd(zmq.poll.get.revents(1), .pbd_env$ZMQ.PO$POLLIN)) {
+        if (bitwAnd(zmq.poll.get.revents(1), ZMQ.PO()$POLLIN)) {
             log_debug('abort loop: found msg')
             abort_shell_msg()
         } else {
@@ -180,9 +180,9 @@ handle_stdin = function() {
     while (TRUE) {
         log_debug('stdin loop: beginning')
         zmq.poll(c(sockets$stdin),          # only stdin channel
-                 c(.pbd_env$ZMQ.PO$POLLIN)) # type
+                 c(ZMQ.PO()$POLLIN)) # type
         
-        if (bitwAnd(zmq.poll.get.revents(1), .pbd_env$ZMQ.PO$POLLIN)) {
+        if (bitwAnd(zmq.poll.get.revents(1), ZMQ.PO()$POLLIN)) {
             log_debug('stdin loop: found msg')
             parts <- zmq.recv.multipart(sockets$stdin, unserialize = FALSE)
             msg <- wire_to_msg(parts)
@@ -360,15 +360,15 @@ initialize = function(connection_file) {
     # ZMQ Socket setup
     zmqctx <<- zmq.ctx.new()
     sockets <<- list(
-        hb      = zmq.socket(zmqctx, .pbd_env$ZMQ.ST$REP),
-        iopub   = zmq.socket(zmqctx, .pbd_env$ZMQ.ST$PUB),
-        control = zmq.socket(zmqctx, .pbd_env$ZMQ.ST$ROUTER),
-        stdin   = zmq.socket(zmqctx, .pbd_env$ZMQ.ST$ROUTER),
-        shell   = zmq.socket(zmqctx, .pbd_env$ZMQ.ST$ROUTER))
+        hb      = zmq.socket(zmqctx, ZMQ.ST()$REP),
+        iopub   = zmq.socket(zmqctx, ZMQ.ST()$PUB),
+        control = zmq.socket(zmqctx, ZMQ.ST()$ROUTER),
+        stdin   = zmq.socket(zmqctx, ZMQ.ST()$ROUTER),
+        shell   = zmq.socket(zmqctx, ZMQ.ST()$ROUTER))
     
     # Enable handover: https://github.com/IRkernel/IRkernel/issues/508
     for (router in sockets[c('control', 'stdin', 'shell')]) {
-        zmq.setsockopt(router, .pbd_env$ZMQ.SO$ROUTER_HANDOVER, 1L)
+        zmq.setsockopt(router, ZMQ.SO()$ROUTER_HANDOVER, 1L)
     }
     
     zmq.bind(sockets$hb,      url_with_port('hb_port'))
@@ -394,7 +394,7 @@ run = function() {
         r <- tryCatch(
             zmq.poll(
                 c(sockets$hb, sockets$shell, sockets$control),
-                rep(.pbd_env$ZMQ.PO$POLLIN, 3),
+                rep(ZMQ.PO()$POLLIN, 3),
                 MC = ZMQ.MC(check.eintr = TRUE)),
             interrupt = function(e) list(0L, 'SIGINT'))
         log_debug('main loop: after poll. ZMQ code: %s; Errno: %s', r[[1L]], r[[2L]])
@@ -411,13 +411,13 @@ run = function() {
         # the easiest seems to be to handle this in a big if .. else if .. else
         # clause...
         # https://github.com/IRkernel/IRkernel/pull/266
-        if (bitwAnd(zmq.poll.get.revents(1), .pbd_env$ZMQ.PO$POLLIN)) {
+        if (bitwAnd(zmq.poll.get.revents(1), ZMQ.PO()$POLLIN)) {
             log_debug('main loop: hb')
             hb_reply()
-        } else if (bitwAnd(zmq.poll.get.revents(2), .pbd_env$ZMQ.PO$POLLIN)) {
+        } else if (bitwAnd(zmq.poll.get.revents(2), ZMQ.PO()$POLLIN)) {
             log_debug('main loop: shell')
             handle_shell()
-        } else if (bitwAnd(zmq.poll.get.revents(3), .pbd_env$ZMQ.PO$POLLIN)) {
+        } else if (bitwAnd(zmq.poll.get.revents(3), ZMQ.PO()$POLLIN)) {
             log_debug('main loop: control')
             handle_control()
         } else {
