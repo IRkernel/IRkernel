@@ -35,7 +35,7 @@
 #' @import digest
 #' @importFrom pbdZMQ zmq.ctx.new zmq.socket zmq.bind zmq.getsockopt zmq.setsockopt
 #' @importFrom pbdZMQ zmq.send zmq.recv zmq.msg.send zmq.msg.recv zmq.send.multipart zmq.recv.multipart
-#' @importFrom pbdZMQ zmq.poll zmq.poll.get.revents ZMQ.MC
+#' @importFrom pbdZMQ zmq.poll zmq.poll.get.revents ZMQ.MC ZMQ.PO ZMQ.ST ZMQ.SO
 #' @importFrom evaluate evaluate new_output_handler parse_all
 #' @importFrom jsonlite fromJSON toJSON
 #' @importFrom IRdisplay publish_mimebundle prepare_mimebundle
