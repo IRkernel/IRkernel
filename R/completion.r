@@ -34,7 +34,7 @@ completions <- function(code, cursor_pos = nchar(code), fixup = TRUE) {
     in_string <- substr(code, start_position, start_position) %in% c("'", '"')
 
     comps <- get('.retrieveCompletions', utils_ns)()
-    if (fixup && !in_string) comps <- fixup_comps(comps)
+    if (fixup && !in_string && length(comps)) comps <- fixup_comps(comps)
     list(
         comps = comps,
         start = start_position,
@@ -45,18 +45,29 @@ completions <- function(code, cursor_pos = nchar(code), fixup = TRUE) {
 fixup_comps <- function(comps) {
     # TODO: only do this if we are not in a string or so
     re_trail <- '=|::'
-    re_lead <- '[\\w\\d._]+(?:\\$|@|:::?)'  # TODO: allow foo$`_bar`$baz<tab>
-    
+
     # split off leading and trailing parts
     trailing <- gsub(sprintf('^.*?(%s)?$', re_trail), '\\1', comps, perl = TRUE)
     comps <- gsub(sprintf('(%s)$', re_trail), '', comps, perl = TRUE)
-    leading <- gsub(sprintf('^((%s)*).*?$', re_lead), '\\1', comps, perl = TRUE)
-    comps <- gsub(sprintf('^(%s)+', re_lead), '', comps, perl = TRUE)
+
+    # split off everything before the last special operator (a la utils:::specialOpLocs)
+    lead_matches <- gregexpr("(?<=[$])|(?<=@)|(?<=[^:]::)|(?<=:::)", comps, perl = TRUE)
+    last_match <- vapply(lead_matches, utils::tail, n = 1L, integer(1L))
+    has_match <- last_match > 0L
+    leading <- character(length(comps))
+    leading[!has_match] <- ""
+    leading[has_match] <- substr(comps[has_match], 1L, last_match - 1L)
+    comps[has_match] <- substr(comps[has_match], last_match, nchar(comps[has_match]))
     
-    # wrap non-identifiers with ``
-    # https://cran.r-project.org/doc/manuals/r-release/R-lang.html#Identifiers
-    comps <- gsub('^(_.*?|[.]{2,}.*?|.*?[^\\w\\d._].*?|.*?[.]\\d)$', '`\\1`', comps, perl = TRUE)
-    
+    # wrap non-identifiers with ``; h/t the related r-devel thread:
+    #   https://stat.ethz.ch/pipermail/r-devel/2023-March/082388.html
+    non_empty <- nzchar(comps)
+    comps[non_empty] <- vapply(
+        comps[non_empty],
+        function(nm) paste(deparse(as.name(nm), backtick = TRUE), collapse = " "),
+        character(1L)
+    )
+
     # good coding style for completions
     trailing <- gsub('=', ' = ', trailing)
     comps <- paste0(leading, comps, trailing)
