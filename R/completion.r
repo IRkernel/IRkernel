@@ -57,8 +57,7 @@ fixup_comps <- function(comps) {
     lead_matches <- gregexpr("(?<=[$])|(?<=@)|(?<=[^:]::)|(?<=:::)", comps, perl = TRUE)
     last_match <- vapply(lead_matches, utils::tail, n = 1L, integer(1L))
     has_match <- last_match > 0L
-    leading <- character(length(comps))
-    leading[!has_match] <- ""
+    leading <- rep("", length(comps))
     leading[has_match] <- substr(comps[has_match], 1L, last_match - 1L)
     comps[has_match] <- substr(comps[has_match], last_match, nchar(comps[has_match]))
     
@@ -67,6 +66,7 @@ fixup_comps <- function(comps) {
     non_empty <- nzchar(comps)
     comps[non_empty] <- vapply(
         comps[non_empty],
+        # TODO(R>=4.0.0) use deparse1() for brevity
         function(nm) paste(deparse(as.name(nm), backtick = TRUE), collapse = " "),
         character(1L)
     )
