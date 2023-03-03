@@ -55,7 +55,7 @@ fixup_comps <- function(comps) {
     #   match.length. Separate look-behind conditions because each one must have a
     #   fixed length.
     lead_matches <- gregexpr("(?<=[$])|(?<=@)|(?<=[^:]::)|(?<=:::)", comps, perl = TRUE)
-    last_match <- vapply(lead_matches, utils::tail, n = 1L, integer(1L))
+    last_match <- vapply(lead_matches, tail, n = 1L, integer(1L))
     has_match <- last_match > 0L
     leading <- rep("", length(comps))
     leading[has_match] <- substr(comps[has_match], 1L, last_match - 1L)
