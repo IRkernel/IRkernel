@@ -51,6 +51,9 @@ fixup_comps <- function(comps) {
     comps <- gsub(sprintf('(%s)$', re_trail), '', comps, perl = TRUE)
 
     # split off everything before the last special operator (a la utils:::specialOpLocs)
+    # NB: use look-behind so that we can use the output directly without worrying about
+    #   match.length. Separate look-behind conditions because each one must have a
+    #   fixed length.
     lead_matches <- gregexpr("(?<=[$])|(?<=@)|(?<=[^:]::)|(?<=:::)", comps, perl = TRUE)
     last_match <- vapply(lead_matches, utils::tail, n = 1L, integer(1L))
     has_match <- last_match > 0L
@@ -69,7 +72,7 @@ fixup_comps <- function(comps) {
     )
 
     # good coding style for completions
-    trailing <- gsub('=', ' = ', trailing)
+    trailing <- gsub('=', ' = ', trailing, fixed = TRUE)
     comps <- paste0(leading, comps, trailing)
     comps[comps == "... = "] <- "..."
     comps
