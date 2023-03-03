@@ -58,8 +58,9 @@ fixup_comps <- function(comps) {
     last_match <- vapply(lead_matches, tail, n = 1L, integer(1L))
     has_match <- last_match > 0L
     leading <- rep("", length(comps))
-    leading[has_match] <- substr(comps[has_match], 1L, last_match - 1L)
-    comps[has_match] <- substr(comps[has_match], last_match, nchar(comps[has_match]))
+    comps_with_leading <- comps[has_match]
+    leading[has_match] <- substr(comps_with_leading, 1L, last_match - 1L)
+    comps[has_match] <- substr(comps_with_leading, last_match, nchar(comps_with_leading))
     
     # wrap non-identifiers with ``; h/t the related r-devel thread:
     #   https://stat.ethz.ch/pipermail/r-devel/2023-March/082388.html
