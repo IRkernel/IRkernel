@@ -71,5 +71,6 @@ fixup_comps <- function(comps) {
     # good coding style for completions
     trailing <- gsub('=', ' = ', trailing)
     comps <- paste0(leading, comps, trailing)
-    gsub('^`[.][.][.]` = $', '...', comps)
+    comps[comps == "... = "] <- "..."
+    comps
 }
