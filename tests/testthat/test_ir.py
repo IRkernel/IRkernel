@@ -267,66 +267,44 @@ class IRkernelTests(jkt.KernelTests):
         self.assertEqual(execution_count_1, execution_count_2)
         self.assertEqual(execution_count_1, execution_count_3)
 
+    irkernel_inspects = [
+        dict(name='Numeric constant', token='1'),
+        # dict(name='Reserved word', token='NULL'),  # null is not an object anymore?
+        dict(name='Dataset with a help document', token='iris'),
+        dict(name='Function with a help document', token='c'),
+        dict(name='Function name with namespace', token='base::c'),
+        dict(name='Function not exported from namespace', token='tools:::.Rd2pdf'),
+        dict(name='User-defined variable', token='x', vars=dict(x='1')),
+        dict(name='User-defined function', token='f', vars=dict(f='function (x) x + x')),
+        dict(name='Object which masks other object in workspace', token='c', vars=dict(c='function (x) x + x')),
+    ]
+
     def test_irkernel_inspects(self):
-        """Test if object inspection works."""
+        """Test if object inspection works.
+
+        Checks if inspect_request for rach `token` returns a reply.
+
+        Currently just test if the kernel replys without an error and not care about its content.
+        Because the contents of inspections are still so arguable.
+        When the requirements for the contents are decided, fix the tests and check the contents.
+        """
         self.flush_channels()
 
-        def test_token_is_ok(token, preprocess=None, postprocess=None):
-            """Check if inspect_request for the `token` returns a reply.
-
-            Run code in `preprocess` before requesting if it's given,
-            and `proprocess` after requesting.
-
-            Currently just test if the kernel replys without an error
-            and not care about its content.
-            Because the contents of inspections are still so arguable.
-            When the requirements for the contents are decided,
-            fix the tests beow and check the contents.
-            """
-            if preprocess:
-                self._execute_code(preprocess, tests=False)
-
-            msg_id = self.kc.inspect(token)
-            reply = self.kc.get_shell_msg(timeout=TIMEOUT)
-            validate_message(reply, 'inspect_reply', msg_id)
-
-            self.assertEqual(reply['content']['status'], 'ok')
-            self.assertTrue(reply['content']['found'])
-            self.assertGreaterEqual(len(reply['content']['data']), 1)
-
-            if postprocess:
-                self._execute_code(postprocess, tests=False)
-
-        # Numeric constant
-        test_token_is_ok('1')
-        # Reserved word
-        # test_token_is_ok('NULL')  # null is not an object anymore?
-        # Dataset with a help document
-        test_token_is_ok('iris')
-        # Function with a help document
-        test_token_is_ok('c')
-        # Function name with namespace
-        test_token_is_ok('base::c')
-        # Function not exported from namespace
-        test_token_is_ok('tools:::.Rd2pdf')
-        # User-defined variable
-        test_token_is_ok(
-            'x',
-            preprocess='x <- 1',
-            postprocess='rm("x")'
-        )
-        # User-defined function
-        test_token_is_ok(
-            'f',
-            preprocess='f <- function (x) x + x',
-            postprocess='rm("f")'
-        )
-        # Object which masks other object in workspace
-        test_token_is_ok(
-            'c',
-            preprocess='c <- function (x) x + x',
-            postprocess='rm("c")'
-        )
+        for sample in self.irkernel_inspects:
+            with self.subTest(text=sample["name"]):
+                for var_name, var_code in sample.get('vars', {}).items():
+                    self._execute_code(f'{var_name} <- {var_code}', tests=False)
+    
+                msg_id = self.kc.inspect(sample["token"])
+                reply = self.kc.get_shell_msg(timeout=TIMEOUT)
+                validate_message(reply, 'inspect_reply', msg_id)
+    
+                self.assertEqual(reply['content']['status'], 'ok')
+                self.assertTrue(reply['content']['found'])
+                self.assertGreaterEqual(len(reply['content']['data']), 1)
+    
+                for var_name in sample.get('vars', {}):
+                    self._execute_code(f'rm("{var_name}")', tests=False)
 
 
 if __name__ == '__main__':
