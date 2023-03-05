@@ -319,7 +319,7 @@ class IRkernelTests(jkt.KernelTests):
     def test_non_syntactic_completions(self):
         """Test tab-completion for non-syntactic names which require setup/teardown"""
 
-        for sample in non_syntactic_completion_samples:
+        for sample in self.non_syntactic_completion_samples:
             with self.subTest(text=sample['text']):
                 for var_name, var_value in sample['vars'].items():
                     self._execute_code(f'{var_name} <- {var_value}', tests=False)
