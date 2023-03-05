@@ -306,6 +306,30 @@ class IRkernelTests(jkt.KernelTests):
                 for var_name in sample.get('vars', {}):
                     self._execute_code(f'rm("{var_name}")', tests=False)
 
+    non_syntactic_completion_samples = [
+        dict(text='xx$host[[1]]$h', matches=['xx$host[[1]]$h1', 'xx$host[[1]]$h2'], vars=dict(xx='list(host = list(list(h1 = 1, h2 = 2), list(h3 = 3, h4 = 4)))')),
+        dict(text='odd_named_list$a', matches=['odd_named_list$a'], vars=dict(odd_named_list='list(a = 1, b = 2, `b c` = 3, 4, 5)')),
+        dict(text='odd_named_list$b', matches=['odd_named_list$b', 'odd_named_list$`b c`'], vars=dict(odd_named_list='list(a = 1, b = 2, `b c` = 3, 4, 5)')),
+        dict(text='odd_named_list$', matches=['odd_named_list$a', 'odd_named_list$`b c`', r'odd_named_list$`\`\\\``', 'odd_named_list$'], vars=dict(odd_named_list='list(a = 1, b = 2, `b c` = 3, 4, 5)')),
+        dict(text='arith_named_env$a', matches=['arith_named_env$`abc+def`', 'arith_named_env$`abc-def`'], vars=dict(arith_named_env='list2env(list(`abc+def` = 1, `def-abc` = 2, `abc-def` = 3, defabc = 4))')),
+        dict(text='arith_named_env$def', matches=['arith_named_env$`def-abc`', 'arith_named_env$defabc'], vars=dict(arith_named_env='list2env(list(`abc+def` = 1, `def-abc` = 2, `abc-def` = 3, defabc = 4))')),
+        dict(text='arith_named_env$', matches=['arith_named_env$`abc+def`', 'arith_named_env$`def-abc`', 'arith_named_env$`abc-def`', 'arith_named_env$defabc'], vars=dict(arith_named_env='list2env(list(`abc+def` = 1, `def-abc` = 2, `abc-def` = 3, defabc = 4))')),
+    ]
+
+    def test_non_syntactic_completions(self):
+        """Test tab-completion for non-syntactic names which require setup/teardown"""
+
+        for sample in non_syntactic_completion_samples:
+            with self.subTest(text=sample['text']):
+                for var_name, var_value in sample['vars'].items():
+                    self._execute_code(f'{var_name} <- {var_value}', tests=False)
+                msg_id = self.kc.complete(sample['text'])
+                reply = self.get_non_kernel_info_reply()
+                validate_message(reply, 'complete_reply', msg_id)
+                self.assertEqual(set(reply['content']['matches']), set(sample['matches']))
+
+                for var_name in sample['vars']:
+                    self._execute_code(f'rm({var_name})', tests=False)
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)
