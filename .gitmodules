@@ -1,6 +1,0 @@
-[submodule "tests/testthat/jkt"]
-	path = tests/testthat/jkt
-	url = https://github.com/jupyter/jupyter_kernel_test.git
-[submodule "tests/testthat/njr"]
-	path = tests/testthat/njr
-	url = https://github.com/flying-sheep/ndjson-testrunner.git

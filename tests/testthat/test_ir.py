@@ -5,14 +5,10 @@ import os
 import sys
 from pathlib import Path
 
-HERE = Path(__file__).parent
-sys.path.insert(0, str(HERE / 'jkt'))
-
 import unittest
-import jupyter_kernel_test as jkt
 
 from jupyter_client.manager import start_new_kernel
-from jupyter_kernel_test import validate_message
+from jupyter_kernel_test import validate_message, KernelTests
 
 
 without_rich_display = '''\
@@ -26,7 +22,7 @@ options(jupyter.rich_display = TRUE)
 TIMEOUT = 15
 
 
-class IRkernelTests(jkt.KernelTests):
+class IRkernelTests(KernelTests):
     kernel_name = os.environ.get('IR_KERNEL_NAME', 'testir')
 
     language_name = 'R'

@@ -1,0 +1,4 @@
+jupyter
+jupyter-client
+ndjson-testrunner
+jupyter-kernel-test>=0.5.0
