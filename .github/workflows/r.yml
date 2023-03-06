@@ -13,7 +13,7 @@ jobs:
 
     strategy:
       matrix:
-        r-version: ['oldrel-1', 'release']
+        r-version: ['oldrel-1', 'release', 'devel']
         os: [ubuntu-latest, macos-latest]
 
     env:
@@ -39,6 +39,7 @@ jobs:
         with:
           python-version: '3.x'
           cache: 'pip'
-      - run: pip install jupyter jupyter-client ndjson-testrunner jupyter-kernel-test
+          cache-dependency-path: 'tests/requirements.txt'
+      - run: pip install -r tests/requirements.txt
       # Checks
       - uses: r-lib/actions/check-r-package@v2
