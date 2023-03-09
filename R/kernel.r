@@ -334,6 +334,9 @@ handle_control = function() {
     if (msg$header$msg_type == 'shutdown_request') {
         log_debug('Control: shutdown...')
         shutdown(msg)
+    } else if (msg$header$msg_type == 'kernel_info_request') {
+        log_debug('Control: kernel_info')
+        kernel_info(msg)
     } else {
         log_debug(paste('Unhandled control message, msg_type:', msg$header$msg_type))
     }
