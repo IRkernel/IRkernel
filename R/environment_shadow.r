@@ -128,8 +128,18 @@ init_null_device <- function() {
     
     ok_device     <- switch(os, win = png,   osx = pdf,  unix = png)
     null_filename <- switch(os, win = 'NUL', osx = NULL, unix = '/dev/null')
+    has_units_arg <- 'units' %in% names(formals(ok_device))
     
-    null_device <- function(filename = null_filename, ...) ok_device(filename, ...)
+    null_device <- function(
+        filename = null_filename,
+        width = getOption('repr.plot.width'),
+        height = getOption('repr.plot.width'),
+        units = 'in',
+        ...
+    ) {
+        if (has_units_arg) ok_device(filename, width, height, units, ...)
+        else ok_device(filename, width, height, ...)
+    }
     
     if (identical(getOption('device'), pdf)) {
         options(device = null_device)
