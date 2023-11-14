@@ -16,5 +16,7 @@ test_that('skip_repeated works on tracebacks', {
         f(1)
     }), new.env())
     skipped_stack <- skip_repeated(err$calls)
-    expect_type(skipped_stack[[1]], 'language')
+    # See discussion in #741 about using inherits() here and not
+    #   expect_type(., "language") or expect_true(is.call(.)) or expect_mode(., "call")
+    expect_true(inherits(skipped_stack[[1]], 'call'))
 })
