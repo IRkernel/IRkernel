@@ -11,7 +11,8 @@ installspec(
   rprofile = NULL,
   prefix = NULL,
   sys_prefix = NULL,
-  verbose = getOption("verbose")
+  verbose = getOption("verbose"),
+  env = NULL
 )
 }
 \arguments{
@@ -28,6 +29,8 @@ installspec(
 \item{sys_prefix}{(optional) Install kernelspec using the \code{--sys-prefix} option of the currently detected jupyter (default: NULL)}
 
 \item{verbose}{(optional) If \code{FALSE}, silence output of \code{install}}
+
+\item{env}{(optional) Named list of environment variables to set in the kernel (default: NULL)}
 }
 \value{
 Exit code of the \code{jupyter kernelspec install} call.

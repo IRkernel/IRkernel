@@ -11,12 +11,13 @@
 #' @param prefix       (optional) Path to alternate directory to install kernelspec into (default: NULL)
 #' @param sys_prefix   (optional) Install kernelspec using the \code{--sys-prefix} option of the currently detected jupyter (default: NULL)
 #' @param verbose      (optional) If \code{FALSE}, silence output of \code{install}
+#' @param env          (optional) Named list of environment variables to set in the kernel (default: NULL)
 #' 
 #' @return Exit code of the \code{jupyter kernelspec install} call.
 #' 
 #' @export
 installspec <- function(
-    user = NULL, name = 'ir', displayname = 'R', rprofile = NULL, prefix = NULL, sys_prefix = NULL, verbose = getOption('verbose')
+    user = NULL, name = 'ir', displayname = 'R', rprofile = NULL, prefix = NULL, sys_prefix = NULL, verbose = getOption('verbose'), env = NULL
 ) {
     exit_code <- system2('jupyter', c('kernelspec', '--version'), FALSE, FALSE)
     if (exit_code != 0)
@@ -36,9 +37,15 @@ installspec <- function(
     spec <- fromJSON(spec_path)
     spec$argv[[1]] <- file.path(R.home('bin'), 'R')
     spec$display_name <- displayname
-    if (!is.null(rprofile)) {
-        spec$env <- list(R_PROFILE_USER = rprofile)
-    }
+
+    if (!is.null(env) && is.list(env))
+        spec$env <- env
+    else
+        spec$env <- list()
+
+    if (!is.null(rprofile))
+        spec$env$R_PROFILE_USER <- rprofile
+
     write(toJSON(spec, pretty = TRUE, auto_unbox = TRUE), file = spec_path)
     
     user_flag <- if (user) '--user' else character(0)
