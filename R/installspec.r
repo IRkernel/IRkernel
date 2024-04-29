@@ -38,11 +38,9 @@ installspec <- function(
     spec$argv[[1]] <- file.path(R.home('bin'), 'R')
     spec$display_name <- displayname
 
-    if (!is.null(env) && is.list(env))
-        spec$env <- env
-    else
-        spec$env <- list()
-
+    spec$env <- if (!is.null(env)) env else list()
+    if (!is.list(spec$env))
+        stop('`env` needs to be a named list')
     if (!is.null(rprofile))
         spec$env$R_PROFILE_USER <- rprofile
 
