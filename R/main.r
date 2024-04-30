@@ -12,5 +12,6 @@ main <- function(connection_file = '') {
     }
     log_debug('Starting the R kernel...')
     kernel <- Kernel$new(connection_file = connection_file)
+    runtime_env$kernel <- kernel
     kernel$run()
 }

@@ -89,19 +89,24 @@ new_reply = function(msg_type, parent_msg) {
     list(
         header        = header,
         parent_header = parent_msg$header,
-        identities    = parent_msg$identities,
-        # Ensure this is {} in JSON, not []
-        metadata      = namedlist())
+        identities    = parent_msg$identities)
 },
 
-send_response = function(msg_type, parent_msg, socket_name, content) {
+send_response = function(msg_type, parent_msg, socket_name, content, metadata) {
     "Send a response"
-    
+
+    if (is.null(parent_msg)) {
+        parent_msg <- runtime_env$kernel$executor$current_request
+    }
+    if (missing(metadata)) {
+        metadata <- namedlist()
+    }
     msg <- new_reply(msg_type, parent_msg)
     if (grepl('_reply$', msg_type) && is.null(content$status)) {
         content$status <- 'ok'
     }
     msg$content <- content
+    msg$metadata <- metadata
     socket <- sockets[[socket_name]]
     zmq.send.multipart(socket, msg_to_wire(msg), serialize = FALSE)
     log_debug('Sending msg %s.%s', socket_name, msg$header$msg_type)
