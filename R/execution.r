@@ -69,7 +69,7 @@ Executor <- setRefClass(
         abort_queued_messages = 'function',
         execution_count       = 'integer',
         payload               = 'list',
-	user_expressions      = 'list',
+        user_expressions      = 'list',
         err                   = 'list',
         interrupted           = 'logical',
         last_recorded_plot    = 'recordedplotOrNULL',
@@ -336,55 +336,52 @@ execute = function(request) {
 
     identifiers <- names(request$content$user_expressions)    
     for (name in identifiers) {
-      expr <- request$content$user_expressions[[name]]
-      log_debug('Evaluating expression %s: %s', name, expr)
-
-      expr_err <- NULL
-
-      handle_error <- function(e) {
-	    estr <- resilient_to_str(e)
-	    tryCatch({
-		log_debug('Error output: %s', estr)
-		calls <- head(sys.calls()[-seq_len(nframe + 1L)], -3)
-
-		calls <- skip_repeated(calls)
-
-		msg <- paste0(estr, 'Traceback:\n')
-		stack_info <- format_stack(calls)
-
+        expr <- request$content$user_expressions[[name]]
+        log_debug('Evaluating expression %s: %s', name, expr)
+        
+        expr_err <- NULL
+        
+        handle_error <- function(e) {
+            estr <- resilient_to_str(e)
+            tryCatch({
+                log_debug('Error output: %s', estr)
+                calls <- head(sys.calls()[-seq_len(nframe + 1L)], -3)
+                
+                calls <- skip_repeated(calls)
+                
+                msg <- paste0(estr, 'Traceback:\n')
+                stack_info <- format_stack(calls)
+                
                 expr_err <<- list(ename = 'ERROR', evalue = estr, traceback = as.list(c(msg, stack_info)))
-	    }, error = function(e2) {
-	    log_error('Error in handle_error! %s', resilient_to_str(e2))
-	    log_error('Caused when handling %s', estr)
-	    })
-      }
-      handle_value <- function(obj, visible) {
-	mimebundle <- prepare_mimebundle_kernel(obj, handle_error)
-	user_expressions[[name]] <<- c(
-	  list(status = 'ok'),
-	  mimebundle	
-	)
-      }      
-      handler <- new_output_handler(value=handle_value, error=handle_error)
-      tryCatch(
-	      evaluate(
-		expr,
-		envir = .GlobalEnv,
-		output_handler = handler,
-		stop_on_error = 1L
-	      ),
-        # Catch error in parsing
-	error = handle_error)
-      # Set error if any errors occurred
-      if (!is.null(expr_err)) {
-        user_expressions[[name]] <<- c(
-          list(status="error"),
-	  expr_err
-	)
-      }
+            }, error = function(e2) {
+                log_error('Error in handle_error! %s', resilient_to_str(e2))
+                log_error('Caused when handling %s', estr)
+            })
+        }
+        handle_value <- function(obj, visible) {
+            mimebundle <- prepare_mimebundle_kernel(obj, handle_error)
+            user_expressions[[name]] <<- c(
+                list(status = 'ok'),
+                mimebundle)
+        }      
+        handler <- new_output_handler(value=handle_value, error=handle_error)
+        tryCatch(
+            evaluate(
+                expr,
+                envir = .GlobalEnv,
+                output_handler = handler,
+                stop_on_error = 1L),
+            # Catch error in parsing
+            error = handle_error)
+        # Set error if any errors occurred
+        if (!is.null(expr_err)) {
+            user_expressions[[name]] <<- c(
+                list(status="error"),
+                expr_err)
+        }
     }
 
-     reply_content <- c(
+    reply_content <- c(
         list(
             status = status,
             execution_count = execution_count),
