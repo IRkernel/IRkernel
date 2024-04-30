@@ -268,7 +268,7 @@ execute = function(request) {
     # reset ...
     payload <<- list()
     err <<- list()
-    user_expressions <<- list()
+    user_expressions <<- namedlist()
     
     # shade base::readline
     replace_in_package('base', 'readline', .self$readline)
