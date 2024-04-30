@@ -378,7 +378,9 @@ initialize = function(...) {
     init_shadowenv()
     init_session()
     init_null_device()
-
+    
+    preflight_check()
+    
     callSuper(...)
 },
 finalize = function() {
